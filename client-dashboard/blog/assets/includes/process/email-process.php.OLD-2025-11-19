@@ -1,0 +1,307 @@
+<?php
+/*
+LOG NOTE: 2024-12-27 PRODUCTION  
+          2025-01-28 Bug Fix:   Re-Activation with Email Change in Profile Edit.
+*/
+    // Namespaces
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+if (!function_exists('send_ticket_email')){
+    function send_ticket_email($email, $id, $title, $msg, $priority, $category, $private, $status, $type, $name = '', $user_email = '') {
+    if (!mail_enabled) return;
+    // Ticket generic subject
+	$subject = 'Your ticket is #' . $id;
+    // Ticket create subject
+	$subject = $type == 'create' ? 'Your ticket has been created #' . $id :$subject;
+    // Ticket update subject
+    $subject = $type == 'update' ? 'Your ticket has been updated #' . $id : $subject;
+    // Ticket comment subject
+    $subject = $type == 'comment' ? 'Someone has replied to your ticket #' . $id : $subject;
+    // Ticket notification
+    $subject = $type == 'notification' ? 'A user has submitted a ticket #' . $id : $subject;
+    // Comment notification
+    $subject = $type == 'notification-comment' ? 'A user has replied on ticket #' . $id : $subject;
+    // Ticket URL
+    $link = site_menu_base . 'index.php';
+    // Include the ticket email template as a string
+    ob_start();
+    include tickets_directory_url . 'ticket-email-template.php';
+    $ticket_email_template = ob_get_clean();
+    // Include PHPMailer library
+    if (!class_exists('PHPMailer\PHPMailer\Exception')){
+    include public_path . 'lib/phpmailer/Exception.php';
+    include public_path . 'lib/phpmailer/PHPMailer.php';
+    include public_path . 'lib/phpmailer/SMTP.php';
+    }
+    // Create an instance; passing `true` enables exceptions
+    $mail = new PHPMailer(true);
+    try {
+        // SMTP Server settings
+        if (SMTP) {
+            $mail->isSMTP();
+            $mail->Host = smtp_host;
+            $mail->SMTPAuth = true;
+            $mail->Username = smtp_user;
+            $mail->Password = smtp_pass;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port = smtp_port;
+        }
+        // Recipients
+        $mail->setFrom(mail_from, no_reply_mail_name);
+        $mail->addAddress($email);
+        $mail->addReplyTo(mail_from, no_reply_mail_name);
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        // Body
+        $mail->Body = $ticket_email_template;
+        $mail->AltBody = strip_tags($ticket_email_template);
+        // Send mail
+        $mail->send();
+    } catch (Exception $e) {
+        // Output error message
+        exit('Error: Message could not be sent. Mailer Error: ' . $mail->ErrorInfo);
+    }
+}
+}//end function exists.
+
+/* Send email is a rework of send activation email 2 to include more than just activation.  It also does two factor authorization code, reset password functionality and resend activation functionality.  This keeps the emails consistant. */
+if (!function_exists('send_email')){
+function send_email($email, $code, $username, $type) {
+ //echo 'send mail parms: email: ' . $email . ' code: '  . $code . ' username: '  . $username . ' type: '  .  $type;
+    $body_template = "";
+    $link="";
+// Generic Email Subject
+	$subject = 'Action Required';
+// Two Factor Authorization
+	$subject = $type == 'twofactor' ? 'Your Access Code' :$subject;
+	$body_template = $type == 'twofactor' ? public_path . 'email_template_twofactor.php' :$body_template;
+	$link = $type == 'twofactor' ? $code :$link;
+// Account Activation subject
+	$subject = $type == 'activation' ? 'Account Activation Required' :$subject;
+	$body_template = $type == 'activation' ? public_path . 'activation-email-template.php' :$body_template;
+	$link = $type == 'activation' ? activation_link . '?email=' . $email . '&code=' . $code :$link;
+// Account Reset Password subject
+    $subject = $type == 'resetpass' ? 'Password Reset' : $subject;
+    $body_template = $type == 'resetpass' ? public_path . 'resetpass-email-template.php' :$body_template;
+    $link = $type == 'resetpass' ? reset_password_url . '?email=' . $_POST['email'] . '&code=' . $code :$link;
+    // Account other subject
+    $subject = $type == 'custom' ? 'Welcome to GlitchWizard Solutions!' : $subject;
+    // Include the email template as a string
+    ob_start();
+    include $body_template;
+    $email_template = ob_get_clean();
+    // Include PHPMailer library
+    include public_path . 'lib/phpmailer/Exception.php';
+    include public_path . 'lib/phpmailer/PHPMailer.php';
+    include public_path . 'lib/phpmailer/SMTP.php';
+    // Create an instance; passing `true` enables exceptions
+    $mail = new PHPMailer(true);
+    try {
+        // SMTP Server settings
+        if (SMTP) {
+            $mail->isSMTP();
+            $mail->Host = smtp_host;
+            $mail->SMTPAuth = true;
+            $mail->Username = smtp_user;
+            $mail->Password = smtp_pass;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port = smtp_port;
+        }
+        // Recipients
+        $mail->setFrom(mail_from, no_reply_mail_name);
+        $mail->addAddress($email);
+        $mail->addReplyTo(mail_from, no_reply_mail_name);
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        // Body
+        $mail->Body = $email_template;
+        $mail->AltBody = strip_tags($email_template);
+        // Send mail
+        $mail->send();
+    } catch (Exception $e) {
+        // Output error message
+        echo 'error';
+        exit('Error: Message could not be sent. Mailer Error: ' . $mail->ErrorInfo);
+    }
+}
+}//end function exists
+
+if (!function_exists('send_client_invoice_email')){
+// Send notification email function
+function send_client_invoice_email($invoice, $client, $subject = '') {
+	if (!mail_enabled) return;
+ // Include PHPMailer library
+    include public_path . 'lib/phpmailer/Exception.php';
+    include public_path . 'lib/phpmailer/PHPMailer.php';
+    include public_path . 'lib/phpmailer/SMTP.php';
+	// Create an instance; passing `true` enables exceptions
+	$mail = new PHPMailer(true);
+	try {
+		// Server settings
+		if (SMTP) {
+			$mail->isSMTP();
+			$mail->Host = smtp_host;
+			$mail->SMTPAuth = empty(smtp_user) && empty(smtp_pass) ? false : true;
+			$mail->Username = smtp_user;
+			$mail->Password = smtp_pass;
+			$mail->SMTPSecure = smtp_secure == 'tls' ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
+			$mail->Port = smtp_port;
+		}
+		// Recipients
+		$mail->setFrom(mail_from, mail_name);
+		$mail->addAddress($client['email'], rtrim($client['first_name'] . ' ' . $client['last_name'], ' '));
+		$mail->addReplyTo(mail_from, mail_name);
+		// Content
+		$mail->isHTML(true);
+        // Set UTF-8 charset
+        $mail->CharSet = 'UTF-8';
+        // Set email subject
+		$mail->Subject = empty($subject) ? 'Invoice #' . $invoice['invoice_number'] . ' from ' . company_name : $subject;
+		// Read the template contents and replace the placeholders with the variables
+		$email_template = str_replace(
+            ['%invoice_number%', '%first_name%', '%amount%', '%due_date%', '%link%'],
+            [$invoice['invoice_number'], $client['first_name'], number_format($invoice['payment_amount']+$invoice['tax_total'], 2), date('m/d/y', strtotime($invoice['due_date'])), 'https://glitchwizarddigitalsolutions.com/client-invoices/invoice.php?id=' . $invoice['invoice_number']],
+            file_get_contents(public_path . 'client-invoices/templates/client-email-template.html')
+        );
+        // Check if pdf atatchment is enabled
+        if (pdf_attachments && file_exists(public_path . '/client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf') && !$subject) {
+            // Include the PHPMailer class
+            $mail->AddAttachment(public_path . '/client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf', $invoice['invoice_number'] . '.pdf');
+        }
+		// Set email body
+		$mail->Body = $email_template;
+		$mail->AltBody = strip_tags($email_template);
+		// Send mail
+		$mail->send();
+	} catch (Exception $e) {
+		// Output error message
+		exit('Error: Invoice Client Message could not be sent. Mailer Error: ' . $mail->ErrorInfo);
+	}
+}
+}//function exists
+
+if (!function_exists('send_admin_invoice_email')){
+// Send notification email function
+function send_admin_invoice_email($invoice, $client) {
+
+    if (!notifications_enabled || !mail_enabled) return;
+     // Include PHPMailer library
+    include public_path . 'lib/phpmailer/Exception.php';
+    include public_path . 'lib/phpmailer/PHPMailer.php';
+    include public_path . 'lib/phpmailer/SMTP.php';
+    // Create an instance; passing `true` enables exceptions
+    $mail = new PHPMailer(true);
+    try {
+        // Server settings
+        if (SMTP) {
+            $mail->isSMTP();
+            $mail->Host = smtp_host;
+            $mail->SMTPAuth = empty(smtp_user) && empty(smtp_pass) ? false : true;
+            $mail->Username = smtp_user;
+            $mail->Password = smtp_pass;
+            $mail->SMTPSecure = smtp_secure == 'tls' ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port = smtp_port;
+        }
+        // Recipients
+        $mail->setFrom(mail_from, mail_name);
+        $mail->addAddress(notification_email);
+        $mail->addReplyTo(mail_from, mail_name);
+        // Content
+        $mail->isHTML(true);
+        // Set UTF-8 charset
+        $mail->CharSet = 'UTF-8';
+        // Set email subject
+        if ($invoice['payment_status'] == 'Paid') {
+            $mail->Subject = 'Invoice #' . $invoice['invoice_number'] . ' has been paid.';
+        } else if ($invoice['payment_status'] == 'Cancelled') {
+            $mail->Subject = 'Invoice #' . $invoice['invoice_number'] . ' has been cancelled.';
+        } else if ($invoice['payment_status'] == 'Pending') {
+            $mail->Subject = 'Invoice #' . $invoice['invoice_number'] . ' is pending payment.';
+        } else {
+            $mail->Subject = 'Invoice #' . $invoice['invoice_number'] . ' has been updated.';
+        }
+        // Read the template contents and replace the placeholders with the variables
+        $email_template = str_replace(
+            ['%invoice_number%', '%client%', '%amount%', '%status%', '%date%'],
+            [$invoice['invoice_number'], $client['first_name'] . ' ' . $client['last_name'], number_format($invoice['payment_amount']+$invoice['tax_total'], 2), $invoice['payment_status'], date('Y-m-d H:i:s')],
+            file_get_contents(client_side_invoice . 'templates/notification-email-template.html')
+        );
+ 		// Set email body
+        $mail->Body = $email_template;
+        $mail->AltBody = strip_tags($email_template);
+        // Send mail
+        $mail->send();
+    } catch (Exception $e) {
+        // Output error message
+        exit('Error: Admin Message could not be sent. Mailer Error: ' . $mail->ErrorInfo);
+    }
+}   
+}//function exists
+
+if (!function_exists('send_activation_email2')){
+/* Send Activiation Email 2 has been worked to include more than just activation.  It also does two factor authorization code, reset password functionality and resend activation functionality.  This keeps the emails consistant. */
+function send_activation_email2($email, $code, $username, $type) {
+ echo 'CODE CALLS FUNCTION SEND ACTIVATION EMAIL2, SHOULD BE ROUTED TO SEND MAIL.';
+ echo '<!--***************************CODE CALLS FUNCTION SEND ACTIVATION EMAIL2, SHOULD BE ROUTED TO SEND MAIL.***
+ -- ++ FUNCTION: send_activation_email2-->';
+    $body_template = "";
+    $link="";
+// Generic Email Subject
+	$subject = 'Action Required';
+// Two Factor Authorization
+	$subject = $type == 'twofactor' ? 'Your Access Code' :$subject;
+	$body_template = $type == 'twofactor' ? public_path . 'email_template_twofactor.php' :$body_template;
+	$link = $type == 'twofactor' ? $code :$link;
+// Account Activation subject
+	$subject = $type == 'activation' ? 'Account Activation Required' :$subject;
+	$body_template = $type == 'activation' ? public_path . 'activation-email-template.php' :$body_template;
+	$link = $type == 'activation' ? activation_link . '?email=' . $email . '&code=' . $code :$link;
+// Account Reset Password subject
+    $subject = $type == 'resetpass' ? 'Password Reset' : $subject;
+    $body_template = $type == 'resetpass' ? public_path . 'resetpass-email-template.php' :$body_template;
+    $link = $type == 'resetpass' ? reset_password_url . '?email=' . $_POST['email'] . '&code=' . $code :$link;
+    // Account other subject
+    $subject = $type == 'custom' ? 'Welcome to GlitchWizard Solutions!' : $subject;
+    // Include the ticket email template as a string
+    ob_start();
+    include $body_template;
+    $email_template = ob_get_clean();
+    // Include PHPMailer library
+ // Include PHPMailer library
+    include public_path . 'lib/phpmailer/Exception.php';
+    include public_path . 'lib/phpmailer/PHPMailer.php';
+    include public_path . 'lib/phpmailer/SMTP.php';
+    // Create an instance; passing `true` enables exceptions
+    $mail = new PHPMailer(true);
+    try {
+        // SMTP Server settings
+        if (SMTP) {
+            $mail->isSMTP();
+            $mail->Host = smtp_host;
+            $mail->SMTPAuth = true;
+            $mail->Username = smtp_user;
+            $mail->Password = smtp_pass;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port = smtp_port;
+        }
+        // Recipients
+        $mail->setFrom(mail_from, no_reply_mail_name);
+        $mail->addAddress($email);
+        $mail->addReplyTo(mail_from, no_reply_mail_name);
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        // Body
+        $mail->Body = $email_template;
+        $mail->AltBody = strip_tags($email_template);
+        // Send mail
+        $mail->send();
+    } catch (Exception $e) {
+        // Output error message
+        exit('Error: Message could not be sent. Mailer Error: ' . $mail->ErrorInfo);
+    }
+}
+}//function exists
+?>

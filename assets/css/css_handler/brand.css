@@ -1,0 +1,57 @@
+/*  #4b3969;    NORDIC PURPLE   
+    #5D4C78;    LIGHT NORDIC PURPLE             HOVER FOR NORDIC PURPLE - ONE TINE LIGHTER 
+    #766590;    LIGHTER NORDIC PURPLE
+    #f5f5f5;    OFF WHITE                       NAVAGATION TEXT
+    #f5f5f5;    GREY TINT                       BACKGROUND FOR FORMS
+    #2d333b;    CHARCOAL GREY                   MORE SUBTLE THAN BLACK
+    #9da3ac;    LIGHT GREY 
+    #8e97a3;    SUB-DUDE GREY                   PLACEHOLDERS IN FORM INPUT BOXES
+    #c2c6cd;    LIGHT GREY                      1PX SOLID BORDERS AROUND FORM INPUT BOXES
+    #5b6574;    SUBTLE GREY                     USED FOR USEFUL LINKS (LIKE FORGOT PASSWORD/REMEMBER ME)
+*/
+.r-logo-public{
+    height:45px;
+    width:45px;
+    margin: 0 0 15px 10px;
+   
+    
+}
+
+.r-biz-name-public{
+    font-size:25px;
+    margin: 10px 5px 5px 5px;
+    padding-top: 0;
+    line-height: 3;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    font-family: 'Bad Script', cursive;
+    /*color:#4b3969;*/
+    font-style: normal;
+    color:#f5f5f5;
+}
+.r-biz-name a {
+    text-decoration:none;
+}
+.r-buz-name-public a.hover{
+     text-decoration:none;
+}
+.r-biz-name{
+
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    font-family: 'Bad Script', cursive !important;
+    font-style: normal;
+    color: #4b3969;
+}
+.r-logo{
+    height:55px;
+    width:55px;
+}
+.no-hover:hover {
+    color:#4b3969;
+  
+}
+
+.r-size{
+    font-size:16px;
+}

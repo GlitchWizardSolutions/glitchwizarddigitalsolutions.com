@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Invoice #%invoice_number% has been updated.</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,minimum-scale=1">
+	</head>
+	<body style="background-color:#400080;font-family:system-ui,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';box-sizing:border-box;font-size:16px;padding:5px;">
+		<div style="padding:50px;background-color:#fff;margin:60px auto;box-sizing:border-box;font-size:16px;max-width:600px;">
+	      <div style='text-align:center'><h2 style="box-sizing:border-box;font-size:20px;color:#474a50;padding-bottom:10px;font-weight:600;">Invoice<br> #%invoice_number%<br> has been updated.</h2></div>
+			<p style="box-sizing:border-box;font-size:16px;margin:0;padding:10px 0 35px 0;">The details are below.</p>
+			<table style="width:100%;margin:0 auto;">
+
+				<thead style="font-weight:500;">
+					<tr>
+						<td>Client:</td>
+						<td>%client%</td>
+					</tr><tr>
+						</tr><tr>
+						<td>Amount</td>
+						<td>Status</td>
+						<td>Date</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>%amount%</td>
+						<td>%status%</td>
+						<td>%date%</td>						
+					</tr>
+				</tbody>
+			</table>
+			
+		</div>
+	</body>
+</html>

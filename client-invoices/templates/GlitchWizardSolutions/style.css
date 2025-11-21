@@ -1,0 +1,247 @@
+* {
+  box-sizing: border-box;
+  font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 16px;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  background-color: #f3f4f7;
+}
+
+.invoice {
+  padding: 60px 15px 15px 15px;
+}
+.invoice .invoice-form {
+  position: relative;
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 15px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 35px;
+  box-shadow: 0px 0px 7px 1px rgba(45, 54, 68, 0.05);
+}
+.invoice .invoice-form .invoice-header .invoice-title {
+  display: flex;
+  align-items: flex-end;
+  font-size: 28px;
+  font-weight: 700;
+  padding: 0;
+  margin: 0;
+  color: #4a5361;
+}
+.invoice .invoice-form .invoice-header .invoice-title strong {
+  color: #5d6779;
+  display: inline-block;
+  font-weight: 600;
+  padding: 0 0 5px 10px;
+}
+.invoice .invoice-form .invoice-header .invoice-title strong.paid {
+  color: #2ecc71;
+}
+.invoice .invoice-form .invoice-header .invoice-title strong.unpaid, .invoice .invoice-form .invoice-header .invoice-title strong.cancelled {
+  color: #e74c3c;
+}
+.invoice .invoice-form .invoice-header .invoice-title strong.pending {
+  color: #f39c12;
+}
+.invoice .invoice-form .invoice-header .due-date, .invoice .invoice-form .invoice-header .invoice-from {
+  font-size: 14px;
+  font-weight: 500;
+  color: #9fa4b1;
+  margin: 0;
+  padding: 0 0 10px 0;
+}
+.invoice .invoice-form .invoice-header .due-date {
+  padding: 10px 0 25px 0;
+  border-bottom: 1px solid #edeff3;
+}
+.invoice .invoice-form .invoice-header .company-logo {
+  position: absolute;
+  top: 35px;
+  right: 35px;
+  max-width: 100px;
+  max-height: 60px;
+  object-fit: contain;
+}
+.invoice .invoice-form .invoice-details {
+  display: flex;
+  flex-flow: column;
+  padding: 15px 0;
+}
+.invoice .invoice-form .invoice-details .invoice-detail {
+  display: flex;
+  padding: 6px 0;
+  align-items: center;
+}
+.invoice .invoice-form .invoice-details .invoice-detail h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #9fa4b1;
+  margin: 0;
+  padding: 0;
+  width: 80px;
+}
+.invoice .invoice-form .invoice-details .invoice-detail p {
+  font-size: 14px;
+  font-weight: 500;
+  color: #5d6779;
+  margin: 0;
+  padding: 0;
+}
+.invoice .invoice-form .invoice-items table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.invoice .invoice-form .invoice-items table thead tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+.invoice .invoice-form .invoice-items table thead tr th {
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #9fa4b1;
+  text-align: left;
+}
+.invoice .invoice-form .invoice-items table thead tr th:first-child {
+  padding-left: 0;
+}
+.invoice .invoice-form .invoice-items table thead tr th:last-child {
+  padding-right: 0;
+  text-align: right;
+}
+.invoice .invoice-form .invoice-items table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+.invoice .invoice-form .invoice-items table tbody tr td {
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #5d6779;
+  text-align: left;
+}
+.invoice .invoice-form .invoice-items table tbody tr td:first-child {
+  padding-left: 0;
+}
+.invoice .invoice-form .invoice-items table tbody tr td:last-child {
+  padding-right: 0;
+  text-align: right;
+}
+.invoice .invoice-form .invoice-items table tbody tr td.total {
+  text-align: right;
+  color: #9fa4b1;
+}
+.invoice .invoice-form .invoice-items table tbody tr td .description {
+  font-size: 12px;
+  color: #9fa4b1;
+  padding: 0;
+  margin: 5px 0 0 0;
+}
+.invoice .invoice-form .invoice-items table tbody tr:nth-last-child(1 of .item) {
+  border-bottom: 0;
+}
+.invoice .invoice-form .invoice-items table tbody tr.alt {
+  border-bottom: 0;
+}
+.invoice .invoice-form .invoice-items table tbody tr.alt td {
+  padding: 5px 0;
+}
+.invoice .invoice-form .payment-methods {
+  padding: 30px 0 10px 0;
+}
+.invoice .invoice-form .payment-methods h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #9fa4b1;
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+.invoice .invoice-form .payment-methods .methods {
+  display: flex;
+  flex-flow: wrap;
+  width: 100%;
+}
+.invoice .invoice-form .payment-methods .methods label {
+  text-decoration: none;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  border: 1px solid #edeff3;
+  border-radius: 5px;
+  height: 70px;
+  width: 135px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #9fa4b1;
+  padding: 0 15px;
+  margin: 0 12px 18px 0;
+  cursor: pointer;
+}
+.invoice .invoice-form .payment-methods .methods label svg {
+  margin-bottom: 2px;
+  fill: #9fa4b1;
+}
+.invoice .invoice-form .payment-methods .methods label:hover {
+  border: 1px solid #ced4df;
+}
+.invoice .invoice-form .payment-methods .methods label:nth-child(6) {
+  margin-right: 0;
+}
+.invoice .invoice-form .payment-methods .methods input {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  visibility: hidden;
+}
+.invoice .invoice-form .payment-methods .methods input:checked + label {
+  color: #5d6779;
+  border: 2px solid #5d6779;
+}
+.invoice .invoice-form .payment-methods .methods input:checked + label svg {
+  fill: #5d6779;
+}
+.invoice .invoice-form .btns {
+  display: flex;
+  justify-content: flex-end;
+}
+.invoice .invoice-form .btns .btn {
+  appearance: none;
+  background: #0e75d6;
+  box-shadow: 0px 0px 7px 1px rgba(45, 54, 68, 0.12);
+  border: 0;
+  border-radius: 4px;
+  color: #FFFFFF;
+  width: 135px;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 5px;
+}
+.invoice .invoice-form .btns .btn:hover {
+  background: #0c68be;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .invoice .invoice-form {
+    padding: 15px;
+  }
+  .invoice .invoice-form .invoice-header .company-logo {
+    display: none;
+  }
+  .invoice .invoice-form .invoice-items table tbody tr td .description {
+    display: none;
+  }
+  .invoice .invoice-form .payment-methods .methods label {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .invoice .invoice-form .payment-methods .btn {
+    width: 100%;
+  }
+}

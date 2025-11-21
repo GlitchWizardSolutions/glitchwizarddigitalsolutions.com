@@ -1,0 +1,428 @@
+/*
+Bootstrap Breakpoints
+
+List of Available Breakpoints
+
+Breakpoint	Range	Media Query
+Extra Small (xs)	0px and up	No media query needed
+Small (sm)	576px and up	@media (min-width: 576px)
+Medium (md)	768px and up	@media (min-width: 768px)
+Large (lg)	992px and up	@media (min-width: 992px)
+Extra Large (xl)	1200px and up	@media (min-width: 1200px)
+Extra Extra Large (xxl)	1400px and up	@media (min-width: 1400px)
+
+classes 
+.d-none, 
+.d-sm-block, 
+.d-md-none
+control element visibility based on screen sizes.
+
+HTML       Font Size screen < 1200px	Font Size on screen more than 1200px
+H1, .h1	   1.375rem + 1.5vw	            2.5rem
+H2, .h2	   1.325rem + 0.9vw	            2rem
+H3, .h3	   1.3rem + 0.6vw	            1.75rem
+H4, .h4	   1.275rem + 0.3vw	            1.5rem
+The following are fixed, not reponsive:
+H5, .h5	   1.25rem	                    1.25rem             
+H6, .h6	   1rem	                        1rem          
+
+The following are pretty huge:
+Heading Classes	Font Size < 1200px	    Font Size > 1200px
+.display-1	    1.625rem + 4.5vw	    5rem
+.display-2	    1.575rem + 3.9vw	    4.5rem
+.display-3	    1.525rem + 3.3vw)	    4rem
+.display-4	    1.475rem + 2.7vw	    3.5rem
+.display-5	    1.425rem + 2.1vw	    3rem
+.display-6	    1.375rem + 1.5vw	    2.5rem
+
+Font Classes 
+Size Class	Font Size < 1200px	Font Size > 1200px
+.fs-1	    1.375rem + 1.5vw	2.5rem
+.fs-2	    1.325rem + 0.9vw	2rem
+.fs-3	    1.3rem + 0.6vw	    1.75rem
+.fs-4	    1.275rem + 0.3vw	1.5rem
+.fs-5	    1.25rem	            1.25rem
+.fs-6	    1rem	            1rem
+*/
+@media screen and (max-width: 234px){
+.menu-items {
+    margin-left:2px;
+}
+
+.email p{
+    font-size:10px;
+}
+.file-manager-header .actions .wrapper {
+    box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.1);
+  }
+ 
+}/*end 234*/
+@media screen and (max-width: 575px){
+
+.collections .collection-list {
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.collections .collection-list a {
+  width: 200px;
+  height: 150px;
+}
+
+
+.collections .collection-list a span {
+  font-weight: 700;
+  padding: 3px;
+  font-size: 14px;
+  color:#093824;
+}
+
+.collections .collection-list a .num {
+  font-size: 14px;
+  font-weight:500;
+  color: #093824;
+}
+
+.collections .collection-list a .description {
+ 
+}
+
+.collections .collection-list a:hover {
+  border: 1px solid #d6dadf;
+  background-color: #edeff1;
+  color: #696b6e;
+}
+
+.collections .collection-list a:hover .num {
+  color: #75787b;
+}
+
+.collections .collection-list a:hover i {
+  color: #696b6e;
+  transform: scale(1.1);
+}
+.r-size{
+    font-size:12px;
+    
+}
+.r-biz-name{
+    font-size: 15px;
+    margin-top: 5px;
+}
+.r-logo{
+    height:35px;
+    width:35px;
+}
+.navbar-nav {
+    display:flex;
+    align-items: flex-start;
+}
+.navbar-collapse .collapse .show{
+    display:flex;
+    flex-basis:50%;
+    align-items:flex-start;
+}
+
+.body{
+   width:100%;
+}
+.content{
+    width:100%;   
+  }
+.login, .register {
+    width:85%;
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    margin: 70px auto;
+  }
+
+
+.file-manager-header .actions .wrapper {
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
+  }
+.file-manager-table thead tr td {
+  position: relative;
+  padding-right: 5px;
+}
+}
+
+@media (min-width: 768px) {
+  .dropdown-menu-arrow::before {
+    content: "";
+    width: 13px;
+    height: 13px;
+    background: #fff;
+    position: absolute;
+    top: -7px;
+    right: 20px;
+    transform: rotate(45deg);
+    border-top: 1px solid #eaedf1;
+    border-left: 1px solid #eaedf1;
+  }
+}
+@media screen and (max-width: 600px) {
+ .file-manager-header label {
+    display: inline-flex;
+    margin: 0 0 0 255px;
+  }
+
+  .responsive-width-100 {
+    width: 98%;
+    max-width: 98%;
+    min-width: 80%;
+  }
+  .responsive-hidden {
+    display: none;
+  }
+ /* || TICKETS */ 
+.update form .wrap label, .update form .wrap select, .view form .wrap label, .view form .wrap select {
+  width: 100%;
+  margin-right: 0;
+}
+   .update {
+    max-width: 600px;
+} 
+  .tickets form, .home form {
+    width: 100%;
+    flex-flow: column;
+  }
+  .tickets form select, .tickets form input, .home form select, .home form input {
+    margin: 5px 0;
+  }
+  .tickets form div, .home form div {
+    display: flex;
+    flex-flow: column;
+  }
+  .tickets .tickets-links, .home .tickets-links {
+    flex-flow: column;
+  }
+  .tickets .tickets-links a, .home .tickets-links a {
+    margin-bottom: 10px;
+  }
+   .file-manager-header .actions .wrapper {
+    /*top:166px; Positions edit dropdown*/
+    padding: 10px;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .file-manager-header label {
+    display: inline-flex;
+    margin: 0 0 0 265px;
+  }
+ .responsive-width-100 {
+    width: 100%;
+    max-width: 100%;
+  }
+  .responsive-hidden {
+    display: none;
+  }  
+  .header .wrapper {
+    width: 100%;
+  }
+  .header .wrapper h1 {
+    font-size: 18px;
+    padding: 10px;
+  }
+  .header .wrapper label {
+    display: inline-flex;
+  }
+  .header .wrapper .menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    flex-flow: column;
+    background-color: #252d38;
+    justify-items: flex-start;
+    align-items: flex-start;
+  }
+  .header .wrapper input[type="checkbox"]:checked ~ .menu {
+    display: flex;
+  }
+  .header .wrapper input[type="checkbox"]:checked ~ .menu a {
+    width: 100%;
+    padding: 15px 17px;
+    border-bottom: 1px solid #1f252e;
+  }
+
+  .file-manager-header .path .alt {
+    display: none;
+  }
+    .content form input[type="text"], .content form input[type="password"], .content form input[type="email"] {
+    width: 100%;
+    max-width: 100%;
+  }
+  .profile-detail strong {
+    width: 100%;
+  }
+   .update form .wrap label, .update form .wrap select, .view form .wrap label, .view form .wrap select {
+  width: 100%;
+  margin-right: 0;
+}
+   .update {
+    width: 400px;
+} 
+  .tickets form, .home form {
+    width: 100%;
+    flex-flow: column;
+  }
+  .tickets form select, .tickets form input, .home form select, .home form input {
+    margin: 5px 0;
+  }
+  .tickets form div, .home form div {
+    display: flex;
+    flex-flow: column;
+  }
+  .tickets .tickets-links, .home .tickets-links {
+    flex-flow: column;
+  }
+  .tickets .tickets-links a, .home .tickets-links a {
+    margin-bottom: 10px;
+  }
+  
+}
+
+@media screen and (max-width: 1100px) {
+
+  .navtop {
+    height: auto;
+    padding: 10px;
+  }
+  .navtop div {
+    flex-flow: wrap;
+    width: 100%;
+  }
+  .navtop div h1 {
+    display: block;
+    flex-basis: 100%;
+  }
+  .navtop div a {
+    padding: 10px 0;
+    flex-basis: 50%;
+  }
+
+  .content form input[type="text"], .content form input[type="password"], .content form input[type="email"] {
+    width: 100%;
+  }
+  .upload form {
+    width: 100%;
+  }
+  .gallery-form {
+    width: 100%;
+  }
+  .home .con, .collection .con {
+    flex-flow: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+  }
+  .home .con .upload-media, .collection .con .upload-media {
+    margin-bottom: 15px;
+  }
+  .home .con form, .collection .con form {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+  }
+  .home .con form label, .collection .con form label {
+    display: inline-flex;
+    margin: 0;
+    width: 100%;
+    padding: 7px 0;
+  }
+  .home .con form select, .home .con form input, .collection .con form select, .collection .con form input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .home .media-list, .collection .media-list {
+    align-items: center;
+    justify-content: center;
+  }
+  .home .media-list a img, .collection .media-list a img {
+    width: 100%;
+  }
+  .media-popup .con {
+    width: 95%;
+    max-height: 85%;
+    padding: 10px;
+    border-radius: 0;
+  }
+  .media-popup .con img {
+    width: 100%;
+    height: auto;
+    max-height: auto;
+  }
+  .media-popup .con video {
+    width: 100%;
+    height: auto;
+  }
+  .media-popup .con audio {
+    max-width: 220px;
+  }
+  .media-popup .next, .media-popup .prev {
+    padding: 0 5px;
+    font-size: 12px;
+  }
+  .media-popup .close {
+    font-size: 12px;
+    right: 10px;
+    top: 10px;
+  }
+}
+
+@media (max-width: 1199px) {
+  #main {
+    padding: 20px;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .file-manager-header label {
+    display: inline-flex;
+    margin: 0 0 0 275px;
+  }
+ 
+  .file-manager-header .actions .wrapper {
+    display: none;
+    flex-flow: column;
+    position: fixed;
+    right: 15px;
+    top: 100px;
+    padding: 15px;
+    width: 200px;
+    background-color:#2d333b;
+    color:#85898f;
+    border-radius: 8px;
+    box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.1);
+  }
+  .file-manager-header .actions .wrapper a, .file-manager-header .actions .wrapper .search {
+    width: 100%;
+    margin: 0;
+  }
+  .file-manager-header .actions .wrapper a {
+    border-radius: 0;
+    justify-content: flex-start;
+    border-bottom: 1px solid #e9eaec;
+    background-color: transparent;
+    padding: 7px 5px;
+  }
+  .file-manager-header .actions .wrapper a:hover {
+    background-color: transparent;
+  }
+  .file-manager-header .actions .wrapper a.last {
+    border: 0 !important;
+  }
+  .file-manager-header .actions .wrapper .search {
+    margin-top: 5px;
+    background-color: #e9eaec;
+  }
+  .file-manager-header .actions .wrapper .search input {
+    color: #4a5361;
+  }
+  .file-manager-header .actions .wrapper .search input::placeholder {
+    color: #606c7e;
+  }
+  .file-manager-header .actions .wrapper .search i {
+    color: #4a5361;
+  }
+}

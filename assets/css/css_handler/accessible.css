@@ -1,0 +1,21 @@
+/*
+Indicate the current item by using aria-current="page" for the current page or aria-current="true" for the current item in a set.
+The animation effect of this component is dependent on the prefers-reduced-motion media query. See the reduced motion section of our accessibility documentation.
+*/
+.thick{
+     font-weight: bold;
+}
+.normal{
+     font-weight: normal;
+     
+}.thicker{
+     font-weight: 900;
+}
+.required {
+    color:red;
+    font-weight:600;
+    margin-right:2px;
+}
+.not-required {
+    margin-right:2px;
+}

@@ -1,0 +1,240 @@
+/* This requires accessible_main.css to preceed it in the doctype.php
+Contains the login, registration, content profile*/
+.login, .register {
+  width: 400px;
+  background-color:#f5f5f5;/* LIGHT GREY TINT */
+  margin:5vh auto;
+}
+
+.login h1, .register h1 {
+  text-align: center;
+  color: #5b6574; /* DARK GREY*/
+  font-size: 24px;
+  padding: 15px 0 15px 0;
+  border-bottom: 1px solid #dee0e4;
+}
+
+.login .links, .register .links {
+  display: flex;
+  padding: 0 15px;
+}
+
+.login .links a, .register .links a {
+  color: #9da3ac; /*LIGHT GREY*/
+  text-decoration: none;
+  display: inline-flex;
+  padding: 0 10px 10px 10px;
+  font-weight: 500;
+}
+
+.login .links a:hover, .register .links a:hover {
+  color: #9da3ac;
+}
+
+/*.login .links a.active, .register .links a.active {
+  border-bottom: 3px solid #5472bd; UGLY BLUE
+  color: #5472bd;
+}*/
+
+.login form, .register form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+.login form label, .register form label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 12%;
+  height: 50px;
+  background-color:#4b3969;/*NORDIC PURPLE*/
+  color:#f5f5f5; /*OFF WHITE */
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.login form input[type="password"], .login form input[type="text"], .login form input[type="email"], .register form input[type="password"], .register form input[type="text"], .register form input[type="email"] {
+  width: 80%;
+  height: 50px;
+  border: 1px solid #dee0e4;
+  border-left: 0;
+  margin-bottom: 10px;
+  padding: 0 15px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  outline: 0;
+}
+
+.login form input[type="password"]::placeholder, .login form input[type="text"]::placeholder, .login form input[type="email"]::placeholder, .register form input[type="password"]::placeholder, .register form input[type="text"]::placeholder, .register form input[type="email"]::placeholder {
+  color: #8e97a3;
+}
+
+.login form input[type="password"]:focus, .login form input[type="text"]:focus, .login form input[type="email"]:focus, .register form input[type="password"]:focus, .register form input[type="text"]:focus, .register form input[type="email"]:focus {
+  border: 1px solid #c2c6cd;
+  border-left: 0;
+}
+
+.login form input[type="submit"], .register form input[type="submit"] {
+  background-color:#4b3969;/* NORDIC PURPLE*/
+  width: 100%;
+  padding: 15px;
+  margin-top: 15px;
+  border: 0;
+  cursor: pointer;
+  font-weight: 500;
+  color:#f5f5f5; /* OFF WHITE*/
+  transition: background-color 0.2s;
+  border-radius: 0;
+  appearance: none;
+  height:65px;
+  font-size:20px;
+}
+
+.login form input[type="submit"]:hover, .register form input[type="submit"]:hover {
+  background-color:#5D4C78; /* NORDIC PURPLE ONE TINT LIGHTER*/
+  transition: background-color 0.2s;
+}
+
+.login form #rememberme, .register form #rememberme {
+  width:100%;
+  margin-top: 15px;
+  font-size:16px;
+  height: auto;
+  padding: 1px 20px;
+  background-color: transparent;
+  color: #5b6574;
+  justify-content: flex-start;
+}
+.forgotpassword a{
+  height: auto;
+  background-color: transparent;
+  color: #5b6574;
+  margin:auto;
+  font-size:14px;
+  text-decoration:none;
+}
+.forgotpassword a:hover{
+   text-decoration:underline;
+   color:#2d333b;
+}
+.login form #rememberme input, .register form #rememberme input {
+  transform: scale(1.3);
+  margin-right: 7px;
+}
+
+.login form .msg, .register form .msg {
+  padding: 0 20px;
+  width: 100%;
+}
+
+.login form .captcha, .register form .captcha {
+  display: flex;
+}
+
+.login form .fb-btn, .login form .gl-btn, .register form .fb-btn, .register form .gl-btn {
+  display: flex;
+  text-decoration: none;
+  position: relative;
+  border-radius: 4px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  color:#f5f5f5;
+  font-weight: 500;
+  font-size: 14px;
+  width: 92%;
+  margin: 15px 0 5px 0;
+  padding: 15px;
+  transition: background-color 0.2s;
+}
+
+.login form .fb-btn i, .login form .gl-btn i, .register form .fb-btn i, .register form .gl-btn i {
+  position: absolute;
+  left: 15px;
+}
+
+.login form .fb-btn:hover, .login form .gl-btn:hover, .register form .fb-btn:hover, .register form .gl-btn:hover {
+  color:#f5f5f5;
+  transition: background-color 0.2s;
+}
+
+.login form .fb-btn, .register form .fb-btn {
+  background-color: #507CBF;
+}
+
+.login form .fb-btn:hover, .register form .fb-btn:hover {
+  background-color: #426fb4;
+}
+
+.login form .gl-btn, .register form .gl-btn {
+  background-color: #d6523e;
+}
+
+.login form .gl-btn:hover, .register form .gl-btn:hover {
+  background-color: #cf412c;
+}
+
+.login form > a, .register form > a {
+  text-decoration: none;
+  color: #5b6574;
+  width: 50%;
+  padding: 5px 20px;
+}
+
+.login form > a:hover, .register form > a:hover {
+  color: #394049;
+}
+
+.content.profile form label {
+  display: block;
+  padding: 15px 0 10px 0;
+  font-weight: 500;
+  font-size: 14px;
+  color: #4d4d4d;
+}
+
+.content.profile form input[type="text"], .content.profile form input[type="password"], .content.profile form input[type="email"] {
+  padding: 10px;
+  width: 270px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.content.profile .profile-detail {
+  padding: 5px;
+}
+
+.content.profile .profile-detail strong {
+  display: inline-block;
+  color: #777;
+  min-width: 120px;
+  font-size: 16px;
+}
+
+.content.profile .profile-detail i {
+  width: 28px;
+  color: #aaabad;
+}
+
+.content.profile .profile-btn {
+  display: inline-block;
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+  color:#f5f5f5;
+  background-color: #5472bd;
+  margin: 20px 5px 0 0;
+  padding: 10px 15px;
+  border-radius: 4px;
+  appearance: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.content.profile .profile-btn:hover {
+  background-color: #435b97;
+}
+
+

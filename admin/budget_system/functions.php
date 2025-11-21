@@ -1,0 +1,1 @@
+echo 'if you see this message, remove the call to functions.php';

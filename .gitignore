@@ -1,0 +1,79 @@
+# User Uploaded Files - Contains Sensitive Client Data
+contact-form-uploads/
+ticket-uploads/
+project-ticket-uploads/
+warranty-ticket-uploads/
+gws-legal-uploads/
+system-client-access_files/
+client-documents/
+media/
+client-invoices/pdfs/
+*.pptx
+*.mp4
+*.avi
+*.mov
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Environment-Specific Files
+# php.ini - Now tracked in Git
+# .htaccess - Now tracked in Git
+error_log
+wtfh_log
+*.log
+lib/email-debug.log
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary and Cache Files
+*.tmp
+*.cache
+
+# Backup Files
+*.bak
+*.backup
+*-backup.txt
+*.zip.old
+
+# Node modules (if any frontend build tools added)
+node_modules/
+package-lock.json
+
+# Composer (if added for dependency management)
+vendor/
+composer.lock
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+Thumbs.db
+
+# Sample and Quarantine Directories - Contains Unused/Testing Code
+admin/sample-working/
+admin/.resources/
+admin/*/quarantine/
+.resources/
+
+# Specific Unused/Testing Files
+notimportant.php
+testshell.php
+phpinfo.php
+
+# Old/Duplicate Systems - To Be Evaluated for Removal
+redo-invoicing/
+sandbox/
+google_login/
+admin-beta/
+client-dashboard/quarantine/
