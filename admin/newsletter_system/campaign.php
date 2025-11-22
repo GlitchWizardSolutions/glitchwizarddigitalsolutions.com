@@ -1,6 +1,14 @@
 <?php
 require 'assets/includes/admin_config.php';
 include_once '../assets/includes/components.php';
+
+// Num format function for newsletter system
+if (!function_exists('num_format')) {
+    function num_format($num, $decimals = 0, $decimal_separator = '.', $thousands_separator = ',') {
+        return number_format(empty($num) || $num == null || !is_numeric($num) ? 0 : $num, $decimals, $decimal_separator, $thousands_separator);
+    }
+}
+
 // Default campaign values
 $campaign = [
     'title' => '',
@@ -66,7 +74,7 @@ if (isset($_GET['id'])) {
         // Retrieve the groups
         $groups = isset($_POST['groups']) && is_array($_POST['groups']) ? $_POST['groups'] : [];
         // Update the campaign
-        $stmt = $pdo->prepare('UPDATE campaigns SET title = ?, status = ?, submit_date = ?, newsletter_id = ?, groups = ? WHERE id = ?');
+        $stmt = $pdo->prepare('UPDATE campaigns SET title = ?, status = ?, submit_date = ?, newsletter_id = ?, `groups` = ? WHERE id = ?');
         $stmt->execute([ $_POST['title'], $_POST['status'], date('Y-m-d H:i:s', strtotime($_POST['start_date'])), $_POST['newsletter_id'], implode(',', $groups), $_GET['id'] ]);
         // add users from the selected groups to the recipients array
         if ($groups) {
@@ -94,7 +102,7 @@ if (isset($_GET['id'])) {
         // Retrieve the groups
         $groups = isset($_POST['groups']) && is_array($_POST['groups']) ? $_POST['groups'] : [];
         // Insert the new campaign
-        $stmt = $pdo->prepare('INSERT INTO campaigns (title,status,groups,submit_date,newsletter_id) VALUES (?,?,?,?,?)');
+        $stmt = $pdo->prepare('INSERT INTO campaigns (title,status,`groups`,submit_date,newsletter_id) VALUES (?,?,?,?,?)');
         $stmt->execute([ $_POST['title'], $_POST['status'], implode(',', $groups), date('Y-m-d H:i:s', strtotime($_POST['start_date'])), $_POST['newsletter_id'] ]);
         $campaign_id = $pdo->lastInsertId();
         // add users from the selected groups to the recipients array

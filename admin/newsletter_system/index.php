@@ -1,6 +1,13 @@
 <?php
 require 'assets/includes/admin_config.php';
 include_once '../assets/includes/components.php';
+
+// Num format function for newsletter system
+if (!function_exists('num_format')) {
+    function num_format($num, $decimals = 0, $decimal_separator = '.', $thousands_separator = ',') {
+        return number_format(empty($num) || $num == null || !is_numeric($num) ? 0 : $num, $decimals, $decimal_separator, $thousands_separator);
+    }
+}
 // Current date
 $date = date('Y-m-d');
 // Get the total number of new subscribers within the last day
