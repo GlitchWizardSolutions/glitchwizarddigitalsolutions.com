@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Retrieve the campaign from the database
 $stmt = $pdo->prepare('SELECT 
     c.*, 
@@ -213,6 +214,11 @@ if (isset($_GET['success_msg'])) {
 ?>
 <?=template_admin_header(htmlspecialchars($campaign['title'], ENT_QUOTES) . ' - Campaign', 'campaigns', 'view')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Campaigns', 'url' => 'campaigns.php'],
+    ['label' => htmlspecialchars($campaign['title'], ENT_QUOTES)]
+])?>
+
 <div class="content-title">
     <h2 class="responsive-width-100 normal">
         <a href="campaigns.php">
@@ -223,9 +229,9 @@ if (isset($_GET['success_msg'])) {
         <span class="<?=str_replace(['Paused','Completed','Cancelled','Inactive','Active'], ['orange','green','red','grey','green'], $campaign['status'])?>"><?=$campaign['status']?></span>
     </h2>
     <div class="btns">
-        <a href="campaigns.php" class="btn alt mar-right-1">Cancel</a>
-        <a href="campaigns.php?delete=<?=$campaign['id']?>" class="btn red mar-right-1" onclick="return confirm('Are you sure you want to delete this campaign?')">Delete</a>
-        <a href="campaign.php?id=<?=$campaign['id']?>" class="btn">Edit</a>
+        <a href="campaigns.php" class="btn btn-secondary mar-right-1">Back</a>
+        <a href="campaigns.php?delete=<?=$campaign['id']?>" class="btn btn-danger mar-right-1" onclick="return confirm('Are you sure you want to delete this campaign?')">Delete</a>
+        <a href="campaign.php?id=<?=$campaign['id']?>" class="btn btn-primary">Edit</a>
     </div>
 </div>
 

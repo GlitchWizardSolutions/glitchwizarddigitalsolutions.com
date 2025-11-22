@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Remove the time limit and file size limit
 set_time_limit(0);
 ini_set('post_max_size', '0');
@@ -57,19 +58,27 @@ if (isset($_FILES['file'], $_POST['table']) && !empty($_FILES['file']['tmp_name'
 ?>
 <?=template_admin_header('Import Campaigns', 'campaigns', 'import')?>
 
-<form method="post" enctype="multipart/form-data">
+<?=generate_breadcrumbs([
+    ['label' => 'Campaigns', 'url' => 'campaigns.php'],
+    ['label' => 'Import Campaigns']
+])?>
+
+<form method="post" enctype="multipart/form-data" class="form-professional">
 
     <div class="content-title">
-        <h2>Import Campaigns</h2>
+        <div class="icon alt"><?=svg_icon_upload()?></div>
+        <div class="txt">
+            <h2>Import Campaigns</h2>
+            <p class="subtitle">Upload campaign data files</p>
+        </div>
         <div class="btns">
-            <a href="campaigns.php" class="btn alt mar-right-1">Cancel</a>
-            <input type="submit" name="submit" value="Import" class="btn">
+            <a href="campaigns.php" class="btn btn-secondary mar-right-1">Cancel</a>
+            <input type="submit" name="submit" value="Import" class="btn btn-success">
         </div>
     </div>
 
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
+    <div class="form-section">
+        <h3 class="section-title">Upload File</h3>
 
             <label for="table"><span class="required">*</span> Table</label>
             <select id="table" name="table" required>

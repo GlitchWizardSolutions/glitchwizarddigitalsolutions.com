@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Get the total number of new subscribers within the last day
 $stmt = $pdo->prepare('SELECT * FROM subscribers WHERE cast(date_subbed as DATE) = cast(now() as DATE) ORDER BY date_subbed DESC');
 $stmt->execute();
@@ -29,12 +30,15 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <?=template_admin_header('Newsletters', 'newsletters')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Newsletter Overview']
+])?>
+
 <div class="content-title">
-    <div class="title">
-      <i class="fa-solid fa-paper-plane"></i>
-        <div class="txt">
-           <h2 class="responsive-width-100">Newsletter System</h2>
-        </div>
+    <div class="icon alt"><?=svg_icon_newsletter()?></div>
+    <div class="txt">
+        <h2 class="responsive-width-100">Newsletter System</h2>
+        <p class="subtitle">Complete overview of newsletter operations</p>
     </div>
 </div>
 <div class="dashboard">

@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Remove the time limit and file size limit
 set_time_limit(0);
 ini_set('post_max_size', '0');
@@ -90,19 +91,27 @@ if (isset($_POST['file_type'], $_POST['table'])) {
 ?>
 <?=template_admin_header('Export Subscribers', 'subscribers', 'export')?>
 
-<form method="post">
+<?=generate_breadcrumbs([
+    ['label' => 'Subscribers', 'url' => 'subscribers.php'],
+    ['label' => 'Export Subscribers']
+])?>
+
+<form method="post" class="form-professional">
 
     <div class="content-title">
-        <h2>Export Subscribers</h2>
+        <div class="icon alt"><?=svg_icon_download()?></div>
+        <div class="txt">
+            <h2>Export Subscribers</h2>
+            <p class="subtitle">Download subscriber data files</p>
+        </div>
         <div class="btns">
-            <a href="subscribers.php" class="btn alt mar-right-1">Cancel</a>
-            <input type="submit" name="submit" value="Export" class="btn">
+            <a href="subscribers.php" class="btn btn-secondary mar-right-1">Cancel</a>
+            <input type="submit" name="submit" value="Export" class="btn btn-success">
         </div>
     </div>
 
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
+    <div class="form-section">
+        <h3 class="section-title">Export Options</h3>
 
             <label for="table"><span class="required">*</span> Table</label>
             <select id="table" name="table" required>

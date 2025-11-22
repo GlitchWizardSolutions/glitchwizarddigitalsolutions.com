@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Remove the time limit and file size limit
 set_time_limit(0);
 ini_set('post_max_size', '0');
@@ -88,19 +89,27 @@ if (isset($_POST['file_type'])) {
 ?>
 <?=template_admin_header('Export Newsletters', 'newsletters', 'export')?>
 
-<form method="post">
+<?=generate_breadcrumbs([
+    ['label' => 'Newsletters', 'url' => 'newsletters.php'],
+    ['label' => 'Export Newsletters']
+])?>
+
+<form method="post" class="form-professional">
 
     <div class="content-title">
-        <h2>Export Newsletters</h2>
+        <div class="icon alt"><?=svg_icon_download()?></div>
+        <div class="txt">
+            <h2>Export Newsletters</h2>
+            <p class="subtitle">Download newsletter data as CSV, JSON, XML, or TXT</p>
+        </div>
         <div class="btns">
-            <a href="newsletters.php" class="btn alt mar-right-1">Cancel</a>
-            <input type="submit" name="submit" value="Export" class="btn">
+            <a href="newsletters.php" class="btn btn-secondary mar-right-1">Cancel</a>
+            <input type="submit" name="submit" value="Export" class="btn btn-success">
         </div>
     </div>
 
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
+    <div class="form-section">
+        <h3 class="section-title">Export Options</h3>
 
             <label for="file_type"><span class="required">*</span> File Type</label>
             <select id="file_type" name="file_type" required>
