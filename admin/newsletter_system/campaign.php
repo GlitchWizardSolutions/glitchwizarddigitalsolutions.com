@@ -29,7 +29,7 @@ $stmt = $pdo->prepare('SELECT * FROM subscribers WHERE status = "Subscribed" AND
 $stmt->execute();
 $subscribers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Retrieve groups
-$groups = $pdo->query('SELECT g.*, (SELECT COUNT(*) FROM group_subscribers gs JOIN subscribers s ON s.id = gs.subscriber_id AND s.status = "Subscribed" WHERE gs.group_id = g.id) AS num_subscribers FROM groups g ORDER BY g.title ASC')->fetchAll(PDO::FETCH_ASSOC);
+$groups = $pdo->query('SELECT g.*, (SELECT COUNT(*) FROM group_subscribers gs JOIN subscribers s ON s.id = gs.subscriber_id AND s.status = "Subscribed" WHERE gs.group_id = g.id) AS num_subscribers FROM `groups` g ORDER BY g.title ASC')->fetchAll(PDO::FETCH_ASSOC);
 // Retrieve newsletters from the database
 $stmt = $pdo->prepare('SELECT * FROM newsletters ORDER BY submit_date ASC');
 $stmt->execute();

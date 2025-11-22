@@ -10,7 +10,7 @@ $subscriber = [
     'groups' => []
 ];
 // Get groups
-$groups = $pdo->query('SELECT * FROM groups ORDER BY title ASC')->fetchAll();
+$groups = $pdo->query('SELECT * FROM `groups` ORDER BY title ASC')->fetchAll();
 // Add subscriber groups to the database
 function addSubscriberGroups($pdo, $subscriber_id) {
     if (isset($_POST['groups']) && is_array($_POST['groups']) && count($_POST['groups']) > 0) {
@@ -33,7 +33,7 @@ if (isset($_GET['id'])) {
     $stmt->execute([ $_GET['id'] ]);
     $subscriber = $stmt->fetch(PDO::FETCH_ASSOC);
     // Get groups
-    $stmt = $pdo->prepare('SELECT g.* FROM groups g JOIN group_subscribers gs ON gs.group_id = g.id AND gs.subscriber_id = ?');
+    $stmt = $pdo->prepare('SELECT g.* FROM `groups` g JOIN group_subscribers gs ON gs.group_id = g.id AND gs.subscriber_id = ?');
     $stmt->execute([ $_GET['id'] ]);
     $subscriber['groups'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     // ID param exists, edit an existing subscriber

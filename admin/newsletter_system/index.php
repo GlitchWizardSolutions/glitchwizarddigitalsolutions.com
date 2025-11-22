@@ -7,7 +7,7 @@ $date = date('Y-m-d');
 $stmt = $pdo->prepare('SELECT 
     s.*, 
     ((SELECT COUNT(*) FROM campaign_items ci WHERE ci.subscriber_id = s.id AND ci.status = "Completed") / ((SELECT COUNT(*) FROM campaign_items ci WHERE ci.subscriber_id = s.id AND ci.status = "Completed") + (SELECT COUNT(*) FROM campaign_items ci WHERE ci.subscriber_id = s.id AND ci.status = "Failed")) * 100) AS percent_received,
-    (SELECT GROUP_CONCAT(g.title, ",") FROM groups g JOIN group_subscribers gs ON gs.group_id = g.id AND gs.subscriber_id = s.id) AS groups 
+    (SELECT GROUP_CONCAT(g.title, ",") FROM `groups` g JOIN group_subscribers gs ON gs.group_id = g.id AND gs.subscriber_id = s.id) AS `groups` 
     FROM subscribers s WHERE cast(s.date_subbed as DATE) = cast(? as DATE) ORDER BY s.date_subbed DESC');
 $stmt->execute([ $date ]);
 $subscribers = $stmt->fetchAll(PDO::FETCH_ASSOC);

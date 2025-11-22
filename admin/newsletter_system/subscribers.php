@@ -40,7 +40,7 @@ if ($group) {
     $where .= ($where ? 'AND ' : 'WHERE ') . 'id IN (SELECT subscriber_id FROM group_subscribers WHERE group_id = :group) ';
 }
 // Get groups
-$groups = $pdo->query('SELECT * FROM groups')->fetchAll();
+$groups = $pdo->query('SELECT * FROM `groups`')->fetchAll();
 // Retrieve the total number of subscribers
 $stmt = $pdo->prepare('SELECT COUNT(*) AS total FROM subscribers ' . $where);
 if ($search) $stmt->bindParam('search', $param3, PDO::PARAM_STR);
@@ -55,7 +55,7 @@ $subscribers_total = $stmt->fetchColumn();
 $stmt = $pdo->prepare('SELECT 
     s.*, 
     ((SELECT COUNT(*) FROM campaign_items ci WHERE ci.subscriber_id = s.id AND ci.status = "Completed") / ((SELECT COUNT(*) FROM campaign_items ci WHERE ci.subscriber_id = s.id AND ci.status = "Completed") + (SELECT COUNT(*) FROM campaign_items ci WHERE ci.subscriber_id = s.id AND ci.status = "Failed")) * 100) AS percent_received,
-    (SELECT GROUP_CONCAT(g.title, ",") FROM groups g JOIN group_subscribers gs ON gs.group_id = g.id AND gs.subscriber_id = s.id) AS groups 
+    (SELECT GROUP_CONCAT(g.title, ",") FROM `groups` g JOIN group_subscribers gs ON gs.group_id = g.id AND gs.subscriber_id = s.id) AS `groups` 
     FROM subscribers s ' . $where . ' ORDER BY ' . $order_by . ' ' . $order . ' LIMIT :start_results,:num_results');
 // Bind params
 $stmt->bindParam('start_results', $param1, PDO::PARAM_INT);

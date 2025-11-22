@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 $filename = '?';
 $application= 'Resource System - Client Projects';
 $inputs     = '';
@@ -93,33 +94,37 @@ $url = 'client-projects.php?search=' . $search . (isset($_GET['page_id']) ? '&pa
 ?>
 <?=template_admin_header('Client Projects', 'resources', 'projects')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'client-projects.php'],
+    ['label' => 'Client Projects']
+])?>
+
 <div class="content-title">
-    <div class="title">
-    <i class="fa-regular fa-handshake"></i>
-        <div class="txt">
-            <h2>Client Projects</h2>
-            <p>All Client Projects</p>
-        </div>
+    <div class="icon"><?=svg_icon_content()?></div>
+    <div class="txt">
+        <h2>Client Projects</h2>
+        <p class="subtitle">Manage client project records</p>
     </div>
 </div>
 
 <?php if (isset($success_msg)): ?>
 <div class="msg success">
-    <i class="fas fa-check-circle"></i>
+    <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>
     <p><?=$success_msg?></p>
-    <i class="fas fa-times"></i>
+    <svg class="close" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
 </div>
 <?php endif; ?>
 
 <div class="content-header responsive-flex-column pad-top-5">
-    <div class="btns">
-        <a href="client-project.php" class="btn">+ Create New Project</a>
-    </div>
+    <a href="client-project.php" class="btn btn-success">
+        <svg class="icon-left" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
+        Create New Project
+    </a>
     <form action="" method="get">
         <div class="search">
             <label for="search">
                 <input id="search" type="text" name="search" placeholder="Search records..." value="<?=htmlspecialchars($search, ENT_QUOTES)?>" class="responsive-width-100">
-                <i class="fas fa-search"></i>
+                <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
             </label>
         </div>
     </form>

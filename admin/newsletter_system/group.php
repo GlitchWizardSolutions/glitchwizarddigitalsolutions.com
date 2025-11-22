@@ -10,7 +10,7 @@ $group = [
 // Check if the ID param exists
 if (isset($_GET['id'])) {
     // Retrieve the group from the database
-    $stmt = $pdo->prepare('SELECT * FROM groups WHERE id = ?');
+    $stmt = $pdo->prepare('SELECT * FROM `groups` WHERE id = ?');
     $stmt->execute([ $_GET['id'] ]);
     $group = $stmt->fetch(PDO::FETCH_ASSOC);
     // ID param exists, edit an existing group
