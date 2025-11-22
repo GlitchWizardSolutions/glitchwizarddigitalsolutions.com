@@ -62,33 +62,38 @@ if (isset($_FILES['file']) && !empty($_FILES['file']['tmp_name'])) {
     }
 }
 ?>
-<?=template_admin_header('Project Tickets', 'projects', 'manage')?>
+<?=template_admin_header('Legal Filings', 'ticketing', 'import')?>
 
 <div class="content-title">
-    <div class="title">
-    <i class="fa-solid fa-file-import fa-lg"></i>
-        <div class="txt">
-            <h2 class="responsive-width-100">Import Tickets</h2>
-            <p>Import tickets from CSV file.</p>
-        </div>
+    <div class="icon alt">
+        <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+    </div>
+    <div class="txt">
+        <h2>Import Legal Filings</h2>
+        <p class="subtitle">Upload and import legal filing records from CSV, JSON, XML, or TXT files</p>
     </div>
 </div>
-<form action="" method="post" enctype="multipart/form-data">
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="tickets.php" class="btn alt mar-right-2">Cancel</a>
-        <input type="submit" name="submit" value="Import" class="btn">
-    </div>
+<form class="form-professional" action="" method="post" enctype="multipart/form-data">
 
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
-
-            <label for="file"><i class="required">*</i> File</label>
+    <div class="form-section">
+        <div class="section-title">File Upload</div>
+        
+        <div class="form-group">
+            <label for="file"><i class="required">*</i> Select File</label>
             <input type="file" name="file" id="file" accept=".csv,.json,.xml,.txt" required>
-
+            <small>Supported formats: CSV, JSON, XML, TXT</small>
         </div>
 
+    </div>
+
+    <div class="form-actions">
+        <a href="tickets.php" class="btn btn-secondary">Cancel</a>
+        <input type="submit" name="submit" value="Import Filings" class="btn btn-primary">
     </div>
 
 </form>

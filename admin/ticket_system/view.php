@@ -274,7 +274,7 @@ if (isset($_POST['msg'], $_SESSION['loggedin']) && !empty($_POST['msg']) && $tic
             </div>
 
             <div class="form-actions" style="margin-top: 20px;">
-                <button type="submit" class="btn btn-primary">Post Comment</button>
+                <button type="submit" class="btn btn-success">Post Comment</button>
             </div>
         </form>
         <?php endif; ?>

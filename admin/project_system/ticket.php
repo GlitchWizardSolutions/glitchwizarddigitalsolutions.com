@@ -97,7 +97,7 @@ if (isset($_GET['id'])) {
 <br><br>
 <form action="" method="post" enctype="multipart/form-data">
    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="tickets.php" class="btn mar-right-2">Cancel</a>
+        <a href="tickets.php" class="btn btn-secondary mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
         <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this ticket?')">
         <?php endif; ?>
@@ -190,7 +190,7 @@ if (isset($_GET['id'])) {
         </div>
     </div>
   <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="tickets.php" class="btn mar-right-2">Cancel</a>
+        <a href="tickets.php" class="btn btn-secondary mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
         <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this ticket?')">
         <?php endif; ?>

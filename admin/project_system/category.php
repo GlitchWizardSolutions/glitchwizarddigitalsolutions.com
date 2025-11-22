@@ -66,7 +66,7 @@ if (isset($_GET['id'])) {
             <?php if ($page == 'Edit'): ?>
             <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">
             <?php endif; ?>
-            <input type="submit" name="submit" value="<?=$page == 'Edit' ? 'Update' : 'Create'?> Category" class="btn btn-primary">
+            <input type="submit" name="submit" value="<?=$page == 'Edit' ? 'Update' : 'Create'?> Category" class="btn btn-success">
         </div>
 
     </div>

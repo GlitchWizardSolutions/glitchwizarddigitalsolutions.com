@@ -1640,6 +1640,37 @@ main .form.size-full, .create-invoice-modal.size-full {
 .btn.disabled:hover {
   background: #a9abad;
 }
+/* Standard button modifier classes */
+.btn-primary, .btn.btn-primary {
+  background: #6b46c1;
+  color: #FFFFFF;
+}
+.btn-primary:hover, .btn.btn-primary:hover {
+  background: #5a3aa3;
+}
+.btn-success, .btn.btn-success {
+  background: #4ab46d;
+  color: #FFFFFF;
+}
+.btn-success:hover, .btn.btn-success:hover {
+  background: #46a966;
+}
+.btn-danger, .btn.btn-danger {
+  background: #be4949;
+  color: #FFFFFF;
+}
+.btn-danger:hover, .btn.btn-danger:hover {
+  background: #b74141;
+}
+.btn-secondary, .btn.btn-secondary {
+  color: #75797e;
+  border: 1px solid #d4dbde;
+  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.03);
+  background: #f1f3f4;
+}
+.btn-secondary:hover, .btn.btn-secondary:hover {
+  background: #eef1f2;
+}
 .btn.small {
   padding: 8px 12px;
   font-size: 12px;

@@ -68,7 +68,7 @@ $url = 'categories.php?search=' . $search;
 
 
 <div class="content-header responsive-flex-column pad-top-5">
-    <a href="category.php" class="btn">Create Category</a>
+    <a href="category.php" class="btn btn-success">Create Category</a>
     <form action="" method="get">
         <div class="search">
             <label for="search">

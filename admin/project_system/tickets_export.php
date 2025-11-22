@@ -95,39 +95,43 @@ if (isset($_POST['file_type'])) {
     }
 }
 ?>
-<?=template_admin_header('Project Tickets', 'projects', 'manage')?>
+<?=template_admin_header('Project Tickets', 'ticketing', 'export')?>
 
 <div class="content-title">
-    <div class="title">
-    <i class="fa-solid fa-file-export fa-lg"></i>
-        <div class="txt">
-                  <h2 class="responsive-width-100">Export Tickets</h2>
-            <p>Export project_tickets to CSV, TXT, JSON, or XML file.</p>
-        </div>
+    <div class="icon alt">
+        <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+    </div>
+    <div class="txt">
+        <h2>Export Project Tickets</h2>
+        <p class="subtitle">Download all project tickets in your preferred format</p>
     </div>
 </div>
 
-<form action="" method="post">
+<form class="form-professional" action="" method="post">
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="tickets.php" class="btn alt mar-right-2">Cancel</a>
-        <input type="submit" name="submit" value="Export" class="btn">
-    </div>
-
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
-
-            <label for="file_type"><i class="required">*</i> File Type</label>
+    <div class="form-section">
+        <div class="section-title">Export Options</div>
+        
+        <div class="form-group">
+            <label for="file_type"><i class="required">*</i> File Format</label>
             <select id="file_type" name="file_type" required>
-                <option value="csv">CSV</option>
-                <option value="txt">TXT</option>
-                <option value="json">JSON</option>
-                <option value="xml">XML</option>
+                <option value="csv">CSV (Comma-Separated Values)</option>
+                <option value="txt">TXT (Plain Text)</option>
+                <option value="json">JSON (JavaScript Object Notation)</option>
+                <option value="xml">XML (Extensible Markup Language)</option>
             </select>
-
+            <small>Select the format for your exported project ticket data</small>
         </div>
 
+    </div>
+
+    <div class="form-actions">
+        <a href="tickets.php" class="btn btn-secondary">Cancel</a>
+        <input type="submit" name="submit" value="Export Tickets" class="btn btn-primary">
     </div>
 
 </form>

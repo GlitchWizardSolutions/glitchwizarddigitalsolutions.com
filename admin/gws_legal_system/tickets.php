@@ -151,9 +151,11 @@ $comment_awaiting_my_response = $stmt->fetchColumn();
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="ticket.php" class="btn">Create Requirement</a>
-        <a href="comments.php" class="btn">Notes</a>
-        <a href="categories.php" class="btn">Categories</a>
+        <a href="ticket.php" class="btn btn-success">Create Requirement</a>
+        <a href="comments.php" class="btn btn-primary mar-left-1">Notes</a>
+        <a href="categories.php" class="btn btn-primary mar-left-1">Categories</a>
+        <a href="tickets_import.php" class="btn btn-primary mar-left-1">Import</a>
+        <a href="tickets_export.php" class="btn btn-primary mar-left-1">Export</a>
     </div>
     <form action="" method="get">
          <input type="hidden" name="page" value="tickets">
@@ -168,7 +170,7 @@ $comment_awaiting_my_response = $stmt->fetchColumn();
                 <label><input type="radio" name="status" value="resolved"<?=$status=='resolved'?' checked':''?>>&nbsp;Resolved</label>
                  <label><input type="radio" name="status" value="paused"<?=$status=='paused'?' checked':''?>>&nbsp;Paused</label>
                  
-                <button type="submit">Apply</button>
+                <button type="submit" class="btn btn-success">Apply</button>
             </div>
         </div>
         <div class="search">

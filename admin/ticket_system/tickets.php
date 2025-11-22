@@ -179,7 +179,7 @@ $comment_awaiting_my_response = $stmt->fetchColumn();
                 <label><input type="radio" name="status" value="closed"<?=$status=='closed'?' checked':''?>>&nbsp;Closed</label>
                 <label><input type="radio" name="status"             value="resolved"<?=$status=='resolved'?' checked':''?>>&nbsp;Resolved</label>
                  
-                <button type="submit">Apply</button>
+                <button type="submit" class="btn btn-success">Apply</button>
             </div>
         </div>
         <div class="search">

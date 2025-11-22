@@ -311,7 +311,7 @@ if (isset($_POST['new-comment'])) {
             </div>
 
             <div class="form-actions" style="margin-top: 20px;">
-                <button type="submit" class="btn btn-primary">Post Note</button>
+                <button type="submit" class="btn btn-success">Post Note</button>
             </div>
         </form>
         <?php endif; ?>

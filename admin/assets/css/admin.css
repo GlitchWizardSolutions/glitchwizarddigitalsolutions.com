@@ -645,3 +645,127 @@ main .form .multi-checkbox .item.check-all input[type="checkbox"]:checked {
     border-top-right-radius: 0;
   }
 }
+
+/* ===================================================================
+   BUTTON COLOR OVERRIDES - Bootstrap 5 Custom Colors
+   =================================================================== */
+
+/* Primary Button - Royal Purple (for navigation/links) */
+.btn-primary,
+.btn.btn-primary,
+a.btn-primary,
+button.btn-primary,
+input.btn-primary {
+  background-color: #6b46c1 !important;
+  border-color: #6b46c1 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-primary:hover,
+.btn.btn-primary:hover,
+a.btn-primary:hover,
+button.btn-primary:hover,
+input.btn-primary:hover {
+  background-color: #5a3aa3 !important;
+  border-color: #5a3aa3 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-primary:active,
+.btn-primary:focus,
+.btn.btn-primary:active,
+.btn.btn-primary:focus {
+  background-color: #4e3189 !important;
+  border-color: #4e3189 !important;
+  box-shadow: 0 0 0 0.25rem rgba(107, 70, 193, 0.5) !important;
+}
+
+/* Success Button - Green (for submit/create actions) */
+.btn-success,
+.btn.btn-success,
+a.btn-success,
+button.btn-success,
+input.btn-success {
+  background-color: #4ab46d !important;
+  border-color: #4ab46d !important;
+  color: #FFFFFF !important;
+}
+
+.btn-success:hover,
+.btn.btn-success:hover,
+a.btn-success:hover,
+button.btn-success:hover,
+input.btn-success:hover {
+  background-color: #46a966 !important;
+  border-color: #46a966 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-success:active,
+.btn-success:focus,
+.btn.btn-success:active,
+.btn.btn-success:focus {
+  background-color: #3d9457 !important;
+  border-color: #3d9457 !important;
+  box-shadow: 0 0 0 0.25rem rgba(74, 180, 109, 0.5) !important;
+}
+
+/* Danger Button - Red (for delete actions) */
+.btn-danger,
+.btn.btn-danger,
+a.btn-danger,
+button.btn-danger,
+input.btn-danger {
+  background-color: #be4949 !important;
+  border-color: #be4949 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-danger:hover,
+.btn.btn-danger:hover,
+a.btn-danger:hover,
+button.btn-danger:hover,
+input.btn-danger:hover {
+  background-color: #b74141 !important;
+  border-color: #b74141 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-danger:active,
+.btn-danger:focus,
+.btn.btn-danger:active,
+.btn.btn-danger:focus {
+  background-color: #a33939 !important;
+  border-color: #a33939 !important;
+  box-shadow: 0 0 0 0.25rem rgba(190, 73, 73, 0.5) !important;
+}
+
+/* Secondary Button - Grey (for cancel actions) */
+.btn-secondary,
+.btn.btn-secondary,
+a.btn-secondary,
+button.btn-secondary,
+input.btn-secondary {
+  background-color: #f1f3f4 !important;
+  border-color: #d4dbde !important;
+  color: #75797e !important;
+}
+
+.btn-secondary:hover,
+.btn.btn-secondary:hover,
+a.btn-secondary:hover,
+button.btn-secondary:hover,
+input.btn-secondary:hover {
+  background-color: #eef1f2 !important;
+  border-color: #c8d0d3 !important;
+  color: #5f6368 !important;
+}
+
+.btn-secondary:active,
+.btn-secondary:focus,
+.btn.btn-secondary:active,
+.btn.btn-secondary:focus {
+  background-color: #e8ebec !important;
+  border-color: #bcc5c8 !important;
+  box-shadow: 0 0 0 0.25rem rgba(212, 219, 222, 0.5) !important;
+}
