@@ -1,17 +1,34 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
 
 if (isset($_POST['add'])) {
     $title = $_POST['title'];
     
-    $add_sql = mysqli_query($connect, "INSERT INTO albums (title) VALUES ('$title')");
+    $add_sql = $blog_pdo->prepare("INSERT INTO albums (title) VALUES (?)");
+    $add_sql->execute([$title]);
     echo '<meta http-equiv="refresh" content="0; url=albums.php">';
 }
 ?>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h3 class="h3"><i class="fas fa-list-ol"></i> Albums</h3>
-	</div>
-	
+<?=template_admin_header('Add Album', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Albums', 'url' => 'albums.php'],
+    ['title' => 'Add Album', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-images"></i>
+        <div class="txt">
+            <h2>Add Album</h2>
+            <p>Create new photo album</p>
+        </div>
+    </div>
+</div>
+
+<div class="form-professional">
             <div class="card">
               <h6 class="card-header">Add Album</h6>         
                   <div class="card-body">
@@ -26,7 +43,5 @@ if (isset($_POST['add'])) {
                      </form>                           
                   </div>
             </div>
-
-<?php
-include "footer.php";
-?>
+</div>
+<?=template_admin_footer()?>

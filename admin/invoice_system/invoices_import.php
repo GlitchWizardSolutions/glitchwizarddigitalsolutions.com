@@ -67,10 +67,12 @@ if (isset($_FILES['file'], $_POST['table']) && !empty($_FILES['file']['tmp_name'
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_upload()?></div>
-    <div class="txt">
-        <h2>Import Invoices</h2>
-        <p class="subtitle">Batch import invoices from file</p>
+    <div class="title">
+       <i class="fa-solid fa-upload"></i>
+        <div class="txt">
+            <h2>Import Invoices</h2>
+            <p>Batch import invoices from file</p>
+        </div>
     </div>
 </div>
 

@@ -6,7 +6,7 @@
 
 /**
  * Generate breadcrumb navigation
- * @param array $crumbs Array of ['label' => 'Text', 'url' => 'link.php'] (last item has no URL)
+ * @param array $crumbs Array of ['label' => 'Text', 'url' => 'link.php'] or ['title' => 'Text', 'url' => 'link.php']
  * @return string HTML breadcrumb
  */
 function generate_breadcrumbs($crumbs) {
@@ -18,11 +18,13 @@ function generate_breadcrumbs($crumbs) {
     
     foreach ($crumbs as $index => $crumb) {
         $html .= '<span class="separator">›</span>';
+        // Support both 'label' and 'title' keys
+        $text = isset($crumb['label']) ? $crumb['label'] : (isset($crumb['title']) ? $crumb['title'] : '');
         if (isset($crumb['url']) && $index < count($crumbs) - 1) {
             $html .= '<a href="' . htmlspecialchars($crumb['url']) . '">' 
-                  . htmlspecialchars($crumb['label']) . '</a>';
+                  . htmlspecialchars($text) . '</a>';
         } else {
-            $html .= '<span class="current">' . htmlspecialchars($crumb['label']) . '</span>';
+            $html .= '<span class="current">' . htmlspecialchars($text) . '</span>';
         }
     }
     

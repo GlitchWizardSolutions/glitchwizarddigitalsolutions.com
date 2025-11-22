@@ -73,10 +73,12 @@ if (isset($_GET['id'])) {
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_user()?></div>
-    <div class="txt">
-        <h2><?=$page?> Client</h2>
-        <p class="subtitle">Manage invoice client information</p>
+    <div class="title">
+       <i class="fa-solid fa-user"></i>
+        <div class="txt">
+            <h2><?=$page?> Client</h2>
+            <p>Manage invoice client information</p>
+        </div>
     </div>
 </div>
 

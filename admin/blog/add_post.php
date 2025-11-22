@@ -1,20 +1,21 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
 
 if (isset($_POST['add'])) {
-    $title       = addslashes($_POST['title']);
-	$slug        = generateSeoURL($title);
-    $active      = addslashes($_POST['active']);
-	$featured    = addslashes($_POST['featured']);
-    $category_id = addslashes($_POST['category_id']);
-    $content     = htmlspecialchars($_POST['content']);
-    $date        = date($settings['date_format']);
-    $time        = date('H:i');
+    $title = trim($_POST['title']);
+	$slug = generateSeoURL($title);
+    $active = $_POST['active'];
+	$featured = $_POST['featured'];
+    $category_id = (int) $_POST['category_id'];
+    $content = $_POST['content'];
+    $date = date($settings['date_format']);
+    $time = date('H:i');
     
-	$author     = $uname;
-	$auth_query = mysqli_query($connect, "SELECT id FROM `users` WHERE username = '$author' LIMIT 1");
-    $auth       = mysqli_fetch_assoc($auth_query);
-    $author_id  = $auth['id'];
+	$author = $uname;
+	$stmt = $blog_pdo->prepare("SELECT id FROM `users` WHERE username = ? LIMIT 1");
+	$stmt->execute([$author]);
+    $auth = $stmt->fetch(PDO::FETCH_ASSOC);
+    $author_id = $auth ? $auth['id'] : 0;
 
     $image = '';
     
@@ -49,18 +50,16 @@ if (isset($_POST['add'])) {
 	   }
     }
     
-    $add_sql = mysqli_query($connect, "INSERT INTO `posts` (category_id, title, slug, author_id, image, content, date, time, active, featured) 
-									   VALUES ('$category_id', '$title', '$slug', '$author_id', '$image', '$content', '$date', '$time', '$active', '$featured')");
+    $stmt = $blog_pdo->prepare("INSERT INTO `posts` (category_id, title, slug, author_id, image, content, date, time, active, featured) 
+								   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+	$stmt->execute([$category_id, $title, $slug, $author_id, $image, $content, $date, $time, $active, $featured]);
     
+    $post_id = $blog_pdo->lastInsertId();
     $from     = $settings['email'];
     $sitename = $settings['sitename'];
 	
-    $run3 = mysqli_query($connect, "SELECT * FROM `posts` WHERE title='$title'");
-    $row3 = mysqli_fetch_assoc($run3);
-    $id3  = $row3['id'];
-	
-    $run2 = mysqli_query($connect, "SELECT * FROM `newsletter`");
-    while ($row = mysqli_fetch_assoc($run2)) {
+    $stmt = $blog_pdo->query("SELECT * FROM `newsletter`");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
         $to = $row['email'];
         $subject = $title;
@@ -68,7 +67,7 @@ if (isset($_POST['add'])) {
 <html>
 <body>
   <b><h1>' . $settings['sitename'] . '</h1><b/>
-  <h2>New post: <b><a href="' . $settings['site_url'] . '/post.php?id=' . $id3 . '" title="Read more">' . $title . '</a></b></h2><br />
+  <h2>New post: <b><a href="' . $settings['site_url'] . '/post.php?id=' . $post_id . '" title="Read more">' . $title . '</a></b></h2><br />
 
   ' . html_entity_decode($content) . '
   
@@ -86,13 +85,30 @@ if (isset($_POST['add'])) {
         @mail($to, $subject, $message, $headers);
     }
     
-    echo '<meta http-equiv="refresh" content="0;url=posts.php">';
+    header('Location: posts.php');
+    exit;
 }
 ?>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h3 class="h3"><i class="fas fa-list"></i> Posts</h3>
-	</div> 
+<?=template_admin_header('Add Post', 'blog')?>
 
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Posts', 'url' => 'posts.php'],
+    ['title' => 'Add Post', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-edit"></i>
+        <div class="txt">
+            <h2>Add Post</h2>
+            <p>Create a new blog post</p>
+        </div>
+    </div>
+</div>
+
+<div class="form-professional">
     <div class="card">
         <h6 class="card-header">Add Post</h6>         
             <div class="card-body">
@@ -126,10 +142,10 @@ if (isset($_POST['add'])) {
 						<label>Category</label><br />
 						<select name="category_id" class="form-select" required>
 <?php
-$crun = mysqli_query($connect, "SELECT * FROM `categories`");
-while ($rw = mysqli_fetch_assoc($crun)) {
+$stmt = $blog_pdo->query("SELECT * FROM `categories`");
+while ($rw = $stmt->fetch(PDO::FETCH_ASSOC)) {
     echo '
-                            <option value="' . $rw['id'] . '">' . $rw['category'] . '</option>
+                            <option value="' . $rw['id'] . '">' . htmlspecialchars($rw['category']) . '</option>
 									';
 }
 ?>
@@ -144,17 +160,17 @@ while ($rw = mysqli_fetch_assoc($crun)) {
 				</form>                      
             </div>
     </div>
+</div>
 
+<?=template_admin_footer('
 <script>
 $(document).ready(function() {
-	$('#summernote').summernote({height: 350});
+	$("#summernote").summernote({height: 350});
 	
-	var noteBar = $('.note-toolbar');
-		noteBar.find('[data-toggle]').each(function() {
-		$(this).attr('data-bs-toggle', $(this).attr('data-toggle')).removeAttr('data-toggle');
+	var noteBar = $(".note-toolbar");
+		noteBar.find("[data-toggle]").each(function() {
+		$(this).attr("data-bs-toggle", $(this).attr("data-toggle")).removeAttr("data-toggle");
 	});
 });
 </script>
-<?php
-include "footer.php";
-?>
+')?>

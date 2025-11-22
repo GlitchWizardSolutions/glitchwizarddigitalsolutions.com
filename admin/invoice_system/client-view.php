@@ -61,10 +61,12 @@ $copy="";
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_user()?></div>
-    <div class="txt">
-        <h2><?=htmlspecialchars($record['business_name'], ENT_QUOTES)?></h2>
-        <p class="subtitle"><?=$page . ' Client # ' ?><?=$record['id']?></p>
+    <div class="title">
+       <i class="fa-solid fa-user"></i>
+        <div class="txt">
+            <h2><?=htmlspecialchars($record['business_name'], ENT_QUOTES)?></h2>
+            <p><?=$page . ' Client # ' ?><?=$record['id']?></p>
+        </div>
     </div>
 </div>
 

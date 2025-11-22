@@ -1,6 +1,9 @@
 <?php
 //2025-06-24 Production
 require 'assets/includes/admin_config.php';
+
+$success_message = '';
+$error_message = '';
 if (isset($_GET['delete_bgrimg'])) {
 	unlink(blog_site_url . $settings['background_image']);
 	
@@ -68,13 +71,29 @@ if (isset($_POST['save'])) {
 	$settings['background_image']   = $image;
 	
 	file_put_contents(blog_site_url .'config_settings.php', '<?php $settings = ' . var_export($settings, true) . '; ?>');
-	echo '<meta http-equiv="refresh" content="0;url=settings.php">';
+	header('Location: settings.php');
+	exit;
 }
 ?>
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h3 class="h3"><i class="fas fa-cogs"></i> Settings</h3>
-		</div>
+<?=template_admin_header('Blog Settings', 'blog')?>
 
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Settings', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-cog"></i>
+        <div class="txt">
+            <h2>Blog Settings</h2>
+            <p>Configure blog settings</p>
+        </div>
+    </div>
+</div>
+
+<div class="form-professional">
 		<div class="card">
 			<h6 class="card-header">Settings</h6>         
 			<div class="card-body">
@@ -367,7 +386,6 @@ if ($settings['background_image'] != "") {
 					</div>
 				</form>                           
 			</div>
-		</div>   
-<?php
-include "footer.php";
-?>
+</div>
+</div>
+<?=template_admin_footer()?>

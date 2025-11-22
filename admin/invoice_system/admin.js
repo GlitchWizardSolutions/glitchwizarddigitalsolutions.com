@@ -262,36 +262,85 @@ const addClient = () => {
     });
 };
 const initManageInvoiceItems = () => {
-    document.querySelector('.add-item').onclick = event => {
-        event.preventDefault();
-        document.querySelector('.manage-invoice-table tbody').insertAdjacentHTML('beforeend', `
-        <tr>
-            <td><input type="hidden" name="item_id[]" value="0"><input name="item_name[]" type="text" placeholder="Name"></td>
-            <td><input name="item_description[]" type="text" placeholder="Description"></td>
-            <td><input name="item_price[]" type="number" placeholder="Price" step=".01"></td>
-            <td><input name="item_quantity[]" type="number" placeholder="Quantity"></td>
-            <td><svg class="delete-item" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg></td>
-        </tr>
-        `);
-        document.querySelectorAll('.delete-item').forEach(element => element.onclick = event => {
+    const addItemBtn = document.querySelector('.add-item');
+    if (addItemBtn) {
+        addItemBtn.onclick = event => {
+            event.preventDefault();
+            const tbody = document.querySelector('.invoice-items-tbody') || document.querySelector('.manage-invoice-table tbody');
+            if (tbody) {
+                // Remove "no items" row if it exists
+                const noItemsRow = tbody.querySelector('.no-items-row');
+                if (noItemsRow) {
+                    noItemsRow.remove();
+                }
+                
+                // Add new item row
+                tbody.insertAdjacentHTML('beforeend', `
+                <tr class="item-row">
+                    <td><input type="hidden" name="item_id[]" value="0"><input name="item_name[]" type="text" placeholder="Item name" required style="width: 100%;"></td>
+                    <td><input name="item_description[]" type="text" placeholder="Description" maxlength="250" style="width: 100%;"></td>
+                    <td><input name="item_price[]" type="number" placeholder="0.00" step="0.01" value="0" class="item-price" style="width: 100%;"></td>
+                    <td><input name="item_quantity[]" type="number" placeholder="1" value="1" class="item-quantity" style="width: 100%;"></td>
+                    <td class="item-total" style="font-weight: bold; padding: 10px;">$0.00</td>
+                    <td style="text-align: center;"><svg class="delete-item" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="cursor: pointer; fill: #d32f2f;"><title>Delete Item</title><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg></td>
+                </tr>
+                `);
+                
+                // Reattach delete handlers
+                document.querySelectorAll('.delete-item').forEach(element => {
+                    element.onclick = event => {
+                        event.preventDefault();
+                        element.closest('tr').remove();
+                        // Recalculate totals after deletion
+                        if (typeof calculateInvoiceTotals === 'function') {
+                            calculateInvoiceTotals();
+                        }
+                    };
+                });
+                
+                // Recalculate totals
+                if (typeof calculateInvoiceTotals === 'function') {
+                    calculateInvoiceTotals();
+                }
+                
+                // Focus on the new item's name field
+                const newRows = tbody.querySelectorAll('.item-row');
+                if (newRows.length > 0) {
+                    const lastRow = newRows[newRows.length - 1];
+                    const nameInput = lastRow.querySelector('input[name="item_name[]"]');
+                    if (nameInput) {
+                        nameInput.focus();
+                    }
+                }
+            }
+        };
+    }
+    document.querySelectorAll('.delete-item').forEach(element => {
+        element.onclick = event => {
             event.preventDefault();
             element.closest('tr').remove();
-        });
-        if (document.querySelector('.no-invoice-items-msg')) {
-            document.querySelector('.no-invoice-items-msg').remove();
-        }
-    };
-    document.querySelectorAll('.delete-item').forEach(element => element.onclick = event => {
-        event.preventDefault();
-        element.closest('tr').remove();
+            // Recalculate totals after deletion
+            if (typeof calculateInvoiceTotals === 'function') {
+                calculateInvoiceTotals();
+            }
+        };
     });
-    document.querySelector('.add-client').onclick = event => {
-        event.preventDefault();
-        addClient();
-    };
-    document.querySelector('#recurrence').onchange = () => {
-        document.querySelector('.recurrence-options').style.display = document.querySelector('#recurrence').value == 1 ? 'block' : 'none';
-    };
+    const addClientBtn = document.querySelector('.add-client');
+    if (addClientBtn) {
+        addClientBtn.onclick = event => {
+            event.preventDefault();
+            addClient();
+        };
+    }
+    const recurrenceSelect = document.querySelector('#recurrence');
+    if (recurrenceSelect) {
+        recurrenceSelect.onchange = () => {
+            const options = document.querySelector('.recurrence-options');
+            if (options) {
+                options.style.display = recurrenceSelect.value == 1 ? 'block' : 'none';
+            }
+        };
+    }
 };
 if (document.querySelector('.quick-create-invoice')) {
     document.querySelector('.quick-create-invoice').onclick = event => {

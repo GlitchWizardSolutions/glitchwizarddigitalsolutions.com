@@ -100,10 +100,12 @@ if (isset($_POST['file_type'], $_POST['table'])) {
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_download()?></div>
-    <div class="txt">
-        <h2>Export Invoices</h2>
-        <p class="subtitle">Batch export invoices to file</p>
+    <div class="title">
+       <i class="fa-solid fa-download"></i>
+        <div class="txt">
+            <h2>Export Invoices</h2>
+            <p>Batch export invoices to file</p>
+        </div>
     </div>
 </div>
 

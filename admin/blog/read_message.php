@@ -1,23 +1,38 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
 
-$id   = (int) $_GET['id'];
-$runq = mysqli_query($connect, "SELECT * FROM `messages` WHERE id='$id'");
-mysqli_query($connect, "UPDATE `messages` SET viewed='Yes' WHERE id='$id'");
-$row = mysqli_fetch_assoc($runq);
+$id = (int) $_GET['id'];
+$stmt = $blog_pdo->prepare("SELECT * FROM `messages` WHERE id = ?");
+$stmt->execute([$id]);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (empty($id)) {
-    echo '<meta http-equiv="refresh" content="0; url=messages.php">';
+if (empty($id) || !$row) {
+    header('Location: messages.php');
 	exit;
 }
-if (mysqli_num_rows($runq) == 0) {
-    echo '<meta http-equiv="refresh" content="0; url=messages.php">';
-	exit;
-}
+
+// Mark as viewed
+$stmt = $blog_pdo->prepare("UPDATE `messages` SET viewed = 'Yes' WHERE id = ?");
+$stmt->execute([$id]);
 ?>
-      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		  <h3 class="h3"><i class="fas fa-envelope"></i> Messages</h3>
-	  </div>
+<?=template_admin_header('Read Message', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Messages', 'url' => 'messages.php'],
+    ['title' => 'Read Message', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-envelope"></i>
+        <div class="txt">
+            <h2>Read Message</h2>
+            <p>View message details</p>
+        </div>
+    </div>
+</div>
 
 	  <div class="card">
 		  <h6 class="card-header">Message</h6>
@@ -50,6 +65,4 @@ echo '
 ?>
 		  </div>
 	  </div>
-<?php
-include "footer.php";
-?>
+<?=template_admin_footer()?>

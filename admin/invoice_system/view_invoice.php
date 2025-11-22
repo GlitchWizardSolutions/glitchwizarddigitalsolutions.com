@@ -39,14 +39,28 @@ if (!$invoice) {
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_invoice()?></div>
-    <div class="txt">
-        <h2>Invoice #<?=$invoice['invoice_number']?><?php if ($invoice['viewed']): ?> <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>The client has viewed the invoice.</title><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg><?php endif; ?></h2>
-        <p class="subtitle">Status: <?=status_badge($invoice['payment_status'])?></p>
+    <div class="title">
+       <i class="fa-solid fa-file-invoice"></i>
+        <div class="txt">
+            <h2>Invoice #<?=$invoice['invoice_number']?><?php if ($invoice['viewed']): ?> <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>The client has viewed the invoice.</title><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg><?php endif; ?></h2>
+            <p>Status: 
+                <?php if ($invoice['payment_status'] == 'Paid'): ?>
+                <span class="green">Paid</span>
+                <?php elseif ($invoice['payment_status'] == 'Cancelled'): ?>
+                <span class="red">Cancelled</span>
+                <?php elseif ($invoice['payment_status'] == 'Pending'): ?>
+                <span class="orange">Pending</span>
+                <?php elseif ($invoice['due_date'] < $date): ?>
+                <span class="red">Overdue</span>
+                <?php else: ?>
+                <span class="red">Unpaid</span>
+                <?php endif; ?>
+            </p>
+        </div>
     </div>
 </div>
 
-<div class="content-title responsive-flex-wrap responsive-pad-bot-3">
+<div class="content-title responsive-flex-wrap responsive-pad-bot-3" style="gap: 10px;">
     <a href="invoices.php" class="btn btn-secondary">Back to Invoices</a>
     <a href="invoice.php?id=<?=$_GET['id']?>" class="btn btn-primary">Edit</a>
     <a href="invoices.php?delete=<?=$_GET['id']?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this invoice?')">Delete</a>

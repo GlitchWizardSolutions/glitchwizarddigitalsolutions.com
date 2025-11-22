@@ -1,58 +1,84 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
 
 if (isset($_GET['delete-id'])) {
-    $id     = (int) $_GET["delete-id"];
+    $id = (int) $_GET["delete-id"];
 	
-	$queryvalid = $connect->query("SELECT * FROM `pages` WHERE id='$id' LIMIT 1");
-	$validator  = mysqli_num_rows($queryvalid);
-	if ($validator > 0) {
+	$stmt = $blog_pdo->prepare("SELECT * FROM `pages` WHERE id = ? LIMIT 1");
+	$stmt->execute([$id]);
+	$row = $stmt->fetch(PDO::FETCH_ASSOC);
+	
+	if ($row) {
+		$slug = $row['slug'];
 		
-		$rowvalidator = mysqli_fetch_assoc($queryvalid);
-		$slug         = $rowvalidator['slug'];
+		$stmt = $blog_pdo->prepare("DELETE FROM `menu` WHERE path = ?");
+		$stmt->execute(['page?name=' . $slug]);
 		
-		$query2 = mysqli_query($connect, "DELETE FROM `menu` WHERE path='page?name=$slug'");
-		$query  = mysqli_query($connect, "DELETE FROM `pages` WHERE id='$id'");
+		$stmt = $blog_pdo->prepare("DELETE FROM `pages` WHERE id = ?");
+		$stmt->execute([$id]);
+		
+		header('Location: pages.php');
+		exit;
     }
 }
 ?>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h3 class="h3"><i class="fas fa-file-alt"></i> Pages</h3>
-	</div>
+<?=template_admin_header('Pages', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Pages', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-file-alt"></i>
+        <div class="txt">
+            <h2>Pages</h2>
+            <p>Manage static pages</p>
+        </div>
+    </div>
+</div>
 	  
 <?php
 if (isset($_GET['edit-id'])) {
-    $id  = (int) $_GET["edit-id"];
-    $sql = mysqli_query($connect, "SELECT * FROM `pages` WHERE id = '$id'");
-    $row = mysqli_fetch_assoc($sql);
-	$slug_old = $row['slug'];
+    $id = (int) $_GET["edit-id"];
+    $stmt = $blog_pdo->prepare("SELECT * FROM `pages` WHERE id = ?");
+    $stmt->execute([$id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+	$slug_old = $row ? $row['slug'] : '';
 	
-    if (empty($id) || mysqli_num_rows($sql) == 0) {
-        echo '<meta http-equiv="refresh" content="0; url=pages.php">';
+    if (empty($id) || !$row) {
+        header('Location: pages.php');
 		exit;
     }
 	
 	if (isset($_POST['submit'])) {
-        $title   = addslashes($_POST['title']);
-		$slug    = generateSeoURL($title, 0);
-        $content = htmlspecialchars($_POST['content']);
+        $title = trim($_POST['title']);
+		$slug = generateSeoURL($title, 0);
+        $content = $_POST['content'];
         
-		$queryvalid = $connect->query("SELECT * FROM `pages` WHERE title = '$title' AND id != '$id' LIMIT 1");
-		$validator  = mysqli_num_rows($queryvalid);
-		if ($validator > 0) {
+		$stmt = $blog_pdo->prepare("SELECT * FROM `pages` WHERE title = ? AND id != ? LIMIT 1");
+		$stmt->execute([$title, $id]);
+		if ($stmt->fetch(PDO::FETCH_ASSOC)) {
 		echo '
 			<div class="alert alert-warning">
-				<i class="fas fa-info-circle"></i> Page with this name has already been added.
+				' . svg_icon_content() . ' Page with this name has already been added.
 			</div>';
 		} else {
 		
-			$update = mysqli_query($connect, "UPDATE pages SET title='$title', slug='$slug', content='$content' WHERE id='$id'");
-			$update = mysqli_query($connect, "UPDATE menu SET page='$title', path='page?name=$slug' WHERE path='page?name=$slug_old'");
+			$stmt = $blog_pdo->prepare("UPDATE pages SET title = ?, slug = ?, content = ? WHERE id = ?");
+			$stmt->execute([$title, $slug, $content, $id]);
 			
-			echo '<meta http-equiv="refresh" content="0; url=pages.php">';
+			$stmt = $blog_pdo->prepare("UPDATE menu SET page = ?, path = ? WHERE path = ?");
+			$stmt->execute([$title, 'page?name=' . $slug, 'page?name=' . $slug_old]);
+			
+			header('Location: pages.php');
+			exit;
 		}
     }
 ?>
+<div class="form-professional">
             <div class="card mb-3">
               <h6 class="card-header">Edit Page</h6>         
                   <div class="card-body">
@@ -73,6 +99,7 @@ if (isset($_GET['edit-id'])) {
 					  </form>
                   </div>
             </div>
+</div>
 <?php
 }
 ?>
@@ -90,14 +117,14 @@ if (isset($_GET['edit-id'])) {
                 </tr>
 				</thead>
 <?php
-$sql = mysqli_query($connect, "SELECT * FROM pages ORDER BY id DESC");
-while ($row = mysqli_fetch_assoc($sql)) {
+$stmt = $blog_pdo->query("SELECT * FROM pages ORDER BY id DESC");
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
   echo '
                 <tr>
-	                <td>' . $row['title'] . '</td>
+	                <td>' . htmlspecialchars($row['title']) . '</td>
 					<td>
 					    <a href="?edit-id=' . $row['id'] . '" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i> Edit</a>
-						<a href="?delete-id=' . $row['id'] . '" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Delete</a>
+						<a href="?delete-id=' . $row['id'] . '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure you want to delete this page?\')"><i class="fa fa-trash"></i> Delete</a>
 					</td>
                 </tr>
 ';
@@ -108,27 +135,26 @@ while ($row = mysqli_fetch_assoc($sql)) {
               
             </div>
 
+<?=template_admin_footer('
 <script>
 $(document).ready(function() {
 
-	$('#dt-basic').dataTable( {
+	$("#dt-basic").dataTable( {
 		"responsive": true,
 		"language": {
 			"paginate": {
-			  "previous": '<i class="fa fa-angle-left"></i>',
-			  "next": '<i class="fa fa-angle-right"></i>'
+			  "previous": "<i class=\"fa fa-angle-left\"></i>",
+			  "next": "<i class=\"fa fa-angle-right\"></i>"
 			}
 		}
 	} );
 	
-	$('#summernote').summernote({height: 350});
+	$("#summernote").summernote({height: 350});
 	
-	var noteBar = $('.note-toolbar');
-		noteBar.find('[data-toggle]').each(function() {
-		$(this).attr('data-bs-toggle', $(this).attr('data-toggle')).removeAttr('data-toggle');
+	var noteBar = $(".note-toolbar");
+		noteBar.find("[data-toggle]").each(function() {
+		$(this).attr("data-bs-toggle", $(this).attr("data-toggle")).removeAttr("data-toggle");
 	});
 } );
 </script>
-<?php
-include "footer.php";
-?>
+')?>

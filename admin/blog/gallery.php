@@ -1,35 +1,50 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
 
 if (isset($_GET['delete-id'])) {
-    $id    = (int) $_GET["delete-id"];
-    $query = mysqli_query($connect, "DELETE FROM `gallery` WHERE id='$id'");
+    $id = (int) $_GET["delete-id"];
+    $stmt = $blog_pdo->prepare("DELETE FROM `gallery` WHERE id = ?");
+    $stmt->execute([$id]);
+    header('Location: gallery.php');
+    exit;
 }
 ?>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h3 class="h3"><i class="fas fa-images"></i> Gallery</h3>
-	</div>
+<?=template_admin_header('Gallery', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Gallery', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-images"></i>
+        <div class="txt">
+            <h2>Gallery</h2>
+            <p>Manage gallery images</p>
+        </div>
+    </div>
+</div>
 	  
 <?php
 if (isset($_GET['edit-id'])) {
-    $id  = (int) $_GET["edit-id"];
-    $sql = mysqli_query($connect, "SELECT * FROM `gallery` WHERE id = '$id'");
-    $row = mysqli_fetch_assoc($sql);
-    if (empty($id)) {
-        echo '<meta http-equiv="refresh" content="0; url=gallery.php">';
-		exit;
-    }
-    if (mysqli_num_rows($sql) == 0) {
-        echo '<meta http-equiv="refresh" content="0; url=gallery.php">';
+    $id = (int) $_GET["edit-id"];
+    $stmt = $blog_pdo->prepare("SELECT * FROM `gallery` WHERE id = ?");
+    $stmt->execute([$id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (empty($id) || !$row) {
+        header('Location: gallery.php');
 		exit;
     }
 	
 	if (isset($_POST['edit'])) {
-        $title       = addslashes($_POST['title']);
-        $image       = $row['image'];
-        $active      = addslashes($_POST['active']);
-		$album_id = addslashes($_POST['album_id']);
-        $description = htmlspecialchars($_POST['description']);
+        $title = trim($_POST['title']);
+        $image = $row['image'];
+        $active = $_POST['active'];
+		$album_id = (int) $_POST['album_id'];
+        $description = $_POST['description'];
         
         if (@$_FILES['avafile']['name'] != '') {
             $target_dir    = "uploads/gallery/";
@@ -62,11 +77,14 @@ if (isset($_GET['edit-id'])) {
             }
         }
         
-        $edit = mysqli_query($connect, "UPDATE gallery SET album_id='$album_id', title='$title', image='$image', active='$active', description='$description' WHERE id='$id'");
-        echo '<meta http-equiv="refresh" content="0; url=gallery.php">';
+        $stmt = $blog_pdo->prepare("UPDATE gallery SET album_id = ?, title = ?, image = ?, active = ?, description = ? WHERE id = ?");
+        $stmt->execute([$album_id, $title, $image, $active, $description, $id]);
+        header('Location: gallery.php');
+        exit;
     }
 ?>
 
+<div class="form-professional">
 	  <div class="card mb-3">
 		  <h6 class="card-header">Edit Image</h6>         
               <div class="card-body">
@@ -103,13 +121,13 @@ if (isset($_GET['edit-id'])) {
 						  <label>Album</label><br />
 						  <select name="album_id" class="form-select" required>
 <?php
-    $crun = mysqli_query($connect, "SELECT * FROM `albums`");
-    while ($rw = mysqli_fetch_assoc($crun)) {
+    $stmt = $blog_pdo->query("SELECT * FROM `albums`");
+    while ($rw = $stmt->fetch(PDO::FETCH_ASSOC)) {
 		$selected = "";
 		if ($row['album_id'] == $rw['id']) {
 			$selected = "selected";
 		}
-        echo '<option value="' . $rw['id'] . '" ' . $selected . '>' . $rw['title'] . '</option>';
+        echo '<option value="' . $rw['id'] . '" ' . $selected . '>' . htmlspecialchars($rw['title']) . '</option>';
     }
 ?>
 						  </select>
@@ -146,21 +164,22 @@ if (isset($_GET['edit-id'])) {
                 </tr>
 				</thead>
 <?php
-$sql = mysqli_query($connect, "SELECT * FROM gallery ORDER BY id DESC");
-while ($row = mysqli_fetch_assoc($sql)) {
+$stmt = $blog_pdo->query("SELECT * FROM gallery ORDER BY id DESC");
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 	$album_id = $row['album_id'];
-    $runq2    = mysqli_query($connect, "SELECT * FROM `albums` WHERE id='$album_id'");
-    $cat      = mysqli_fetch_assoc($runq2);
+    $stmt2 = $blog_pdo->prepare("SELECT * FROM `albums` WHERE id = ?");
+    $stmt2->execute([$album_id]);
+    $cat = $stmt2->fetch(PDO::FETCH_ASSOC);
 	
     echo '
                 <tr>
-	                <td><center><img src="../' . $row['image'] . '" width="100px" height="75px" /></center></td>
-	                <td>' . $row['title'] . '</td>
-					<td>' . $row['active'] . '</td>
-					<td>' . $cat['title'] . '</td>
+	                <td><center><img src="../' . htmlspecialchars($row['image']) . '" width="100px" height="75px" style="object-fit: cover;" /></center></td>
+	                <td>' . htmlspecialchars($row['title']) . '</td>
+					<td>' . htmlspecialchars($row['active']) . '</td>
+					<td>' . ($cat ? htmlspecialchars($cat['title']) : 'N/A') . '</td>
 					<td>
 					    <a href="?edit-id=' . $row['id'] . '" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i> Edit</a>
-						<a href="?delete-id=' . $row['id'] . '" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Delete</a>
+						<a href="?delete-id=' . $row['id'] . '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure you want to delete this image?\')"><i class="fa fa-trash"></i> Delete</a>
 					</td>
                 </tr>
 ';
@@ -171,28 +190,27 @@ echo '</table>';
                   </div>
             </div>
 
+<?=template_admin_footer('
 <script>
 $(document).ready(function() {
 	
-	$('#dt-basic').dataTable( {
+	$("#dt-basic").dataTable( {
 		"responsive": true,
 		"order": [[ 1, "asc" ]],
 		"language": {
 			"paginate": {
-			  "previous": '<i class="fa fa-angle-left"></i>',
-			  "next": '<i class="fa fa-angle-right"></i>'
+			  "previous": "<i class=\"fa fa-angle-left\"></i>",
+			  "next": "<i class=\"fa fa-angle-right\"></i>"
 			}
 		}
 	} );
 	
-	$('#summernote').summernote({height: 350});
+	$("#summernote").summernote({height: 350});
 	
-	var noteBar = $('.note-toolbar');
-		noteBar.find('[data-toggle]').each(function() {
-		$(this).attr('data-bs-toggle', $(this).attr('data-toggle')).removeAttr('data-toggle');
+	var noteBar = $(".note-toolbar");
+		noteBar.find("[data-toggle]").each(function() {
+		$(this).attr("data-bs-toggle", $(this).attr("data-toggle")).removeAttr("data-toggle");
 	});
 } );
 </script>
-<?php
-include "footer.php";
-?>
+')?>

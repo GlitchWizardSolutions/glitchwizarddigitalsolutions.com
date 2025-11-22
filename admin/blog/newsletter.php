@@ -1,32 +1,49 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
 
 if (isset($_GET['unsubscribe'])) {
 	$unsubscribe_email = $_GET['unsubscribe'];
 
-    $querych = mysqli_query($connect, "SELECT * FROM `newsletter` WHERE email='$unsubscribe_email' LIMIT 1");
-    if (mysqli_num_rows($querych) > 0) {
-        $query = mysqli_query($connect, "DELETE FROM `newsletter` WHERE email='$unsubscribe_email'");
+    $stmt = $blog_pdo->prepare("SELECT * FROM `newsletter` WHERE email = ? LIMIT 1");
+    $stmt->execute([$unsubscribe_email]);
+    if ($stmt->fetch(PDO::FETCH_ASSOC)) {
+        $stmt = $blog_pdo->prepare("DELETE FROM `newsletter` WHERE email = ?");
+        $stmt->execute([$unsubscribe_email]);
     }
 }
 ?>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h3 class="h3"><i class="far fa-envelope"></i> Newsletter</h3>
-	</div>
+<?=template_admin_header('Newsletter', 'blog')?>
 
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Newsletter', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-envelope"></i>
+        <div class="txt">
+            <h2>Newsletter</h2>
+            <p>Manage newsletter subscribers and send messages</p>
+        </div>
+    </div>
+</div>
+
+<div class="form-professional">
         <div class="card">
 			<h6 class="card-header">Send mass message</h6>         
 			<div class="card-body">
 <?php
 if (isset($_POST['send_mass_message'])) {
-    $title    = addslashes($_POST['title']);
-    $content  = htmlspecialchars($_POST['content']);
+    $title = trim($_POST['title']);
+    $content = $_POST['content'];
 
-    $from     = $settings['email'];
+    $from = $settings['email'];
     $sitename = $settings['sitename'];
 	
-    $run2 = mysqli_query($connect, "SELECT * FROM `newsletter`");
-    while ($row = mysqli_fetch_assoc($run2)) {
+    $stmt = $blog_pdo->query("SELECT * FROM `newsletter`");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 		
         $to = $row['email'];
 		
@@ -54,7 +71,7 @@ if (isset($_POST['send_mass_message'])) {
         @mail($to, $subject, $message, $headers);
     }
     
-    echo '<div class="alert alert-success">Your global message has been sent successfully.</div>';
+    echo '<div class="alert alert-success">' . svg_icon_email() . ' Your global message has been sent successfully.</div>';
 }
 ?>
 				<form action="" method="post">
@@ -70,7 +87,8 @@ if (isset($_POST['send_mass_message'])) {
 					<input type="submit" name="send_mass_message" class="btn btn-primary col-12" value="Send" />
 				</form>
 			</div>
-        </div><br />
+        </div>
+</div><br />
 			
 			<div class="card">
               <h6 class="card-header">Subscribers</h6>         
@@ -84,13 +102,13 @@ if (isset($_POST['send_mass_message'])) {
                           </thead>
                           <tbody>
 <?php
-$query = mysqli_query($connect, "SELECT * FROM newsletter ORDER BY email ASC");
-while ($row = mysqli_fetch_assoc($query)) {
+$stmt = $blog_pdo->query("SELECT * FROM newsletter ORDER BY email ASC");
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     echo '
                             <tr>
-                                <td>' . $row['email'] . '</td>
+                                <td>' . htmlspecialchars($row['email']) . '</td>
 								<td>
-									<a href="?unsubscribe=' . $row['email'] . '" class="btn btn-danger btn-sm"><i class="fas fa-bell-slash"></i> Unsubscribe</a>
+									<a href="?unsubscribe=' . urlencode($row['email']) . '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure you want to unsubscribe this email?\')"><i class="fas fa-bell-slash"></i> Unsubscribe</a>
 								</td>
                             </tr>
 ';
@@ -101,28 +119,27 @@ while ($row = mysqli_fetch_assoc($query)) {
                   </div>
             </div>
 
+<?=template_admin_footer('
 <script>
 $(document).ready(function() {
 
-	$('#dt-basic').dataTable( {
+	$("#dt-basic").dataTable( {
 		"responsive": true,
 		"order": [[ 0, "asc" ]],
 		"language": {
 			"paginate": {
-			  "previous": '<i class="fa fa-angle-left"></i>',
-			  "next": '<i class="fa fa-angle-right"></i>'
+			  "previous": "<i class=\"fa fa-angle-left\"></i>",
+			  "next": "<i class=\"fa fa-angle-right\"></i>"
 			}
 		}
 	} );
 	
-	$('#summernote').summernote({height: 350});
+	$("#summernote").summernote({height: 350});
 	
-	var noteBar = $('.note-toolbar');
-		noteBar.find('[data-toggle]').each(function() {
-		$(this).attr('data-bs-toggle', $(this).attr('data-toggle')).removeAttr('data-toggle');
+	var noteBar = $(".note-toolbar");
+		noteBar.find("[data-toggle]").each(function() {
+		$(this).attr("data-bs-toggle", $(this).attr("data-toggle")).removeAttr("data-toggle");
 	});
 } );
 </script>
-<?php
-include "footer.php";
-?>
+')?>

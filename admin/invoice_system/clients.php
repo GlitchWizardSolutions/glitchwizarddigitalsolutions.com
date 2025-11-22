@@ -69,10 +69,12 @@ $url = 'clients.php?search_query=' . $search;
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_user()?></div>
-    <div class="txt">
-        <h2>Invoice Clients</h2>
-        <p class="subtitle">View, edit, and create invoice clients</p>
+    <div class="title">
+       <i class="fa-solid fa-users"></i>
+        <div class="txt">
+            <h2>Invoice Clients</h2>
+            <p>View, edit, and create invoice clients</p>
+        </div>
     </div>
 </div>
 

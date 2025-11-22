@@ -65,10 +65,12 @@ if (isset($_FILES['file']) && !empty($_FILES['file']['tmp_name'])) {
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_upload()?></div>
-    <div class="txt">
-        <h2>Import Clients</h2>
-        <p class="subtitle">Batch import invoice clients from file</p>
+    <div class="title">
+       <i class="fa-solid fa-upload"></i>
+        <div class="txt">
+            <h2>Import Clients</h2>
+            <p>Batch import invoice clients from file</p>
+        </div>
     </div>
 </div>
 

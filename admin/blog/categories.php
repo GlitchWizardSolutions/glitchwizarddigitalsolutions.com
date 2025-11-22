@@ -39,24 +39,26 @@ if (isset($_GET['edit-id'])) {
     }
 }
 ?>
-<?=template_admin_header('Blog Categories', 'dashboard')?>
+<?=template_admin_header('Blog Categories', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Categories', 'url' => '']
+])?>
 
 <div class="content-title">
     <div class="title">
+       <i class="fa-solid fa-list-ol"></i>
         <div class="txt">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="../index.php">Admin Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="blog_dash.php">Blog</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Categories</li>
-                </ol>
-            </nav>
             <h2>Blog Categories</h2>
+            <p>Manage blog categories</p>
         </div>
     </div>
 </div>
 
 <?php if (isset($_GET['edit-id'])): ?>
+<div class="form-professional">
             <div class="content-block">
               <h3>Edit Category</h3>         
                       <form action="" method="post" style="max-width: 500px;">
@@ -69,14 +71,15 @@ if (isset($_GET['edit-id'])) {
                           <label>Category</label>
                           <input name="category" type="text" value="<?= htmlspecialchars($row['category']) ?>" style="width: 100%;" required>
 						</p>
-                        <input type="submit" class="btn" name="submit" value="Save" />
+                        <input type="submit" class="btn btn-primary" name="submit" value="Save" />
                       </form>
               </div>
+</div>
 <?php endif; ?>
 
 			<div class="content-block">
               <h3>All Categories</h3>
-			  <a href="add_category.php" class="btn" style="margin-bottom: 1rem;"><i class="fa fa-plus"></i> Add Category</a>
+			  <a href="add_category.php" class="btn btn-primary" style="margin-bottom: 1rem;"><i class="fa fa-plus"></i> Add Category</a>
               <div class="table">
 
             <table id="dt-basic" width="100%">

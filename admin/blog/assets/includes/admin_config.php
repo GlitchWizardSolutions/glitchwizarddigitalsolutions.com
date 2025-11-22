@@ -8,4 +8,6 @@ include ('../../../private/blog_config2025.php');
 include '../../client-dashboard/blog/config_settings.php';
 include admin_includes_path . 'main.php';
 include admin_includes_path . 'admin_page_setup.php';
-include process_path . 'email-process.php';?>
+include admin_includes_path . 'components.php';
+include process_path . 'email-process.php';
+require_once __DIR__ . '/../../functions.php';?>

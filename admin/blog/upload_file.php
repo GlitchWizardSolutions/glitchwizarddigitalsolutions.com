@@ -4,37 +4,26 @@ error_log('Loading Page: /admin/blog/upload_files ');
 require 'assets/includes/admin_config.php';
 ?> 
 
-<?=template_admin_header('Blog Users', 'blog', 'blog')?>
+<?=template_admin_header('Upload File', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Files', 'url' => 'files.php'],
+    ['title' => 'Upload File', 'url' => '']
+])?>
 
 <div class="content-title">
     <div class="title">
-       <i class="fas fa-folder-open"></i> Files 
+       <i class="fa-solid fa-upload"></i>
         <div class="txt">
-            <h2>Upload Files</h2>
-            <p>Upload files to your server.</p>.</p>
+            <h2>Upload File</h2>
+            <p>Upload files to server</p>
         </div>
-    </div>
-        <div class="btns">
-           <a href="https://glitchwizarddigitalsolutions.com/blog/" class="btn btn-primary" style='background:green'><i class="fa fa-eye"></i>&nbsp;  Go to Blog</a>
     </div>
 </div>
 
-<div class="content-header responsive-flex-column pad-top-5">
-               <div class="card">
-              <h6 class="card-header">Shortcuts</h6>         
-                <div class="card-body">
-     <center>
-                    <a href="blog_dash.php" class="btn btn-sm btn-primary mt-2">Blog Dashboard</a>
-					<a href="add_user.php" class="btn btn-sm btn-primary mt-2">+ User</a>
-				 
-                  </center>
-</div>
-      </div>
-            </div>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h3 class="h3"><i class="fas fa-folder-open"></i> Files</h3>
-    </div>
-    
+<div class="form-professional">    
             <div class="card">
               <h6 class="card-header">Upload File</h6>
                   <div class="card-body">
@@ -71,11 +60,12 @@ if (isset($_POST['upload'])) {
     } else {
         $string     = "0123456789wsderfgtyhjuk";
         $new_string = str_shuffle($string);
-        $location   = "../../blog/uploads/other/file_$new_string.$format";
-        move_uploaded_file($tmp_name, $location);
+        $file_location   = blog_files_path . "file_$new_string.$format";
+        $web_path = blog_files_url . "file_$new_string.$format";
+        move_uploaded_file($tmp_name, $file_location);
         // Insert the records
-         $stmt = $pdo_b2b_blog->prepare('INSERT INTO files (filename, date, time, path) VALUES ((?, ?, ?, ? )');
-         $stmt->execute([$name, $date, $time,$location]);
+         $stmt = $blog_pdo->prepare('INSERT INTO files (filename, date, time, path) VALUES (?, ?, ?, ?)');
+         $stmt->execute([$name, $date, $time, $web_path]);
 		echo '<meta http-equiv="refresh" content="0; url=files.php">';
     }
 }
@@ -83,6 +73,7 @@ if (isset($_POST['upload'])) {
                   </div>
               </div>
             </div>
+</div>
 <?php
 include "footer.php";
 ?>

@@ -1,57 +1,83 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
 
 if (isset($_GET['up-id'])) {
     $id = (int) $_GET["up-id"];
 	
-    $querype = mysqli_query($connect, "SELECT id FROM `menu` WHERE id<$id ORDER BY id DESC LIMIT 1");
-	$rowpe   = mysqli_fetch_assoc($querype);
+    $querype = $blog_pdo->prepare("SELECT id FROM `menu` WHERE id<? ORDER BY id DESC LIMIT 1");
+    $querype->execute([$id]);
+	$rowpe   = $querype->fetch(PDO::FETCH_ASSOC);
 	$prev_id = $rowpe['id'];
 	
-	$queryce = mysqli_query($connect, "SELECT id FROM `menu` WHERE id='$id' LIMIT 1");
-	$rowce   = mysqli_fetch_assoc($queryce);
+	$queryce = $blog_pdo->prepare("SELECT id FROM `menu` WHERE id=? LIMIT 1");
+    $queryce->execute([$id]);
+	$rowce   = $queryce->fetch(PDO::FETCH_ASSOC);
 	$curr_id = $rowce['id'];
 	
-	$update_sql = mysqli_query($connect, "UPDATE menu SET id='9999999' WHERE id='$prev_id'");
-	$update_sql = mysqli_query($connect, "UPDATE menu SET id='$prev_id' WHERE id='$curr_id'");
-	$update_sql = mysqli_query($connect, "UPDATE menu SET id='$curr_id' WHERE id='9999999'");
+	$update_sql = $blog_pdo->prepare("UPDATE menu SET id='9999999' WHERE id=?");
+    $update_sql->execute([$prev_id]);
+	$update_sql = $blog_pdo->prepare("UPDATE menu SET id=? WHERE id=?");
+    $update_sql->execute([$prev_id, $curr_id]);
+	$update_sql = $blog_pdo->prepare("UPDATE menu SET id=? WHERE id='9999999'");
+    $update_sql->execute([$curr_id]);
 }
 
 if (isset($_GET['down-id'])) {
     $id = (int) $_GET["down-id"];
 	
-    $queryne = mysqli_query($connect, "SELECT id FROM `menu` WHERE id>$id ORDER BY id ASC LIMIT 1");
-	$rowne   = mysqli_fetch_assoc($queryne);
+    $queryne = $blog_pdo->prepare("SELECT id FROM `menu` WHERE id>? ORDER BY id ASC LIMIT 1");
+    $queryne->execute([$id]);
+	$rowne   = $queryne->fetch(PDO::FETCH_ASSOC);
 	$next_id = $rowne['id'];
 	
-	$queryce = mysqli_query($connect, "SELECT id FROM `menu` WHERE id='$id' LIMIT 1");
-	$rowce   = mysqli_fetch_assoc($queryce);
+	$queryce = $blog_pdo->prepare("SELECT id FROM `menu` WHERE id=? LIMIT 1");
+    $queryce->execute([$id]);
+	$rowce   = $queryce->fetch(PDO::FETCH_ASSOC);
 	$curr_id = $rowce['id'];
 	
-	$update_sql = mysqli_query($connect, "UPDATE menu SET id='9999998' WHERE id='$next_id'");
-	$update_sql = mysqli_query($connect, "UPDATE menu SET id='$next_id' WHERE id='$curr_id'");
-	$update_sql = mysqli_query($connect, "UPDATE menu SET id='$curr_id' WHERE id='9999998'");
+	$update_sql = $blog_pdo->prepare("UPDATE menu SET id='9999998' WHERE id=?");
+    $update_sql->execute([$next_id]);
+	$update_sql = $blog_pdo->prepare("UPDATE menu SET id=? WHERE id=?");
+    $update_sql->execute([$next_id, $curr_id]);
+	$update_sql = $blog_pdo->prepare("UPDATE menu SET id=? WHERE id='9999998'");
+    $update_sql->execute([$curr_id]);
 }
 
 if (isset($_GET['delete-id'])) {
     $id    = (int) $_GET["delete-id"];
-    $query = mysqli_query($connect, "DELETE FROM `menu` WHERE id='$id'");
+    $query = $blog_pdo->prepare("DELETE FROM `menu` WHERE id=?");
+    $query->execute([$id]);
 }
 ?>
-      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h3 class="h3"><i class="fas fa-bars"></i> Menu Editor</h3>
-	  </div>
+<?=template_admin_header('Menu Editor', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Menu Editor', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-bars"></i>
+        <div class="txt">
+            <h2>Menu Editor</h2>
+            <p>Manage blog menu items</p>
+        </div>
+    </div>
+</div>
 	  
 <?php
 if (isset($_GET['edit-id'])) {
     $id  = (int) $_GET["edit-id"];
-    $sql = mysqli_query($connect, "SELECT * FROM `menu` WHERE id = '$id'");
-    $row = mysqli_fetch_assoc($sql);
+    $sql = $blog_pdo->prepare("SELECT * FROM `menu` WHERE id = ?");
+    $sql->execute([$id]);
+    $row = $sql->fetch(PDO::FETCH_ASSOC);
     if (empty($id)) {
         echo '<meta http-equiv="refresh" content="0; url=menu_editor.php">';
 		exit;
     }
-    if (mysqli_num_rows($sql) == 0) {
+    if (!$row) {
         echo '<meta http-equiv="refresh" content="0; url=menu_editor.php">';
 		exit;
     }
@@ -61,10 +87,12 @@ if (isset($_GET['edit-id'])) {
         $path    = $_POST['path'];
         $fa_icon = $_POST['fa_icon'];
         
-		$update_sql = mysqli_query($connect, "UPDATE menu SET page='$page', path='$path', fa_icon='$fa_icon' WHERE id='$id'");
+		$update_sql = $blog_pdo->prepare("UPDATE menu SET page=?, path=?, fa_icon=? WHERE id=?");
+        $update_sql->execute([$page, $path, $fa_icon, $id]);
         echo '<meta http-equiv="refresh" content="0;url=menu_editor.php">';
     }
 ?>
+<div class="form-professional">
             <div class="card mb-3">
               <h6 class="card-header">Edit Menu</h6>         
                   <div class="card-body">
@@ -91,6 +119,7 @@ echo $row['fa_icon'];
                   </form>
                   </div>
             </div>
+</div>
 <?php
 }
 ?>
@@ -110,14 +139,14 @@ echo $row['fa_icon'];
                 </tr>
 				</thead>
 <?php
-$query = mysqli_query($connect, "SELECT * FROM menu ORDER BY id ASC");
+$query = $blog_pdo->query("SELECT * FROM menu ORDER BY id ASC");
 
-$queryli  = mysqli_query($connect, "SELECT * FROM menu ORDER BY id DESC LIMIT 1");
-$rowli    = mysqli_fetch_assoc($queryli);
+$queryli  = $blog_pdo->query("SELECT * FROM menu ORDER BY id DESC LIMIT 1");
+$rowli    = $queryli->fetch(PDO::FETCH_ASSOC);
 $last_id  = $rowli['id'];
 
 $first = true;
-while ($row = mysqli_fetch_assoc($query)) {
+while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
 	
         echo '
                 <tr>

@@ -76,24 +76,26 @@ if (isset($_GET['edit-id'])) {
     }
 }
 ?>
-<?=template_admin_header('Blog Posts', 'dashboard')?>
+<?=template_admin_header('Blog Posts', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Posts', 'url' => '']
+])?>
 
 <div class="content-title">
     <div class="title">
+       <i class="fa-solid fa-edit"></i>
         <div class="txt">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="../index.php">Admin Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="blog_dash.php">Blog</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Posts</li>
-                </ol>
-            </nav>
             <h2>Blog Posts</h2>
+            <p>Manage blog posts</p>
         </div>
     </div>
 </div>
 
 <?php if (isset($_GET['edit-id'])): ?>
+<div class="form-professional">
 	<div class="content-block">
 		<h3>Edit Post</h3>         
 			<form name="post_form" action="" method="post" enctype="multipart/form-data" style="max-width: 900px;">
@@ -146,11 +148,12 @@ foreach ($categories as $cat) {
 				<input type="submit" class="btn" name="submit" value="Save" />
 			</form>
 	</div>
+</div>
 <?php endif; ?>
 
 	<div class="content-block">
 		<h3>All Posts</h3>
-		<a href="add_post.php" class="btn" style="margin-bottom: 1rem;"><i class="fa fa-plus"></i> Add Post</a>
+		<a href="add_post.php" class="btn btn-primary" style="margin-bottom: 1rem;"><i class="fa fa-plus"></i> Add Post</a>
         <div class="table">
 
 			<table id="dt-basic" width="100%">

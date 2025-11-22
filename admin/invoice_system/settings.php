@@ -120,10 +120,12 @@ if (isset($_GET['error_msg'])) {
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_settings()?></div>
-    <div class="txt">
-        <h2>Invoice Settings</h2>
-        <p class="subtitle">Configure invoice system parameters</p>
+    <div class="title">
+       <i class="fa-solid fa-gear"></i>
+        <div class="txt">
+            <h2>Invoice Settings</h2>
+            <p>Configure invoice system parameters</p>
+        </div>
     </div>
 </div>
 

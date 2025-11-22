@@ -98,10 +98,12 @@ if (isset($_POST['file_type'])) {
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_download()?></div>
-    <div class="txt">
-        <h2>Export Clients</h2>
-        <p class="subtitle">Batch export invoice clients to file</p>
+    <div class="title">
+       <i class="fa-solid fa-download"></i>
+        <div class="txt">
+            <h2>Export Clients</h2>
+            <p>Batch export invoice clients to file</p>
+        </div>
     </div>
 </div>
 

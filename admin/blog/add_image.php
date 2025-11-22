@@ -1,11 +1,11 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
 
 if (isset($_POST['add'])) {
-    $title       = addslashes($_POST['title']);
-    $active      = addslashes($_POST['active']);
-	$album_id = addslashes($_POST['album_id']);
-    $description = htmlspecialchars($_POST['description']);
+    $title = trim($_POST['title']);
+    $active = $_POST['active'];
+	$album_id = (int) $_POST['album_id'];
+    $description = $_POST['description'];
     
     $image = '';
     
@@ -40,14 +40,32 @@ if (isset($_POST['add'])) {
         }
     }
     
-    $add = mysqli_query($connect, "INSERT INTO `gallery` (album_id, title, image, description, active) VALUES ('$album_id', '$title', '$image', '$description', '$active')");
-    echo '<meta http-equiv="refresh" content="0; url=gallery.php">';
+    $stmt = $blog_pdo->prepare("INSERT INTO `gallery` (album_id, title, image, description, active) VALUES (?, ?, ?, ?, ?)");
+    $stmt->execute([$album_id, $title, $image, $description, $active]);
+    header('Location: gallery.php');
+    exit;
 }
 ?>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h3 class="h3"><i class="fas fa-images"></i> Gallery</h3>
-	</div>
+<?=template_admin_header('Add Image', 'blog')?>
 
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Gallery', 'url' => 'gallery.php'],
+    ['title' => 'Add Image', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-camera-retro"></i>
+        <div class="txt">
+            <h2>Add Image</h2>
+            <p>Upload a new gallery image</p>
+        </div>
+    </div>
+</div>
+
+<div class="form-professional">
 	<div class="card">
         <h6 class="card-header">Add Image</h6>         
             <div class="card-body">
@@ -71,10 +89,10 @@ if (isset($_POST['add'])) {
 						<label>Album</label><br />
 						<select name="album_id" class="form-select" required>
 <?php
-$crun = mysqli_query($connect, "SELECT * FROM `albums`");
-while ($rw = mysqli_fetch_assoc($crun)) {
+$stmt = $blog_pdo->query("SELECT * FROM `albums`");
+while ($rw = $stmt->fetch(PDO::FETCH_ASSOC)) {
     echo '
-                            <option value="' . $rw['id'] . '">' . $rw['title'] . '</option>
+                            <option value="' . $rw['id'] . '">' . htmlspecialchars($rw['title']) . '</option>
 									';
 }
 ?>
@@ -89,17 +107,17 @@ while ($rw = mysqli_fetch_assoc($crun)) {
 				</form>                            
             </div>
         </div>
+</div>
 
+<?=template_admin_footer('
 <script>
 $(document).ready(function() {
-	$('#summernote').summernote({height: 350});
+	$("#summernote").summernote({height: 350});
 	
-	var noteBar = $('.note-toolbar');
-		noteBar.find('[data-toggle]').each(function() {
-		$(this).attr('data-bs-toggle', $(this).attr('data-toggle')).removeAttr('data-toggle');
+	var noteBar = $(".note-toolbar");
+		noteBar.find("[data-toggle]").each(function() {
+		$(this).attr("data-bs-toggle", $(this).attr("data-toggle")).removeAttr("data-toggle");
 	});
 });
 </script>
-<?php
-include "footer.php";
-?>
+')?>

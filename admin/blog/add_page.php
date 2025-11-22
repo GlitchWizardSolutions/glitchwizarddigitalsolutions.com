@@ -1,36 +1,57 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
+
+$error_message = '';
+$success_message = '';
 
 if (isset($_POST['add'])) {
-    $title   = addslashes($_POST['title']);
+    $title   = trim($_POST['title']);
 	$slug    = generateSeoURL($title, 0);
-    $content = htmlspecialchars($_POST['content']);
+    $content = $_POST['content'];
     
-	$queryvalid = $connect->query("SELECT * FROM `pages` WHERE title='$title' LIMIT 1");
-	$validator  = mysqli_num_rows($queryvalid);
-	if ($validator > 0) {
-		echo '<br />
-			<div class="alert alert-warning">
-				<i class="fas fa-info-circle"></i> Page with this name has already been added.
-			</div>';
-	
+	$stmt = $blog_pdo->prepare("SELECT * FROM `pages` WHERE title = ? LIMIT 1");
+	$stmt->execute([$title]);
+	if ($stmt->fetch(PDO::FETCH_ASSOC)) {
+		$error_message = 'Page with this name has already been added.';
     } else {
-		$add = mysqli_query($connect, "INSERT INTO pages (title, slug, content) VALUES ('$title', '$slug', '$content')");
+		$stmt = $blog_pdo->prepare("INSERT INTO pages (title, slug, content) VALUES (?, ?, ?)");
+		$stmt->execute([$title, $slug, $content]);
 		
-		$sql2    = "SELECT * FROM pages WHERE title='$title'";
-		$result2 = mysqli_query($connect, $sql2);
-		$row     = mysqli_fetch_assoc($result2);
-		$id      = $row['id'];
-		$add2    = mysqli_query($connect, "INSERT INTO menu (page, path, fa_icon) VALUES ('$title', 'page?name=$slug', 'fa-columns')");
+		$page_id = $blog_pdo->lastInsertId();
+		$stmt = $blog_pdo->prepare("INSERT INTO menu (page, path, fa_icon) VALUES (?, ?, ?)");
+		$stmt->execute([$title, 'page?name=' . $slug, 'fa-columns']);
 		
-		echo '<meta http-equiv="refresh" content="0;url=pages.php">';
+		header('Location: pages.php');
+		exit;
 	}
 }
 ?>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h3 class="h3"><i class="fas fa-file-alt"></i> Pages</h3>
-	</div>
+<?=template_admin_header('Add Page', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Pages', 'url' => 'pages.php'],
+    ['title' => 'Add Page', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-file-alt"></i>
+        <div class="txt">
+            <h2>Add Page</h2>
+            <p>Create a new page</p>
+        </div>
+    </div>
+</div>
+
+<?php if ($error_message): ?>
+<div class="alert alert-warning">
+	<?=svg_icon_content()?> <?=htmlspecialchars($error_message)?>
+</div>
+<?php endif; ?>
 	
+<div class="form-professional">
             <div class="card">
               <h6 class="card-header">Add Page</h6>         
                   <div class="card-body">
@@ -47,17 +68,17 @@ if (isset($_POST['add'])) {
 					  </form>                            
                   </div>
             </div>
+</div>
 
+<?=template_admin_footer('
 <script>
 $(document).ready(function() {
-	$('#summernote').summernote({height: 350});
+	$("#summernote").summernote({height: 350});
 	
-	var noteBar = $('.note-toolbar');
-		noteBar.find('[data-toggle]').each(function() {
-		$(this).attr('data-bs-toggle', $(this).attr('data-toggle')).removeAttr('data-toggle');
+	var noteBar = $(".note-toolbar");
+		noteBar.find("[data-toggle]").each(function() {
+		$(this).attr("data-bs-toggle", $(this).attr("data-toggle")).removeAttr("data-toggle");
 	});
 });
 </script>
-<?php
-include "footer.php";
-?>
+')?>

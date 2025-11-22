@@ -1,28 +1,50 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
+
+$error_message = '';
 
 if (isset($_POST['add'])) {
-    $category = $_POST['category'];
-	$slug     = generateSeoURL($category, 0);
+    $category = trim($_POST['category']);
+	$slug = generateSeoURL($category, 0);
     
-    $queryvalid = $connect->query("SELECT * FROM `categories` WHERE category='$category' LIMIT 1");
-	$validator  = mysqli_num_rows($queryvalid);
-	if ($validator > 0) {
-		echo '<br />
-			<div class="alert alert-warning">
-				<i class="fas fa-info-circle"></i> Category with this name has already been added.
-			</div>';
-	
+    $stmt = $blog_pdo->prepare("SELECT * FROM `categories` WHERE category = ? LIMIT 1");
+	$stmt->execute([$category]);
+	if ($stmt->fetch(PDO::FETCH_ASSOC)) {
+		$error_message = 'Category with this name has already been added.';
     } else {
-		$add_sql = mysqli_query($connect, "INSERT INTO categories (category, slug) VALUES ('$category', '$slug')");
-		echo '<meta http-equiv="refresh" content="0; url=categories.php">';
+		$stmt = $blog_pdo->prepare("INSERT INTO categories (category, slug) VALUES (?, ?)");
+		$stmt->execute([$category, $slug]);
+		header('Location: categories.php');
+		exit;
 	}
 }
 ?>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h3 class="h3"><i class="fas fa-list-ol"></i> Categories</h3>
-	</div>
-	
+<?=template_admin_header('Add Category', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Categories', 'url' => 'categories.php'],
+    ['title' => 'Add Category', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-list-ol"></i>
+        <div class="txt">
+            <h2>Add Category</h2>
+            <p>Create a new blog category</p>
+        </div>
+    </div>
+</div>
+
+<?php if ($error_message): ?>
+<div class="alert alert-warning">
+	<?=svg_icon_content()?> <?=htmlspecialchars($error_message)?>
+</div>
+<?php endif; ?>
+
+<div class="form-professional">
             <div class="card">
               <h6 class="card-header">Add Category</h6>         
                   <div class="card-body">
@@ -37,7 +59,5 @@ if (isset($_POST['add'])) {
                      </form>                           
                   </div>
             </div>
-
-<?php
-include "footer.php";
-?>
+</div>
+<?=template_admin_footer()?>

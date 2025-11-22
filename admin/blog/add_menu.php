@@ -1,20 +1,38 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
 
 if (isset($_POST['add'])) {
     $page    = $_POST['page'];
     $path    = $_POST['path'];
     $fa_icon = $_POST['fa_icon'];
     
-	$add_sql = mysqli_query($connect, "INSERT INTO menu (page, path, fa_icon) VALUES ('$page', '$path', '$fa_icon')");
+	$add_sql = $blog_pdo->prepare("INSERT INTO menu (page, path, fa_icon) VALUES (?, ?, ?)");
+    $add_sql->execute([$page, $path, $fa_icon]);
 
-    echo '<meta http-equiv="refresh" content="0;url=menu_editor.php">';
+    header('Location: menu_editor.php');
+    exit;
 }
 ?>
-		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h3 class="h3"><i class="fas fa-bars"></i> Menu Editor</h3>
-		</div>
+<?=template_admin_header('Add Menu', 'blog')?>
 
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Menu Editor', 'url' => 'menu_editor.php'],
+    ['title' => 'Add Menu', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-bars"></i>
+        <div class="txt">
+            <h2>Add Menu</h2>
+            <p>Create new menu item</p>
+        </div>
+    </div>
+</div>
+
+<div class="form-professional">
             <div class="card">
               <h6 class="card-header">Add Menu</h6>         
                   <div class="card-body">
@@ -37,6 +55,5 @@ if (isset($_POST['add'])) {
 						</form>                       
                   </div>
             </div>
-<?php
-include "footer.php";
-?>
+</div>
+<?=template_admin_footer()?>

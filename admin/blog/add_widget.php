@@ -3,53 +3,38 @@
 error_log('Loading Page: /admin/blog/add+widget ');
 require 'assets/includes/admin_config.php';
 if (isset($_POST['add'])) {
-    $title    = addslashes($_POST['title']);
-    $content  = htmlspecialchars($_POST['content']);
-	$position = addslashes($_POST['position']);
+    $title    = trim($_POST['title']);
+    $content  = $_POST['content'];
+	$position = $_POST['position'];
     
           // Insert the records
          $stmt = $blog_pdo->prepare('INSERT INTO `widgets` (title, content, position) VALUES (?, ?, ? )');
          $stmt->execute([$title, $content, $position]);
   
-    echo '<meta http-equiv="refresh" content="0; url=widgets.php">';
+    header('Location: widgets.php');
+    exit;
 }
 ?>
-<?=template_admin_header('Add Widget',  'blog', 'blog')?>
+<?=template_admin_header('Add Widget', 'blog')?>
 
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Widgets', 'url' => 'widgets.php'],
+    ['title' => 'Add Widget', 'url' => '']
+])?>
 
 <div class="content-title">
-  <div class="title">
-     <div class="icon">
-        <i class="fa-solid fa-circle-info"></i>
-       
-       </div>
+    <div class="title">
+       <i class="fa-solid fa-archive"></i>
         <div class="txt">
-            <h2>Blog - Add Widget</h2>
-            <p>Add a Widget.</p>
+            <h2>Add Widget</h2>
+            <p>Create new blog widget</p>
         </div>
     </div>
-    <div class="btns">
-           <a href="https://glitchwizarddigitalsolutions.com/blog/" class="btn btn-primary" style='background:green'><i class="fa fa-eye"></i>&nbsp;  Go to Blog</a>
-    </div>
 </div>
-<div class="content-header responsive-flex-column pad-top-5">
-               <div class="card">
-              <h6 class="card-header">Shortcuts</h6>         
-                <div class="card-body">
-     <center>
-                    <a href="blog_dash.php" class="btn btn-sm btn-primary mt-2">Blog Dashboard</a>
-					<a href="widgets.php" class="btn btn-sm btn-primary mt-2">View Widgets</a>
-                  </center>
-</div>
-      </div>
-            </div>
 
-
-
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-	 
-	</div>
-
+<div class="form-professional">
 	<div class="card">
         <h6 class="card-header">Add Widget</h6>         
             <div class="card-body">
@@ -75,6 +60,7 @@ if (isset($_POST['add'])) {
 				</form>                          
 			</div>
 	</div>
+</div>
 	
 <script>
 $(document).ready(function() {

@@ -50,10 +50,12 @@ if (isset($_GET['error_msg'])) {
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_email()?></div>
-    <div class="txt">
-        <h2>Email Templates</h2>
-        <p class="subtitle">Manage invoice email templates</p>
+    <div class="title">
+       <i class="fa-solid fa-envelope"></i>
+        <div class="txt">
+            <h2>Email Templates</h2>
+            <p>Manage invoice email templates</p>
+        </div>
     </div>
 </div>
 

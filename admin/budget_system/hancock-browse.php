@@ -1,5 +1,6 @@
 <?php
 include_once 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Connect to MySQL database
 $budget_pdo = pdo_connect_budget_db($db_host, $db_name7, $db_user, $db_pass);
 // Error message
@@ -69,15 +70,19 @@ $stmt->execute();
 $num_results = $stmt->fetchColumn();
 ?>
 <?=template_admin_header('Budget System', 'budget', 'hancock')?>
-<div class="content read">
 
-	<div class="page-title">
-		<i class="fa-regular fa-address-book fa-lg"></i>
-		<div class="wrap">
-			<h2>Read Hancock Transactions Table</h2>
-			<p></p>
-		</div>
+<?=generate_breadcrumbs([
+    ['label' => 'Budget System', 'url' => 'bs_dashboard.php'],
+    ['label' => 'Hancock Table']
+])?>
+
+<div class="content-title">
+	<div class="icon"><?=svg_icon_budget()?></div>
+	<div class="txt">
+		<h2>Hancock Transactions Table</h2>
+		<p class="subtitle">View and manage Hancock bank transactions</p>
 	</div>
+</div>
 
 	<form action="" method="get" class="crud-form">
 

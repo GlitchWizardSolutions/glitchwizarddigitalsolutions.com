@@ -1,19 +1,50 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
 
 if (isset($_GET['delete-id'])) {
     $id     = (int) $_GET["delete-id"];
-    $query2 = mysqli_query($connect, "SELECT * FROM `files` WHERE id='$id'");
-    $row2   = mysqli_fetch_assoc($query2);
+    $query2 = $blog_pdo->prepare("SELECT * FROM `files` WHERE id=?");
+    $query2->execute([$id]);
+    $row2   = $query2->fetch(PDO::FETCH_ASSOC);
     $path   = $row2['path'];
 	
-    unlink($path);
-	$query = mysqli_query($connect, "DELETE FROM `files` WHERE id='$id'");
+    // Convert web path to server path for deletion
+    if (strpos($path, '/') === 0) {
+        // Web path format - convert to server path using constant
+        $server_path = str_replace(blog_files_url, blog_files_path, $path);
+    } else {
+        // Old relative path format
+        $server_path = $path;
+    }
+    
+    if (file_exists($server_path)) {
+        unlink($server_path);
+    }
+    
+	$query = $blog_pdo->prepare("DELETE FROM `files` WHERE id=?");
+    $query->execute([$id]);
+    
+    header('Location: files.php');
+    exit;
 }
 ?>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h3 class="h3"><i class="fas fa-folder-open"></i> Files</h3>
+<?=template_admin_header('Files', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Files', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-file"></i>
+        <div class="txt">
+            <h2>Files</h2>
+            <p>Manage uploaded files</p>
+        </div>
     </div>
+</div>
 
             <div class="card">
               <h6 class="card-header">Files</h6>         
@@ -33,16 +64,35 @@ if (isset($_GET['delete-id'])) {
                 </tr>
 				</thead>
 <?php
-$query = mysqli_query($connect, "SELECT * FROM files ORDER BY id DESC");
-while ($row = mysqli_fetch_assoc($query)) {
+$query = $blog_pdo->query("SELECT * FROM files ORDER BY id DESC");
+while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+        // Convert old relative paths to web paths if needed
+        $file_path = $row['path'];
+        
+        // Handle various old path formats
+        if (strpos($file_path, '../') === 0 || strpos($file_path, '../../') === 0) {
+            // Old relative path format - extract just the filename and use the constant
+            $filename = basename($file_path);
+            $file_path = blog_files_url . $filename;
+        } elseif (strpos($file_path, '/') !== 0 && strpos($file_path, 'http') !== 0) {
+            // Relative path without ../ - assume it's in the files directory
+            $file_path = blog_files_url . basename($file_path);
+        }
+        
+        // Check if file exists for server-side path using constant
+        $server_path = str_replace(blog_files_url, blog_files_path, $file_path);
+        $file_exists = file_exists($server_path);
+        $file_type = $file_exists ? strtoupper(pathinfo($file_path, PATHINFO_EXTENSION)) : 'Unknown';
+        $file_size = $file_exists ? byte_convert(filesize($server_path)) : 'N/A';
+        
         echo '
                 <tr>
-	                <td>' . $row['filename'] . '</td>
-					<td>' . filetype($row['path']) . '</td>
-					<td>' . byte_convert(filesize($row['path'])) . '</td>
-					<td data-sort="' . strtotime($row['date']) . '">' . date($settings['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</td>
+	                <td>' . htmlspecialchars($row['filename']) . '</td>
+					<td>' . $file_type . '</td>
+					<td>' . $file_size . '</td>
+					<td data-sort="' . strtotime($row['date']) . '">' . date($settings['date_format'], strtotime($row['date'])) . ', ' . htmlspecialchars($row['time']) . '</td>
 					<td>
-					    <a href="' . $row['path'] . '" target="_blank" class="btn btn-success btn-sm"><i class="fa fa-eye"></i> View</a>
+					    <a href="' . htmlspecialchars($file_path) . '" target="_blank" class="btn btn-success btn-sm"><i class="fa fa-eye"></i> View</a>
 						<a href="?delete-id=' . $row['id'] . '" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Delete</a>
 					</td>
                 </tr>
@@ -67,6 +117,4 @@ $(document).ready(function() {
 	} );
 } );
 </script>
-<?php
-include "footer.php";
-?>
+<?=template_admin_footer()?>

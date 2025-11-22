@@ -13,36 +13,23 @@ if (isset($_GET['delete-id'])) {
 }
 ?>
 
-<?=template_admin_header('Blog Users', 'blog', 'blog')?>
+<?=template_admin_header('Blog Users', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Users', 'url' => '']
+])?>
+
 <div class="content-title">
     <div class="title">
-       <i class="fa-solid fa-circle-info"></i>
+       <i class="fa-solid fa-users"></i>
         <div class="txt">
             <h2>Blog Users</h2>
-            <p>Manage your users from here.</p>
+            <p>Manage blog users</p>
         </div>
     </div>
-        <div class="btns">
-           <a href="https://glitchwizarddigitalsolutions.com/blog/" class="btn btn-primary" style='background:green'><i class="fa fa-eye"></i>&nbsp;  Go to Blog</a>
-    </div>
 </div>
-
-<div class="content-header responsive-flex-column pad-top-5">
-               <div class="card">
-              <h6 class="card-header">Shortcuts</h6>         
-                <div class="card-body">
-     <center>
-                    <a href="blog_dash.php" class="btn btn-sm btn-primary mt-2">Blog Dashboard</a>
-					<a href="add_user.php" class="btn btn-sm btn-primary mt-2">+ User</a>
-				 
-                  </center>
-</div>
-      </div>
-            </div>
-
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-	 
-	</div>
 	
 <?php
 if (isset($_GET['edit-id'])) {
@@ -67,6 +54,7 @@ if (isset($_GET['edit-id'])) {
         
 ?>
 
+<div class="form-professional">
             <div class="card mb-3">
               <h6 class="card-header">Edit User</h6>         
                   <div class="card-body">
@@ -109,6 +97,7 @@ if (isset($_GET['edit-id'])) {
 					</form>
                   </div>
             </div>
+</div>
 <?php
 }
 ?>
@@ -141,10 +130,14 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	if ($row['role'] == 'User') {
         $badge = '<h6><span class="badge bg-primary">User</span></h6>';
     }
+    
+    // Handle avatar path - avatars are stored in uploads/avatars/ within the blog admin folder
+    $avatar_path = !empty($row['avatar']) ? htmlspecialchars($row['avatar']) : 'uploads/avatars/default.png';
+    
     echo '
                             <tr>
-                                <td><img src="../../blog/' . $row['avatar'] . '" width="40px" height="40px" /> ' . $row['username'] . '</td>
-								<td>' . $row['email'] . '</td>
+                                <td><img src="' . $avatar_path . '" width="40px" height="40px" style="object-fit: cover; border-radius: 50%;" onerror="this.style.display=\'none\'" /> ' . htmlspecialchars($row['username']) . '</td>
+								<td>' . htmlspecialchars($row['email']) . '</td>
 								<td>' . $badge . '</td>
                                 <td>
                                     <a class="btn btn-primary btn-sm" href="?edit-id=' . $row['id'] . '">

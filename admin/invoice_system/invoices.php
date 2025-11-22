@@ -172,10 +172,12 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_invoice()?></div>
-    <div class="txt">
-        <h2>Manage Invoices</h2>
-        <p class="subtitle">View, edit, and create invoices</p>
+    <div class="title">
+       <i class="fa-solid fa-file-invoice"></i>
+        <div class="txt">
+            <h2>Manage Invoices</h2>
+            <p>View, edit, and create invoices</p>
+        </div>
     </div>
 </div>
 

@@ -116,24 +116,24 @@ if(isset($_FILES['file']['name']) && is_array($_FILES['file']['name'])) {
 }
 
 ?>
-<?=template_admin_header('Blog',  'blog', 'blog')?>
+<?=template_admin_header('Upload Documents', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Upload Documents', 'url' => '']
+])?>
+
 <div class="content-title">
     <div class="title">
-       <i class="fa-solid fa-circle-info"></i>
+       <i class="fa-solid fa-upload"></i>
         <div class="txt">
             <h2>Upload Documents</h2>
-            <p>Manage your uploads from here.</p>
+            <p>Upload multiple documents</p>
         </div>
     </div>
-        <div class="btns">
-           <a href="https://glitchwizarddigitalsolutions.com/blog/" class="btn btn-primary" style='background:green'><i class="fa fa-eye"></i>&nbsp;  Go to Blog</a>
-    </div>
-  </div>
 </div>
 
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-	
-	</div>
         <div class="container">
             <div class="row">
                 <div class="twelve column" style="margin-top: 5%">

@@ -158,10 +158,12 @@ if (isset($_GET['id'])) {
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_invoice()?></div>
-    <div class="txt">
-        <h2><?=$page?> Invoice</h2>
-        <p class="subtitle">Invoice clients consistently for all work performed</p>
+    <div class="title">
+       <i class="fa-solid fa-file-invoice"></i>
+        <div class="txt">
+            <h2><?=$page?> Invoice</h2>
+            <p>Invoice clients consistently for all work performed</p>
+        </div>
     </div>
 </div>
 
@@ -187,7 +189,7 @@ if (isset($_GET['id'])) {
 
 <form action="" method="post" class="form-professional">
 
-    <div class="form-actions">
+    <div class="form-actions" style="position: sticky; top: 0; background: white; z-index: 100; padding: 15px 0; border-bottom: 2px solid #e0e0e0; margin-bottom: 20px;">
         <a href="invoices.php" class="btn btn-secondary">Cancel</a>
         <?php if ($page == 'Edit'): ?>
         <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this invoice?')">
@@ -202,33 +204,29 @@ if (isset($_GET['id'])) {
         <?php endif; ?>
     </div>
 
-    <div class="tabs">
-        <a href="#" class="active">Details</a>
-        <a href="#">Items</a>
-    </div>
-
-    <div class="content-block tab-content active">
+    <!-- Section 1: Client & Basic Info -->
+    <div class="content-block" style="margin-bottom: 30px;">
         <div class="form-section">
-            <div class="section-title">Invoice Details</div>
+            <div class="section-title" style="background: #6b46c1; color: white; padding: 12px 20px; border-radius: 6px 6px 0 0; font-size: 16px; display: flex; align-items: center; gap: 10px;">
+                <span style="background: white; color: #6b46c1; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold;">1</span>
+                <i class="fa-solid fa-user"></i> Client & Invoice Information
+            </div>
 
-            <div class="form responsive-width-100">
+            <div class="form responsive-width-100" style="padding: 20px;">
 
-            <label for="client_id">Client</label>
+            <label for="client_id"><span class="required">*</span> Client</label>
     
-            <select id="client_id" name="client_id" class="client_id" style="margin-bottom:10px">
- required>
-                <option value="0">Select Invoice Client</option>
+            <select id="client_id" name="client_id" class="client_id" style="margin-bottom:10px" required>
+                <option value="">Select Invoice Client</option>
                 <?php foreach ($invoice_clients as $invoice_client): ?>
                 <option value="<?=$invoice_client['id']?>"<?=$invoice['client_id']==$invoice_client['id']?' selected':''?>><?=$invoice_client['business_name'] ?>&nbsp;[<?=$invoice_client['first_name']?>&nbsp;<?=$invoice_client['last_name']?>]</option>
-
                 <?php endforeach; ?>
             </select>
-          <?php /*  <a href="#" class="add-client"><svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>Add New Client</a>  
-                This modal doesn't allow for a client with the same email as another, nor does it collect the acc_id, errors also, saying the name and email aren't populating.*/ ?>
-<a href="client.php" class="btn btn-primary">Add New Client</a>  <br>
+            <a href="client.php" class="btn btn-primary" style="margin-top: 10px; display: inline-block;">Add New Client</a>
+            
             <?php if ($page == 'Create'): ?>
-            <label for="send_email" class="checkbox pad-bot-5">
-                <input id="send_email" type="checkbox" name="send_email" value="1" checked>
+            <label for="send_email_checkbox" class="checkbox pad-bot-5" style="margin-top: 15px;">
+                <input id="send_email_checkbox" type="checkbox" name="send_email" value="1" checked>
                 Send email to client
             </label>
             <?php endif; ?>
@@ -253,113 +251,374 @@ if (isset($_GET['id'])) {
                     <input type="hidden" name="payment_methods[]" value="<?=$m?>">
                 </span>
                 <?php endforeach; ?>
-                <input type="text" class="search" id="payment_method" placeholder="Payment Methods">
+                <input type="text" class="search" id="payment_method" placeholder="Add payment method...">
                 <div class="list">
-                    <span data-value="Cash">Cash</span>
                     <span data-value="PayPal">PayPal</span>
-                 
+                    <span data-value="Cash">Cash</span>
+                    <span data-value="Check">Check</span>
+                    <span data-value="Bank Transfer">Bank Transfer</span>
+                    <span data-value="Credit Card">Credit Card</span>
                 </div>
             </div>
+            <small style="color: #666; display: block; margin-top: 5px;"><i class="fa-solid fa-info-circle"></i> PayPal is recommended for online payments</small>
+
+            <label for="due_date"><span class="required">*</span> Due Date</label>
+            <input id="due_date" type="datetime-local" name="due_date" value="<?=date('Y-m-d\TH:i', strtotime($invoice['due_date']))?>" required>
+
+            <label for="created"><span class="required">*</span> Created Date</label>
+            <input id="created" type="datetime-local" name="created" value="<?=date('Y-m-d\TH:i', strtotime($invoice['created']))?>" required>
+
+        </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Invoice Items (MOST IMPORTANT) -->
+    <div class="content-block" style="margin-bottom: 30px; border: 3px solid #ff9800; border-radius: 8px; box-shadow: 0 4px 12px rgba(255, 152, 0, 0.2);">
+        <div class="form-section">
+            <div class="section-title" style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; padding: 12px 20px; border-radius: 6px 6px 0 0; font-size: 16px; display: flex; align-items: center; gap: 10px;">
+                <span style="background: white; color: #ff9800; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold;">2</span>
+                <i class="fa-solid fa-shopping-cart"></i> Invoice Items
+                <span style="background: #fff3e0; color: #e65100; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-left: auto;">⚠️ REQUIRED</span>
+            </div>
+
+            <div style="padding: 20px; background: #fff8e1;">
+                <p style="margin: 0 0 15px 0; color: #e65100; font-weight: 500;">
+                    <i class="fa-solid fa-exclamation-triangle"></i> <strong>Important:</strong> Add at least one item to this invoice. Items define what the client is being charged for.
+                </p>
+
+                <div class="table manage-invoice-table">
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <td style="width: 25%;">Name</td>
+                                <td style="width: 35%;">Description</td>
+                                <td style="width: 15%;">Price</td>
+                                <td style="width: 10%;">Qty</td>
+                                <td style="width: 10%;">Total</td>
+                                <td style="width: 5%;"></td>
+                            </tr>
+                        </thead>
+                        <tbody class="invoice-items-tbody">
+                            <?php if (empty($invoice_items)): ?>
+                            <tr class="no-items-row">
+                                <td colspan="6" class="no-invoice-items-msg no-results" style="background: #ffebee; color: #c62828; font-weight: 500; padding: 30px; text-align: center;">
+                                    <i class="fa-solid fa-inbox" style="font-size: 48px; opacity: 0.3; display: block; margin-bottom: 10px;"></i>
+                                    No items added yet. Click "Add Item" below to get started.
+                                </td>
+                            </tr>
+                            <?php else: ?>
+                            <?php foreach ($invoice_items as $item): ?>
+                            <tr class="item-row">
+                                <td><input type="hidden" name="item_id[]" value="<?=$item['id']?>"><input name="item_name[]" type="text" placeholder="Item name" value="<?=htmlspecialchars($item['item_name'], ENT_QUOTES)?>" required style="width: 100%;"></td>
+                                <td><input name="item_description[]" type="text" placeholder="Description" maxlength="250" value="<?=htmlspecialchars($item['item_description'], ENT_QUOTES)?>" style="width: 100%;"></td>
+                                <td><input name="item_price[]" type="number" placeholder="0.00" value="<?=$item['item_price']?>" step="0.01" class="item-price" style="width: 100%;"></td>
+                                <td><input name="item_quantity[]" type="number" placeholder="1" value="<?=$item['item_quantity']?>" class="item-quantity" style="width: 100%;"></td>
+                                <td class="item-total" style="font-weight: bold; padding: 10px;">$<?=number_format($item['item_price'] * $item['item_quantity'], 2)?></td>
+                                <td style="text-align: center;"><svg class="delete-item" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="cursor: pointer; fill: #d32f2f;"><title>Delete Item</title><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg></td>
+                            </tr>
+                            <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                    <div style="margin-top: 15px; display: flex; gap: 10px;">
+                        <a href="#" class="add-item btn btn-primary" style="flex: 1;">
+                            <i class="fa-solid fa-plus"></i> Add Item
+                        </a>
+                        <div style="flex: 1; text-align: right; font-size: 18px; font-weight: bold; padding: 10px 15px; background: #e3f2fd; border-radius: 6px; color: #1976d2;">
+                            Subtotal: <span class="invoice-subtotal">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Future: Service Selector (Coming Soon) -->
+                <div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-left: 4px solid #4caf50; border-radius: 4px;">
+                    <p style="margin: 0; color: #2e7d32; font-size: 14px;">
+                        <i class="fa-solid fa-lightbulb"></i> <strong>Coming Soon:</strong> Select from your saved services catalog to quickly add items with pre-filled prices and descriptions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Advanced Settings (Tax, Template, Recurrence) -->
+    <div class="content-block" style="margin-bottom: 30px;">
+        <div class="form-section">
+            <div class="section-title" style="background: #424242; color: white; padding: 12px 20px; border-radius: 6px 6px 0 0; font-size: 16px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="toggleAdvancedSettings()">
+                <span style="background: white; color: #424242; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold;">3</span>
+                <i class="fa-solid fa-sliders"></i> Advanced Settings
+                <i class="fa-solid fa-chevron-down" id="advanced-toggle-icon" style="margin-left: auto; transition: transform 0.3s;"></i>
+            </div>
+
+            <div id="advanced-settings-content" class="form responsive-width-100" style="padding: 20px;">
 
             <label for="tax">Tax</label>
-            <input id="tax" type="text" name="tax" placeholder="% or fixed amount" value="<?=$invoice['tax'] == 'fixed' ? $invoice['tax_total'] : $invoice['tax']?>" step=".01">
+            <input id="tax" type="text" name="tax" placeholder="% or fixed amount (e.g., 10% or 25.00)" value="<?=$invoice['tax'] == 'fixed' ? $invoice['tax_total'] : $invoice['tax']?>" step="0.01">
+            <small style="color: #666; display: block; margin-top: 5px; margin-bottom: 15px;">Enter as percentage (10%) or fixed amount (25.00)</small>
 
-            <label for="invoice_template">Template</label>
-            <select id="invoice_template" name="invoice_template">
-                <?php foreach ($templates as $template): ?>
-                <option value="<?=basename($template)?>"<?=$invoice['invoice_template']==basename($template)?' selected':''?>><?=basename($template)?></option>
+            <label for="invoice_template">Invoice Template</label>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <?php foreach ($templates as $template): 
+                    $template_name = basename($template);
+                    $template_preview = file_exists($template . '/preview.png') ? $template . '/preview.png' : '';
+                ?>
+                <label class="template-card" style="cursor: pointer; border: 3px solid #e0e0e0; border-radius: 8px; padding: 10px; transition: all 0.3s; display: block; text-align: center; background: white;">
+                    <input type="radio" name="invoice_template" value="<?=$template_name?>" <?=$invoice['invoice_template']==$template_name?' checked':''?> style="margin-bottom: 10px;">
+                    <?php if ($template_preview): ?>
+                    <img src="<?=str_replace(base_path, '../../client-invoices/', $template_preview)?>" alt="<?=$template_name?>" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 8px; border: 1px solid #ddd;">
+                    <?php else: ?>
+                    <div style="width: 100%; height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 4px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                    <?php endif; ?>
+                    <strong style="display: block; color: #333; text-transform: capitalize;"><?=$template_name?></strong>
+                </label>
                 <?php endforeach; ?>
-            </select>
+            </div>
 
-            <label for="notes">Notes</label>
-            <textarea id="notes" name="notes" placeholder="Notes"><?=htmlspecialchars($invoice['notes'], ENT_QUOTES)?></textarea>
+            <label for="notes">Invoice Notes</label>
+            <textarea id="notes" name="notes" placeholder="Thank you for your business!" rows="4"><?=htmlspecialchars($invoice['notes'], ENT_QUOTES)?></textarea>
 
-            <label for="recurrence">Recurrence</label>
+            <label for="recurrence">Recurring Invoice</label>
             <select id="recurrence" name="recurrence">
-                <option value="0"<?=$invoice['recurrence']==0?' selected':''?>>No</option>
-                <option value="1"<?=$invoice['recurrence']==1?' selected':''?>>Yes</option>
+                <option value="0"<?=$invoice['recurrence']==0?' selected':''?>>No - One-time invoice</option>
+                <option value="1"<?=$invoice['recurrence']==1?' selected':''?>>Yes - Recurring invoice</option>
             </select>
 
             <div class="recurrence-options"<?=$invoice['recurrence']==0 ? ' style="display:none"' : ''?>>
                 <label for="recurrence_period">Recurrence Period</label>
-                <input id="recurrence_period" type="number" name="recurrence_period" placeholder="Recurrence Period" min="1" value="<?=$invoice['recurrence_period']?>">
+                <input id="recurrence_period" type="number" name="recurrence_period" placeholder="1" min="1" value="<?=$invoice['recurrence_period']?>">
 
-                <label for="recurrence_period_type">Recurrence Period Type</label>
+                <label for="recurrence_period_type">Recurrence Frequency</label>
                 <select id="recurrence_period_type" name="recurrence_period_type">
-                    <option value="day"<?=$invoice['recurrence_period_type']=='day'?' selected':''?>>Day</option>
-                    <option value="week"<?=$invoice['recurrence_period_type']=='week'?' selected':''?>>Week</option>
-                    <option value="month"<?=$invoice['recurrence_period_type']=='month'?' selected':''?>>Month</option>
-                    <option value="year"<?=$invoice['recurrence_period_type']=='year'?' selected':''?>>Year</option>
+                    <option value="day"<?=$invoice['recurrence_period_type']=='day'?' selected':''?>>Day(s)</option>
+                    <option value="week"<?=$invoice['recurrence_period_type']=='week'?' selected':''?>>Week(s)</option>
+                    <option value="month"<?=$invoice['recurrence_period_type']=='month'?' selected':''?>>Month(s)</option>
+                    <option value="year"<?=$invoice['recurrence_period_type']=='year'?' selected':''?>>Year(s)</option>
                 </select>
+                <small style="color: #666; display: block; margin-top: 5px;">Client will be automatically invoiced every period</small>
             </div>
 
             <?php if ($page == 'Edit'): ?>
-            <label for="paid_total">Paid Total</label>
-            <input id="paid_total" type="number" name="paid_total" placeholder="Paid Total" value="<?=$invoice['paid_total']?>" step=".01">
+            <label for="paid_total">Amount Paid</label>
+            <input id="paid_total" type="number" name="paid_total" placeholder="0.00" value="<?=$invoice['paid_total']?>" step="0.01">
             <?php endif; ?>
 
             <label for="due_date"><span class="required">*</span> Due Date</label>
             <input id="due_date" type="datetime-local" name="due_date" value="<?=date('Y-m-d\TH:i', strtotime($invoice['due_date']))?>" required>
 
-            <label for="created"><span class="required">*</span> Created</label>
+            <label for="created"><span class="required">*</span> Created Date</label>
             <input id="created" type="datetime-local" name="created" value="<?=date('Y-m-d\TH:i', strtotime($invoice['created']))?>" required>
 
         </div>
-       <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
- 
-        <a href="invoices.php" class="btn mar-right-2">Cancel</a>
-        <a href="invoices.php" class="btn mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this invoice?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save Invoice" class="btn btn-success mar-right-2">
-        <?php if ($page == 'Edit'): ?>
-            <?php if (isset($invoice['payment_status']) && $invoice['payment_status'] == 'Paid'): ?>
-        <input type="submit" name="send_receipt" value="Save & Send Receipt" class="btn" style="background:#28a745; color:white;" onclick="return confirm('Send payment receipt to client?')">
-            <?php else: ?>
-        <input type="submit" name="send_email" value="Save & Send Email" class="btn" style="background:#0066cc; color:white;" onclick="return confirm('Send invoice email to client?')">
-            <?php endif; ?>
-        <?php endif; ?>
-   </div>
+       </div>
     </div>
 
-    <div class="content-block tab-content">
-        <div class="table manage-invoice-table">
-            <table>
-                <thead>
-                    <tr>
-                        <td>Name</td>
-                        <td>Description</td>
-                        <td>Price</td>
-                        <td>Quantity</td>
-                        <td></td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($invoice_items)): ?>
-                    <tr>
-                        <td colspan="20" class="no-invoice-items-msg no-results">There are no invoice items.</td>
-                    </tr>
-                    <?php else: ?>
-                    <?php foreach ($invoice_items as $item): ?>
-                    <tr>
-                        <td><input type="hidden" name="item_id[]" value="<?=$item['id']?>"><input name="item_name[]" type="text" placeholder="Name" value="<?=htmlspecialchars($item['item_name'], ENT_QUOTES)?>" required></td>
-                        <td><input name="item_description[]" type="text" placeholder="Description"  maxlength="250" value="<?=htmlspecialchars($item['item_description'], ENT_QUOTES)?>"></td>
-                        <td><input name="item_price[]" type="number" placeholder="Price" value="<?=$item['item_price']?>" step=".01"></td>
-                        <td><input name="item_quantity[]" type="number" placeholder="Quantity" value="<?=$item['item_quantity']?>"></td>
-                        <td><svg class="delete-item" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Delete Item</title><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg></td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-            <a href="#" class="add-item"><svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>Add Item</a>
-        </div>
-       </div>
- 
- 
- </div>
+    <div class="form-actions" style="position: sticky; bottom: 0; background: white; z-index: 100; padding: 15px 0; border-top: 2px solid #e0e0e0; margin-top: 20px;">
+        <a href="invoices.php" class="btn btn-secondary">Cancel</a>
+        <?php if ($page == 'Edit'): ?>
+        <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this invoice?')">
+        <?php endif; ?>
+        <input type="submit" name="submit" value="Save Invoice" class="btn btn-success">
+        <?php if ($page == 'Edit'): ?>
+            <?php if (isset($invoice['payment_status']) && $invoice['payment_status'] == 'Paid'): ?>
+        <input type="submit" name="send_receipt" value="Save & Send Receipt" class="btn btn-success" onclick="return confirm('Send payment receipt to client?')">
+            <?php else: ?>
+        <input type="submit" name="send_email" value="Save & Send Email" class="btn btn-success" onclick="return confirm('Send invoice email to client?')">
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+
 </form>
-  
+
+<script>
+// Auto-preselect PayPal if no payment methods selected
+document.addEventListener('DOMContentLoaded', function() {
+    const multiselect = document.querySelector('.multiselect[data-name="payment_methods[]"]');
+    if (multiselect) {
+        const existingItems = multiselect.querySelectorAll('.item');
+        
+        // If creating new invoice and no payment methods, add PayPal
+        if (existingItems.length === 0 && <?=$page == 'Create' ? 'true' : 'false'?>) {
+            const paypalOption = multiselect.querySelector('.list span[data-value="PayPal"]');
+            if (paypalOption) {
+                paypalOption.click();
+            }
+        }
+    }
+});
+
+// Toggle advanced settings
+function toggleAdvancedSettings() {
+    const content = document.getElementById('advanced-settings-content');
+    const icon = document.getElementById('advanced-toggle-icon');
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+    } else {
+        content.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+    }
+}
+
+// Calculate item totals and invoice subtotal
+function calculateInvoiceTotals() {
+    let subtotal = 0;
+    const rows = document.querySelectorAll('.item-row');
+    if (rows.length > 0) {
+        rows.forEach(row => {
+            const priceInput = row.querySelector('.item-price');
+            const qtyInput = row.querySelector('.item-quantity');
+            const totalCell = row.querySelector('.item-total');
+            
+            if (priceInput && qtyInput && totalCell) {
+                const price = parseFloat(priceInput.value) || 0;
+                const quantity = parseFloat(qtyInput.value) || 1;
+                const total = price * quantity;
+                totalCell.textContent = '$' + total.toFixed(2);
+                subtotal += total;
+            }
+        });
+    }
+    const subtotalElement = document.querySelector('.invoice-subtotal');
+    if (subtotalElement) {
+        subtotalElement.textContent = '$' + subtotal.toFixed(2);
+    }
+}
+
+// Update totals on price/quantity change
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('item-price') || e.target.classList.contains('item-quantity')) {
+        calculateInvoiceTotals();
+    }
+});
+
+// Calculate on page load
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(calculateInvoiceTotals, 500);
+});
+
+// Highlight selected template card
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.template-card').forEach(card => {
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio && radio.checked) {
+            card.style.borderColor = '#6b46c1';
+            card.style.background = '#f3e5f5';
+        }
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.template-card').forEach(c => {
+                c.style.borderColor = '#e0e0e0';
+                c.style.background = 'white';
+            });
+            this.style.borderColor = '#6b46c1';
+            this.style.background = '#f3e5f5';
+        });
+    });
+});
+
+// Recurrence toggle
+const recurrenceSelect = document.getElementById('recurrence');
+if (recurrenceSelect) {
+    recurrenceSelect.addEventListener('change', function() {
+        const options = document.querySelector('.recurrence-options');
+        if (options) {
+            if (this.value == '1') {
+                options.style.display = 'block';
+            } else {
+                options.style.display = 'none';
+            }
+        }
+    });
+}
+
+// Add Item functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const addItemBtn = document.querySelector('.add-item');
+    if (addItemBtn) {
+        addItemBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            const tbody = document.querySelector('.invoice-items-tbody');
+            if (tbody) {
+                // Remove "no items" row if it exists
+                const noItemsRow = tbody.querySelector('.no-items-row');
+                if (noItemsRow) {
+                    noItemsRow.remove();
+                }
+                
+                // Add new item row
+                const newRow = document.createElement('tr');
+                newRow.className = 'item-row';
+                newRow.innerHTML = `
+                    <td><input type="hidden" name="item_id[]" value="0"><input name="item_name[]" type="text" placeholder="Item name" required style="width: 100%;"></td>
+                    <td><input name="item_description[]" type="text" placeholder="Description" maxlength="250" style="width: 100%;"></td>
+                    <td><input name="item_price[]" type="number" placeholder="0.00" step="0.01" value="0" class="item-price" style="width: 100%;"></td>
+                    <td><input name="item_quantity[]" type="number" placeholder="1" value="1" class="item-quantity" style="width: 100%;"></td>
+                    <td class="item-total" style="font-weight: bold; padding: 10px;">$0.00</td>
+                    <td style="text-align: center;"><svg class="delete-item" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="cursor: pointer; fill: #d32f2f;"><title>Delete Item</title><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg></td>
+                `;
+                tbody.appendChild(newRow);
+                
+                // Attach delete handler to new row
+                const deleteBtn = newRow.querySelector('.delete-item');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        newRow.remove();
+                        calculateInvoiceTotals();
+                    });
+                }
+                
+                // Recalculate totals
+                calculateInvoiceTotals();
+                
+                // Focus on the new item's name field
+                const nameInput = newRow.querySelector('input[name="item_name[]"]');
+                if (nameInput) {
+                    nameInput.focus();
+                }
+            }
+        });
+    }
     
-<?=template_admin_footer('<script>initManageInvoiceItems()</script>')?>
+    // Attach delete handlers to existing items
+    document.querySelectorAll('.delete-item').forEach(function(element) {
+        element.addEventListener('click', function(event) {
+            event.preventDefault();
+            element.closest('tr').remove();
+            calculateInvoiceTotals();
+        });
+    });
+    
+    // Form validation before submission
+    const invoiceForm = document.querySelector('form');
+    if (invoiceForm) {
+        invoiceForm.addEventListener('submit', function(event) {
+            const clientSelect = document.getElementById('client_id');
+            if (!clientSelect.value || clientSelect.value === '' || clientSelect.value === '0') {
+                event.preventDefault();
+                alert('Please select a client before submitting the invoice.');
+                clientSelect.focus();
+                clientSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+            
+            // Check if at least one item exists
+            const itemRows = document.querySelectorAll('.invoice-items-tbody .item-row');
+            if (itemRows.length === 0) {
+                event.preventDefault();
+                alert('Please add at least one invoice item before submitting.');
+                document.querySelector('.invoice-items-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return false;
+            }
+        });
+    }
+});
+</script>
+<script>
+// Also call the external function if it exists
+if (typeof initManageInvoiceItems === 'function') {
+    initManageInvoiceItems();
+}
+</script>
+
+<?=template_admin_footer()?>

@@ -13,24 +13,22 @@ require 'assets/includes/admin_config.php';
         </div>
     </div>
 </div>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h3 class="h3"><i class="fas fa-columns"></i> Dashboard</h3>
-    </div>
+	 
 	  
             <div class="card">
               <h6 class="card-header">Shortcuts</h6>         
                 <div class="card-body">
-                  <center>
-                    <a href="add_post.php" class="btn mt-2 btn-small btn-primary"><i class="fa fa-edit"></i><br />Write Post</a>
-                    <a href="settings.php" class="btn mt-2 btn-primary"><i class="fa fa-cogs"></i><br /> Settings</a>
-					<a href="messages.php" class="btn mt-2btn-small btn-primary"><i class="fa fa-envelope"></i><br /> Messages</a>
-					<a href="menu_editor.php" class="btn mt-2 btn-small btn-primary"><i class="fa fa-bars"></i><br /> Menu Editor</a>
-					<a href="add_page.php" class="btn mt-2 btn-small btn-primary"><i class="fa fa-file-alt"></i><br /> Add Page</a>
-					<a href="add_image.php" class="btn mt-2 btn-small btn-primary"><i class="fa fa-camera-retro"></i><br /> Add Image</a>
-					<a href="widgets.php" class="btn mt-2 btn-small btn-primary"><i class="fa fa-archive"></i><br /> Widgets</a>
-					<a href="upload_file.php" class="btn mt-2 btn-small btn-primary"><i class="fa fa-upload"></i><br /> Upload File</a>
-                    <a href="<?php echo $settings['site_url']; ?>" class="btn mt-auto btn-small btn-primary"><i class="fa fa-eye"></i><br /> Visit Site</a>
-                  </center>
+                  <div class="d-flex flex-wrap gap-2 justify-content-center">
+                    <a href="add_post.php" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i> Write Post</a>
+                    <a href="settings.php" class="btn btn-primary btn-sm"><i class="fa fa-cogs"></i> Settings</a>
+					<a href="messages.php" class="btn btn-primary btn-sm"><i class="fa fa-envelope"></i> Messages</a>
+					<a href="menu_editor.php" class="btn btn-primary btn-sm"><i class="fa fa-bars"></i> Menu Editor</a>
+					<a href="add_page.php" class="btn btn-primary btn-sm"><i class="fa fa-file-alt"></i> Add Page</a>
+					<a href="add_image.php" class="btn btn-primary btn-sm"><i class="fa fa-camera-retro"></i> Add Image</a>
+					<a href="widgets.php" class="btn btn-primary btn-sm"><i class="fa fa-archive"></i> Widgets</a>
+					<a href="upload_file.php" class="btn btn-primary btn-sm"><i class="fa fa-upload"></i> Upload File</a>
+                    <a href="<?php echo $settings['site_url']; ?>" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i> Visit Site</a>
+                  </div>
                 </div>
             </div>
 	  

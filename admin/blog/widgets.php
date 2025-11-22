@@ -10,36 +10,23 @@ if (isset($_GET['delete-id'])) {
 }
 
 ?>
-<?=template_admin_header('Blog Dashboard', 'blog')?>
+<?=template_admin_header('Blog Widgets', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Widgets', 'url' => '']
+])?>
 
 <div class="content-title">
     <div class="title">
-       <i class="fa-solid fa-circle-info"></i>
+       <i class="fa-solid fa-archive"></i>
         <div class="txt">
             <h2>Blog Widgets</h2>
-            <p>Manage your widgets from here.</p>
+            <p>Manage blog widgets</p>
         </div>
     </div>
-        <div class="btns">
-           <a href="https://glitchwizarddigitalsolutions.com/blog/" class="btn btn-primary" style='background:green'><i class="fa fa-eye"></i>&nbsp;  Go to Blog</a>
-    </div>
 </div>
-
-<div class="content-header responsive-flex-column pad-top-5">
-               <div class="card">
-              <h6 class="card-header">Shortcuts</h6>         
-                <div class="card-body">
-     <center>
-                    <a href="blog_dash.php" class="btn btn-sm btn-primary mt-2">Blog Dashboard</a>
-					<a href="add_widget.php" class="btn btn-sm btn-primary mt-2">+ Widget</a>
-				 
-                  </center>
-</div>
-      </div>
-            </div>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-	 
-	</div>
 <?php
 if (isset($_GET['edit-id'])) {
     $id  = (int) $_GET["edit-id"];
@@ -102,11 +89,13 @@ echo html_entity_decode($row['content']);
                   </form>
                   </div>
             </div>
+</div>
 <?php
 }
 ?>
 
-            <div class="card">
+<div class="form-professional">
+            <div class="card mb-3">
               <h6 class="card-header">Widgets</h6>         
                   <div class="card-body">
 				  

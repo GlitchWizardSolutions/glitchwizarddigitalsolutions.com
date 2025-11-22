@@ -44,24 +44,26 @@ if (isset($_GET['edit-id'])) {
     }
 }
 ?>
-<?=template_admin_header('Blog Comments', 'dashboard')?>
+<?=template_admin_header('Blog Comments', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Comments', 'url' => '']
+])?>
 
 <div class="content-title">
     <div class="title">
+       <i class="fa-solid fa-comments"></i>
         <div class="txt">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="../index.php">Admin Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="blog_dash.php">Blog</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Comments</li>
-                </ol>
-            </nav>
             <h2>Blog Comments</h2>
+            <p>Manage blog comments</p>
         </div>
     </div>
 </div>
 
 <?php if (isset($_GET['edit-id'])): ?>
+<div class="form-professional">
             <div class="content-block">
               <h3>Edit Comment</h3>         
 					<form action="" method="post" style="max-width: 800px;">
@@ -88,6 +90,7 @@ if (isset($_GET['edit-id'])) {
 						<input type="submit" class="btn" name="submit" value="Update" />
 					  </form>
               </div>
+</div>
 <?php endif; ?>
 			
 			<div class="content-block">

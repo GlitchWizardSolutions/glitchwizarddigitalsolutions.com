@@ -1,36 +1,55 @@
 <?php
-include "header.php";
+require 'assets/includes/admin_config.php';
 
 if (isset($_GET['delete-id'])) {
     $id    = (int) $_GET["delete-id"];
-    $query = mysqli_query($connect, "DELETE FROM `albums` WHERE id='$id'");
-    $query = mysqli_query($connect, "DELETE FROM `galery` WHERE album_id='$id'");
+    $query = $blog_pdo->prepare("DELETE FROM `albums` WHERE id=?");
+    $query->execute([$id]);
+    $query = $blog_pdo->prepare("DELETE FROM `galery` WHERE album_id=?");
+    $query->execute([$id]);
 }
 ?>
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h3 class="h3"><i class="fas fa-list-ol"></i> Albums</h3>
-	</div>
+<?=template_admin_header('Albums', 'blog')?>
+
+<?=generate_breadcrumbs([
+    ['title' => 'Admin Dashboard', 'url' => '../index.php'],
+    ['title' => 'Blog', 'url' => 'blog_dash.php'],
+    ['title' => 'Albums', 'url' => '']
+])?>
+
+<div class="content-title">
+    <div class="title">
+       <i class="fa-solid fa-images"></i>
+        <div class="txt">
+            <h2>Albums</h2>
+            <p>Manage photo albums</p>
+        </div>
+    </div>
+</div>
 	  
 <?php
 if (isset($_GET['edit-id'])) {
     $id  = (int) $_GET["edit-id"];
-    $sql = mysqli_query($connect, "SELECT * FROM `albums` WHERE id = '$id'");
-    $row = mysqli_fetch_assoc($sql);
+    $sql = $blog_pdo->prepare("SELECT * FROM `albums` WHERE id = ?");
+    $sql->execute([$id]);
+    $row = $sql->fetch(PDO::FETCH_ASSOC);
     if (empty($id)) {
         echo '<meta http-equiv="refresh" content="0; url=albums.php">';
 		exit;
     }
-    if (mysqli_num_rows($sql) == 0) {
+    if (!$row) {
         echo '<meta http-equiv="refresh" content="0; url=albums.php">';
 		exit;
     }
     
     if (isset($_POST['submit'])) {
         $title    = $_POST['title'];
-        $edit_sql = mysqli_query($connect, "UPDATE albums SET title='$title' WHERE id='$id'");
+        $edit_sql = $blog_pdo->prepare("UPDATE albums SET title=? WHERE id=?");
+        $edit_sql->execute([$title, $id]);
         echo '<meta http-equiv="refresh" content="0; url=albums.php">';
     }
 ?>
+<div class="form-professional">
             <div class="card mb-3">
               <h6 class="card-header">Edit Album</h6>         
                   <div class="card-body">
@@ -45,6 +64,7 @@ if (isset($_GET['edit-id'])) {
                       </form>
                   </div>
             </div>
+</div>
 <?php
 }
 ?>
@@ -63,8 +83,8 @@ if (isset($_GET['edit-id'])) {
 				</thead>
 <?php
 $sql    = "SELECT * FROM albums ORDER BY title ASC";
-$result = mysqli_query($connect, $sql);
-while ($row = mysqli_fetch_assoc($result)) {
+$result = $blog_pdo->query($sql);
+while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
         echo '
                 <tr>
 	                <td>' . $row['title'] . '</td>
@@ -80,6 +100,4 @@ while ($row = mysqli_fetch_assoc($result)) {
 
                   </div>
               </div>
-<?php
-include "footer.php";
-?>
+<?=template_admin_footer()?>
