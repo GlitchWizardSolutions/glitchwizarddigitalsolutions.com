@@ -35,46 +35,61 @@ if (isset($_GET['success_msg'])) {
     }
 }
 ?>
-<?=template_admin_header('Email Template', 'emailtemplate')?>
+<?=template_admin_header('Email Templates', 'emailtemplate')?>
+
+<div class="content-title">
+    <div class="title">
+        <div class="icon alt">
+            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>
+        </div>
+        <div class="txt">
+            <h2 class="responsive-width-100">Email Templates</h2>
+            <p>Manage system email templates</p>
+        </div>
+    </div>
+</div>
+
+<?php if (isset($success_msg)): ?>
+<div class="msg success">
+    <i class="fas fa-check-circle"></i>
+    <p><?=$success_msg?></p>
+    <i class="fas fa-times"></i>
+</div>
+<?php endif; ?>
 
 <form action="" method="post" enctype="multipart/form-data">
-
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <h2 class="responsive-width-100">Email Templates</h2>
-        <input type="submit" name="submit" value="Save" class="btn">
-    </div>
-
-    <?php if (isset($success_msg)): ?>
-    <div class="msg success">
-        <i class="fas fa-check-circle"></i>
-        <p><?=$success_msg?></p>
-        <i class="fas fa-times"></i>
-    </div>
-    <?php endif; ?>
-
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
-
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Account Email Templates</h3>
+            
             <?php if (isset($activation_email_template)): ?>
-            <label for="activation_email_template">Activation Email Template</label>
-            <textarea id="activation_email_template" name="activation_email_template"><?=$activation_email_template?></textarea>
+            <div class="form-group">
+                <label for="activation_email_template">Activation Email Template</label>
+                <textarea id="activation_email_template" name="activation_email_template" rows="10" placeholder="HTML email template for account activation"><?=$activation_email_template?></textarea>
+            </div>
             <?php endif; ?>
 
             <?php if (isset($twofactor_email_template)): ?>
-            <label for="twofactor_email_template">Two-factor Email Template</label>
-            <textarea id="twofactor_email_template" name="twofactor_email_template"><?=$twofactor_email_template?></textarea>
+            <div class="form-group">
+                <label for="twofactor_email_template">Two-Factor Email Template</label>
+                <textarea id="twofactor_email_template" name="twofactor_email_template" rows="10" placeholder="HTML email template for two-factor authentication"><?=$twofactor_email_template?></textarea>
+            </div>
             <?php endif; ?>
 
             <?php if (isset($resetpass_email_template)): ?>
-            <label for="resetpass_email_template">Reset Password Email Template</label>
-            <textarea id="resetpass_email_template" name="resetpass_email_template"><?=$resetpass_email_template?></textarea>
+            <div class="form-group">
+                <label for="resetpass_email_template">Reset Password Email Template</label>
+                <textarea id="resetpass_email_template" name="resetpass_email_template" rows="10" placeholder="HTML email template for password reset"><?=$resetpass_email_template?></textarea>
+            </div>
             <?php endif; ?>
+        </div>
 
+        <div class="form-actions">
+            <input type="submit" name="submit" value="Save Templates" class="btn btn-primary">
         </div>
 
     </div>
-
 </form>
 
 <?=template_admin_footer()?>

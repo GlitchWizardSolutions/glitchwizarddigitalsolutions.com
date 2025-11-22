@@ -58,23 +58,6 @@ main h2 a:hover {
   color: #6e7581;
 }
 
-main .content-title .title i {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #489c80;
-  color: #fff;
-  width: 52px;
-  height: 42px;
-  border-radius: 4px;
-  margin-right: 12px;
-  font-size: 18px;
-}
-
-main .content-title .title i.alt {
-  background-color: #7c8394;
-}
-
 main .msg i.fa-times {
   align-self: flex-end;
   justify-content: flex-end;

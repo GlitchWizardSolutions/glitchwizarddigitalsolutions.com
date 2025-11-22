@@ -46,7 +46,7 @@ if (isset($_GET['success_msg'])) {
 // Determine the URL
 $url = 'categories.php?search=' . $search;
 ?>
-<?=template_admin_header('GWS Legal Categories', 'legal', 'categories')?>
+<?=template_admin_header('Legal Filing Categories', 'ticketing', 'legal')?>
 
 <div class="content-title">
     <div class="title">

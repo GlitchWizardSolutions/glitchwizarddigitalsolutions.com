@@ -36,38 +36,40 @@ if (isset($_GET['id'])) {
     }
 }
 ?>
-<?=template_admin_header($page . ' GWS Legal Req. Category', 'legal', 'catagories')?>
+<?=template_admin_header($page . ' Legal Category', 'ticketing', 'legal')?>
 <div class="content-title">
     <div class="title">
-        <i class="fa-solid fa-folder"></i>
+        <div class="icon alt">
+            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" /></svg>
+        </div>
         <div class="txt">
-             <h2 class="responsive-width-100"><?=$page?> GWS Legal Category</h2>
-           
+            <h2 class="responsive-width-100"><?=$page?> Legal Category</h2>
+            <p>Manage legal filing categories</p>
         </div>
     </div>
 </div>
+
 <form action="" method="post">
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Category Information</h3>
+            
+            <div class="form-group">
+                <label for="title">Category Title <span class="required">*</span></label>
+                <input id="title" type="text" name="title" placeholder="Enter category name" value="<?=htmlspecialchars($category['title'], ENT_QUOTES)?>" required>
+            </div>
+        </div>
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-       
-        <a href="categories.php" class="btn alt mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this category?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
-    </div>
-
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
-
-            <label for="title"><i class="required">*</i> Title</label>
-            <input id="title" type="text" name="title" placeholder="Title" value="<?=htmlspecialchars($category['title'], ENT_QUOTES)?>" required>
-
+        <div class="form-actions">
+            <a href="categories.php" class="btn btn-secondary">Cancel</a>
+            <?php if ($page == 'Edit'): ?>
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">
+            <?php endif; ?>
+            <input type="submit" name="submit" value="<?=$page == 'Edit' ? 'Update' : 'Create'?> Category" class="btn btn-primary">
         </div>
 
     </div>
-
 </form>
 
 <?=template_admin_footer()?>

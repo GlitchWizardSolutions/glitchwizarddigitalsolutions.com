@@ -46,7 +46,7 @@ if (isset($_GET['success_msg'])) {
 // Determine the URL
 $url = 'categories.php?search=' . $search;
 ?>
-<?=template_admin_header('Project Ticket Categories', 'projects', 'categories')?>
+<?=template_admin_header('Project Ticket Categories', 'ticketing', 'projects')?>
 
 <div class="content-title">
     <div class="title">

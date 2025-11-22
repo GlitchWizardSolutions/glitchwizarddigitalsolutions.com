@@ -33,7 +33,7 @@ $stmt = $pdo->prepare('SELECT COUNT(*) AS total FROM gws_legal WHERE ticket_stat
 $stmt->execute();
 $resolved_tickets_total = $stmt->fetchColumn();
 ?>
-<?=template_admin_header('GWS Legal Requirements', 'legal', 'legal')?>
+<?=template_admin_header('Manage Legal Filings', 'ticketing', 'legal')?>
 
 <div class="content-title">
     <h2>GWS Legal Requirements System</h2>

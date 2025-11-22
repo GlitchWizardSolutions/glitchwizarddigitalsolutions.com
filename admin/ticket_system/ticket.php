@@ -54,95 +54,133 @@ if (isset($_GET['id'])) {
     }
 }
 ?>
-<?=template_admin_header($page . ' Ticket', 'tickets', 'manage')?>
+<?=template_admin_header($page . ' Ticket', 'ticketing', 'client')?>
 
 <div class="content-title">
     <div class="title">
-    <i class="fa-solid fa-person-through-window  fa-lg"></i>
+        <div class="icon alt">
+            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.34C20.37 13.12 19.7 13 19 13V5H5V18.26L6 17.6L9 19.6L12 17.6L13.04 18.29C13 18.5 13 18.76 13 19C13 19.65 13.1 20.28 13.3 20.86L12 20L9 22L6 20L3 22V3H21V13.34M17 9V7H7V9H17M15 13V11H7V13H15M18 15V18H15V20H18V23H20V20H23V18H20V15H18Z" /></svg>
+        </div>
         <div class="txt">
-            <h2 class="responsive-width-100"><?=$page?> Ticket</h2>
+            <h2 class="responsive-width-100"><?=$page?> Client Ticket</h2>
+            <p>Manage client support tickets</p>
         </div>
     </div>
 </div>
 
 <form action="" method="post">
-   <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="tickets.php" class="btn alt mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this ticket?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
-    </div>
+    <div class="form-professional">
+        
+        <!-- Ticket Information Section -->
+        <div class="form-section">
+            <h3 class="section-title">Ticket Information</h3>
+            
+            <div class="form-group">
+                <label for="title">Title <span class="required">*</span></label>
+                <input id="title" type="text" name="title" placeholder="Enter ticket title" value="<?=htmlspecialchars($ticket['title'], ENT_QUOTES)?>" required>
+            </div>
 
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
-
-            <label for="title"><i class="required">*</i> Title</label>
-            <input id="title" type="text" name="title" placeholder="Title" value="<?=htmlspecialchars($ticket['title'], ENT_QUOTES)?>" required>
-
-            <label for="msg"><i class="required">*</i> Message</label>
-            <textarea id="msg" name="msg" placeholder="Write your ticket message..." required><?=htmlspecialchars($ticket['msg'], ENT_QUOTES)?></textarea>
-
-            <label for="full_name"><i class="required">*</i> Full Name</label>
-            <input id="full_name" type="text" name="full_name" placeholder="Full Name" value="<?=htmlspecialchars($ticket['full_name'], ENT_QUOTES)?>" required>
-
-            <label for="email"><i class="required">*</i> Email</label>
-            <input id="email" type="email" name="email" placeholder="Email" value="<?=htmlspecialchars($ticket['email'], ENT_QUOTES)?>" required>
-
-            <label for="created"><i class="required">*</i> Created</label>
-            <input id="created" type="datetime-local" name="created" value="<?=date('Y-m-d\TH:i', strtotime($ticket['created']))?>" required>
-
-            <label for="ticket_status"><i class="required">*</i> Status</label>
-            <select id="ticket_status" name="ticket_status" required>
-                <option value="open"<?=$ticket['ticket_status']=='open'?' selected':''?>>Open</option>
-                <option value="closed"<?=$ticket['ticket_status']=='closed'?' selected':''?>>Closed</option>
-                <option value="resolved"<?=$ticket['ticket_status']=='resolved'?' selected':''?>>Resolved</option>
-            </select>
-
-            <label for="priority"><i class="required">*</i> Priority</label>
-            <select id="priority" name="priority" required>
-                <option value="low"<?=$ticket['priority']=='low'?' selected':''?>>Low</option>
-                <option value="medium"<?=$ticket['priority']=='medium'?' selected':''?>>Medium</option>
-                <option value="high"<?=$ticket['priority']=='high'?' selected':''?>>High</option>
-            </select>
-
-            <label for="category_id"><i class="required">*</i> Category</label>
-            <select id="category_id" name="category_id" required>
-                <?php foreach ($categories as $category): ?>
-                <option value="<?=$category['id']?>"<?=$ticket['category_id']==$category['id']?' selected':''?>><?=$category['title']?></option>
-                <?php endforeach; ?>
-            </select>
-
-            <label for="private"><i class="required">*</i> Private</label>
-            <select id="private" name="private" required>
-                <option value="0"<?=$ticket['private']==0?' selected':''?>>No</option>
-                <option value="1"<?=$ticket['private']==1?' selected':''?>>Yes</option>
-            </select>
-
-               <label for="acc_id">Account</label>
-            <select id="acc_id" name="acc_id" required>
-                <option value="0"<?=$ticket['acc_id']==0?' selected':''?>>0 - Guest / Unregistered User</option>
-                <?php foreach ($accounts as $account): ?>
-                 <option value="<?=$account['id']?>"<?=$ticket['acc_id']==$account['id']?' selected':''?>><?=$account['id']?> - <?=$account['email']?></option>
-                <?php endforeach; ?>
-            </select>
-
-            <label for="approved"><i class="required">*</i> Approved</label>
-            <select id="approved" name="approved" required>
-                <option value="0"<?=$ticket['approved']==0?' selected':''?>>No</option>
-                <option value="1"<?=$ticket['approved']==1?' selected':''?>>Yes</option>
-            </select>
-
+            <div class="form-group">
+                <label for="msg">Message <span class="required">*</span></label>
+                <textarea id="msg" name="msg" placeholder="Describe the issue or request..." rows="6" required><?=htmlspecialchars($ticket['msg'], ENT_QUOTES)?></textarea>
+            </div>
         </div>
 
-    </div>
-   <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="tickets.php" class="btn alt mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this ticket?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
+        <!-- Client Information Section -->
+        <div class="form-section">
+            <h3 class="section-title">Client Information</h3>
+            
+            <div class="form-group">
+                <label for="acc_id">Account</label>
+                <select id="acc_id" name="acc_id" required>
+                    <option value="0"<?=$ticket['acc_id']==0?' selected':''?>>Guest / Unregistered User</option>
+                    <?php foreach ($accounts as $account): ?>
+                    <option value="<?=$account['id']?>"<?=$ticket['acc_id']==$account['id']?' selected':''?>><?=$account['id']?> - <?=$account['email']?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="full_name">Full Name <span class="required">*</span></label>
+                    <input id="full_name" type="text" name="full_name" placeholder="Enter full name" value="<?=htmlspecialchars($ticket['full_name'], ENT_QUOTES)?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email <span class="required">*</span></label>
+                    <input id="email" type="email" name="email" placeholder="Enter email address" value="<?=htmlspecialchars($ticket['email'], ENT_QUOTES)?>" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ticket Settings Section -->
+        <div class="form-section">
+            <h3 class="section-title">Ticket Settings</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="ticket_status">Status <span class="required">*</span></label>
+                    <select id="ticket_status" name="ticket_status" required>
+                        <option value="open"<?=$ticket['ticket_status']=='open'?' selected':''?>>Open</option>
+                        <option value="resolved"<?=$ticket['ticket_status']=='resolved'?' selected':''?>>Resolved</option>
+                        <option value="closed"<?=$ticket['ticket_status']=='closed'?' selected':''?>>Closed</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="priority">Priority <span class="required">*</span></label>
+                    <select id="priority" name="priority" required>
+                        <option value="low"<?=$ticket['priority']=='low'?' selected':''?>>Low</option>
+                        <option value="medium"<?=$ticket['priority']=='medium'?' selected':''?>>Medium</option>
+                        <option value="high"<?=$ticket['priority']=='high'?' selected':''?>>High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="category_id">Category <span class="required">*</span></label>
+                    <select id="category_id" name="category_id" required>
+                        <?php foreach ($categories as $category): ?>
+                        <option value="<?=$category['id']?>"<?=$ticket['category_id']==$category['id']?' selected':''?>><?=$category['title']?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="created">Created Date <span class="required">*</span></label>
+                    <input id="created" type="datetime-local" name="created" value="<?=date('Y-m-d\TH:i', strtotime($ticket['created']))?>" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="private">Private <span class="required">*</span></label>
+                    <select id="private" name="private" required>
+                        <option value="0"<?=$ticket['private']==0?' selected':''?>>No</option>
+                        <option value="1"<?=$ticket['private']==1?' selected':''?>>Yes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="approved">Approved <span class="required">*</span></label>
+                    <select id="approved" name="approved" required>
+                        <option value="0"<?=$ticket['approved']==0?' selected':''?>>No</option>
+                        <option value="1"<?=$ticket['approved']==1?' selected':''?>>Yes</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a href="tickets.php" class="btn btn-secondary">Cancel</a>
+            <?php if ($page == 'Edit'): ?>
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this ticket?')">
+            <?php endif; ?>
+            <input type="submit" name="submit" value="<?=$page == 'Edit' ? 'Update' : 'Create'?> Ticket" class="btn btn-primary">
+        </div>
+
     </div>
 </form>
 

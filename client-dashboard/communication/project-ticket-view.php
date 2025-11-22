@@ -15,6 +15,10 @@ LOG NOTE:   2024-10-08 PRODUCTION  - Active
 ***********************************************************************************************/
 include 'assets/includes/user-config.php';
 include process_path . 'project-ticket-view-process.php';
+
+// Set upload paths for attachments (filepath already contains project-ticket-uploads/)
+$ticket_uploads_path = public_path . "client-dashboard/communication/";
+$ticket_uploads_url = BASE_URL . "client-dashboard/communication/";
    
 if ($_SESSION['role'] !="Admin") { 
     //Remove anyone but Admin.
@@ -159,25 +163,33 @@ include includes_path . "page-setup.php";
         <p class="msg fs-6 ms-3"><?=str_ireplace(['&lt;strong&gt;','&lt;/strong&gt;','&lt;u&gt;','&lt;/u&gt;','&lt;i&gt;','&lt;/i&gt;'], ['<strong>','</strong>','<u>','</u>','<i>','</i>'], nl2br(htmlspecialchars($ticket_data['msg'] ?? '', ENT_QUOTES)))?></p>
     </div><!--projects-->
 </div><!--block projects view-->
+
     <?php if (!empty($ticket_uploads)): ?>
-    
-    <h5 class="uploads-header mt-3 fs-6">Attachment(s)</h5>
-    <div class="uploads">
-        <?php foreach($ticket_uploads as $ticket_upload): ?>
-        <a title="download ticket" href="<?=$ticket_upload['filepath']?>" download>
-            <?php if (getimagesize($ticket_upload['filepath'])): ?>
-            <img src="<?=$ticket_upload['filepath']?>" width="80" height="80" alt="">
+    <h6 class="mt-4 mb-3">Attachment(s)</h6>
+    <?php foreach($ticket_uploads as $ticket_upload): ?>
+        <?php 
+            $upload_file_path = $ticket_uploads_path . $ticket_upload['filepath'];
+            $upload_url = $ticket_uploads_url . $ticket_upload['filepath'];
+        ?>
+        <div class="mb-3" style="border: 1px solid #ddd; padding: 10px; border-radius: 4px;">
+            <?php if (file_exists($upload_file_path) && @getimagesize($upload_file_path)): ?>
+                <img src="<?=$upload_url?>" class="img-fluid" style="max-width: 100%; height: auto;" alt="Attachment">
+                <div class="mt-2">
+                    <small class="text-muted"><a href="<?=$upload_url?>" target="_blank">View full size</a></small>
+                </div>
             <?php else: ?>
-            <i class="fas fa-file"></i>
-            <span><?=pathinfo($ticket_upload['filepath'], PATHINFO_EXTENSION)?></span>
+                <a href="<?=$upload_url?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-file"></i> Download <?=strtoupper(pathinfo($ticket_upload['filepath'], PATHINFO_EXTENSION))?> file
+                </a>
             <?php endif; ?>
-        </a>
-        <?php endforeach; ?>
-    </div><!--uploads-->
+        </div>
+    <?php endforeach; ?>
     <?php endif; ?>
+
          </div><!--/body-->
         </div><!--/card-->
        </div><!--/column-6-->
+        
         <div class="col-lg-6">
           <div class="card">
             <div class="card-body">

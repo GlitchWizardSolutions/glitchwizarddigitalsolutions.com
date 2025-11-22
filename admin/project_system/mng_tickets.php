@@ -33,7 +33,7 @@ $stmt = $pdo->prepare('SELECT COUNT(*) AS total FROM project_tickets WHERE ticke
 $stmt->execute();
 $resolved_tickets_total = $stmt->fetchColumn();
 ?>
-<?=template_admin_header('Project Tickets', 'projects', 'manage')?>
+<?=template_admin_header('Manage Project Tickets', 'ticketing', 'projects')?>
 
 <div class="content-title">
     <h2>Project System</h2>

@@ -74,7 +74,7 @@ $stmt->execute([ $_GET['id'] ]);
 $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 //Display webpage on browser
 ?>   
-<?=template_admin_header('Tickets', 'tickets', 'view')?>
+<?=template_admin_header('View Project Ticket', 'ticketing', 'projects')?>
 <div class="content-title">
     <div class="title">
         <div class="icon alt">

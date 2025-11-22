@@ -21,7 +21,8 @@ if (!isset($_GET['id'])) {
     exit('No ID specified!');
 }
 require 'assets/includes/admin_config.php';
-$path="client-dashboard/communication/";
+$ticket_uploads_path = public_path . "client-dashboard/communication/ticket-uploads/";
+$ticket_uploads_url = BASE_URL . "client-dashboard/communication/ticket-uploads/";
 
 // output message (errors, etc)
 $msg = '';
@@ -112,112 +113,170 @@ if (isset($_POST['msg'], $_SESSION['loggedin']) && !empty($_POST['msg']) && $tic
 }
 
 ?>
-<?=template_admin_header('Tickets', 'tickets', 'manage')?>
+<?=template_admin_header('Tickets', 'ticketing', 'client')?>
 <div class="content-title">
     <div class="title">
         <div class="icon alt">
             <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.34C20.37 13.12 19.7 13 19 13V5H5V18.26L6 17.6L9 19.6L12 17.6L13.04 18.29C13 18.5 13 18.76 13 19C13 19.65 13.1 20.28 13.3 20.86L12 20L9 22L6 20L3 22V3H21V13.34M17 9V7H7V9H17M15 13V11H7V13H15M18 15V18H15V20H18V23H20V20H23V18H20V15H18Z" /></svg>
         </div>
         <div class="txt">
-                  <h2 class="responsive-width-100">Ticketing System</h2>
-            <p>View Member Ticket</p>
+            <h2 class="responsive-width-100">View Client Ticket</h2>
+            <p>Client support ticket details and communication</p>
         </div>
     </div>
 </div>
 
- 
-<div class="content view">
-
-            <h3 style='color:blue'><?=htmlspecialchars($ticket['a_name'] ?? $ticket['full_name'], ENT_QUOTES)?> </h3>
-             <h3 style='color:orange'><?=$ticket['a_email'] ?? $ticket['email']?> </h3>
-             <br>
-             <p><strong>Status:</strong> <?=$ticket['ticket_status']?></p> 
-            <p><strong>Priority </strong><?=$ticket['priority']?></p> 
-            <p><strong>Category </strong><?=$ticket['category']?></p> 
-            
-            <p class="created"><?=date('F dS, G:ia', strtotime($ticket['created']))?></p>
+<div class="form-professional" style="max-width: 1200px;">
+    
+    <!-- Ticket Header Section -->
+    <div class="form-section">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
+            <div>
+                <h2 style="margin: 0 0 10px 0; color: #6b46c1;"><?=htmlspecialchars($ticket['title'], ENT_QUOTES)?></h2>
+                <p style="margin: 0; color: #666; font-size: 14px;">
+                    <strong>Client:</strong> <?=htmlspecialchars($ticket['a_name'] ?? $ticket['full_name'], ENT_QUOTES)?> 
+                    (<?=htmlspecialchars($ticket['a_email'] ?? $ticket['email'], ENT_QUOTES)?>)
+                </p>
+                <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">
+                    <strong>Created:</strong> <?=date('F dS, Y h:ia', strtotime($ticket['created']))?>
+                </p>
+            </div>
+            <a href="tickets.php" class="btn btn-secondary">← Back to List</a>
         </div>
-        
-	<h2><?=htmlspecialchars($ticket['title'], ENT_QUOTES)?></h2>
-        <p class="msg"><?=str_ireplace(['&lt;strong&gt;','&lt;/strong&gt;','&lt;u&gt;','&lt;/u&gt;','&lt;i&gt;','&lt;/i&gt;'], ['<strong>','</strong>','<u>','</u>','<i>','</i>'], nl2br(htmlspecialchars($ticket['msg'], ENT_QUOTES)))?></p>
+
+        <div class="form-row" style="margin-top: 20px;">
+            <div class="form-group">
+                <label><strong>Status</strong></label>
+                <div>
+                    <span class="<?=$ticket['ticket_status']=='resolved'?'blue':($ticket['ticket_status']=='open'?'green':'grey')?>" style="display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: 500; text-transform: capitalize;">
+                        <?=ucwords($ticket['ticket_status'])?>
+                    </span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><strong>Priority</strong></label>
+                <div>
+                    <span style="display: inline-block; padding: 6px 12px; border-radius: 4px; background: <?=$ticket['priority']=='high'?'#fee':'#efefef'?>; color: <?=$ticket['priority']=='high'?'#c00':'#666'?>; font-weight: 500; text-transform: capitalize;">
+                        <?=ucwords($ticket['priority'])?>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+            <label><strong>Category</strong></label>
+            <div style="color: #666;"><?=htmlspecialchars($ticket['category'], ENT_QUOTES)?></div>
+        </div>
+    </div>
+
+    <!-- Message Section -->
+    <div class="form-section">
+        <h3 class="section-title">Ticket Message</h3>
+        <div style="padding: 15px; background: white; border: 1px solid #e0d4f7; border-radius: 6px; line-height: 1.6;">
+            <?=str_ireplace(['&lt;strong&gt;','&lt;/strong&gt;','&lt;u&gt;','&lt;/u&gt;','&lt;i&gt;','&lt;/i&gt;'], ['<strong>','</strong>','<u>','</u>','<i>','</i>'], nl2br(htmlspecialchars($ticket['msg'], ENT_QUOTES)))?>
+        </div>
     </div>
 
     <?php if (!empty($ticket_uploads)): ?>
-    <h3 class="uploads-header">Attachment(s)</h3>
-      <div class="uploads">
-        <?php foreach($ticket_uploads as $ticket_upload): ?>
-        <?php $upload_path='../../' . $path . $ticket_upload['filepath']; ?>
-        <a title="download ticket" href="<?=$upload_path ?>" download>
-            <?php if (getimagesize($upload_path)): ?>
-               <img src="<?=$upload_path?>" width="80" height="80" alt="">
-            <?php else: ?>
-            <i class="fas fa-file"></i>
-            <span><?=pathinfo($upload_path, PATHINFO_EXTENSION)?></span>
-            <?php endif; ?>
-        </a>
-        <?php endforeach; ?>
-    </div><!--uploads-->
+    <!-- Attachments Section -->
+    <div class="form-section">
+        <h3 class="section-title">Attachments</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+            <?php foreach($ticket_uploads as $ticket_upload): ?>
+            <?php 
+                $upload_file_path = $ticket_uploads_path . $ticket_upload['filepath'];
+                $upload_url = $ticket_uploads_url . $ticket_upload['filepath'];
+            ?>
+            <a href="<?=$upload_url ?>" download style="display: flex; flex-direction: column; align-items: center; padding: 15px; border: 2px dashed #9f7aea; border-radius: 8px; text-decoration: none; background: white; transition: all 0.3s;" onmouseover="this.style.borderColor='#6b46c1'; this.style.background='#f8f4ff'" onmouseout="this.style.borderColor='#9f7aea'; this.style.background='white'">
+                <?php if (file_exists($upload_file_path) && @getimagesize($upload_file_path)): ?>
+                    <img src="<?=$upload_url?>" width="100" height="100" alt="" style="border-radius: 4px; object-fit: cover;">
+                <?php else: ?>
+                    <i class="fas fa-file" style="font-size: 48px; color: #6b46c1;"></i>
+                    <span style="margin-top: 8px; font-size: 12px; color: #666; text-transform: uppercase;"><?=pathinfo($upload_file_path, PATHINFO_EXTENSION)?></span>
+                <?php endif; ?>
+            </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
     <?php endif; ?>
 
-    <div class="comments">
-        <?php foreach($comments as $comment): ?>
-        <div class="comment">
-            
-            <p>
-                <span class="comment-header" style='background:grey'>
-             <?php if ($comment['a_role']=='Admin'): ?>
-                    <p style='color:purple'>
-                <?php else : ?>
-                <p style='color:orange'>
-                    <?php endif; ?>
-                    
-    <?=htmlspecialchars($comment['full_name'], ENT_QUOTES)?> </p>
-                   
-                    <p><a class='btn btn-sm' href="comment.php?id=<?=$comment['id']?>" target="_blank" class="edit">Edit</a> &nbsp; <?=date('F dS, G:ia', strtotime($comment['created']))?></p>
-
-                </span>
-                <?=str_ireplace(['&lt;strong&gt;','&lt;/strong&gt;','&lt;u&gt;','&lt;/u&gt;','&lt;i&gt;','&lt;/i&gt;'], ['<strong>','</strong>','<u>','</u>','<i>','</i>'], nl2br(htmlspecialchars($comment['msg'], ENT_QUOTES)))?>
-            </p>
+    <!-- Comments Section -->
+    <div class="form-section">
+        <h3 class="section-title">Conversation</h3>
+        
+        <?php if (empty($comments)): ?>
+        <p style="color: #999; font-style: italic; padding: 20px; text-align: center; background: white; border-radius: 6px;">No comments yet</p>
+        <?php else: ?>
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <?php foreach($comments as $comment): ?>
+            <div style="padding: 20px; background: white; border-left: 4px solid <?=$comment['a_role']=='Admin'?'#6b46c1':'#4a90e2'?>; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                    <div>
+                        <strong style="color: <?=$comment['a_role']=='Admin'?'#6b46c1':'#4a90e2'?>; font-size: 15px;">
+                            <?=htmlspecialchars($comment['full_name'], ENT_QUOTES)?>
+                        </strong>
+                        <span style="color: #999; font-size: 12px; margin-left: 10px;">
+                            <?=$comment['a_role']=='Admin'?'(Support Team)':'(Client)'?>
+                        </span>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color: #999; font-size: 13px; margin-bottom: 5px;">
+                            <?=date('F dS, Y h:ia', strtotime($comment['created']))?>
+                        </div>
+                        <a href="comment.php?id=<?=$comment['id']?>" target="_blank" class="btn" style="font-size: 11px; padding: 4px 10px; background: #6b46c1; color: white; text-decoration: none; border-radius: 4px;">
+                            Edit
+                        </a>
+                    </div>
+                </div>
+                <div style="color: #444; line-height: 1.6;">
+                    <?=str_ireplace(['&lt;strong&gt;','&lt;/strong&gt;','&lt;u&gt;','&lt;/u&gt;','&lt;i&gt;','&lt;/i&gt;'], ['<strong>','</strong>','<u>','</u>','<i>','</i>'], nl2br(htmlspecialchars($comment['msg'], ENT_QUOTES)))?>
+                </div>
+            </div>
+            <?php endforeach; ?>
         </div>
-        <?php endforeach; ?>
+        <?php endif; ?>
+
         <?php if (isset($_SESSION['loggedin']) && $ticket['ticket_status'] != 'closed'): ?>
- 
- <form action="" id='comment' class='form' method="post">
-   <div class="new-comment">
-     <textarea aria-labelledby="new_comment" name="new-comment" class='fs-6'  style='padding:10px; width:100%' placeholder="Enter your comment..."  maxlength="<?=max_msg_length?>" required></textarea>
-   </div>
-   	        <?php if ($msg): ?>
-                 <p class="error-msg"><?=$msg?></p>
+        <!-- Add New Comment Form -->
+        <form action="" method="post" style="margin-top: 25px; padding: 25px; background: #f8f4ff; border: 2px solid #9f7aea; border-radius: 8px;">
+            <h4 style="margin: 0 0 15px 0; color: #6b46c1; font-size: 16px;">Add Comment</h4>
+            
+            <?php if ($msg): ?>
+            <div style="padding: 12px; background: #fee; border: 1px solid #fcc; border-radius: 6px; color: #c00; margin-bottom: 15px;">
+                <?=$msg?>
+            </div>
             <?php endif; ?>
-   <span class='fs-6 mb-1'><strong>Is this resolved?</strong></span> 
-<div class="d-flex justify-content-start">
-  
-  <label for="status"><span class='fs-6 mt-2 ms-4'>Yes (close)</span> 
-      
-<input name="status" aria-labelledby="status" type="radio" value="closed" id="status" onclick="return confirm('Are you sure you want to permenantly close the ticket?')" >
-           <span class="checkmark"></span></label> 
-  
-  
-  <label><span class='fs-6 ms-4 mt-2'>Not yet (keep open)</span> 
-<input name="status" aria-labelledby="status" checked='checked' value="open" type="radio" id="status" onclick="return confirm('Are you sure you want to open/re-open the ticket?')" >
-           <span class="checkmark"></span></label> 
- 
-       
-            <label><span class='fs-6 ms-4 mt-2'>Res.</span>             
-                <input aria-labelledby="status" id='status' type="radio" name="status" value='resolved'>
-                <span class="checkmark"></span>
-            </label> 
-  
-</div>
-           <div class='mt-3'>
-	        <?php if ($msg): ?>
-                 <p class="error-msg"><?=$msg?></p>
-            <?php endif; ?>
-</div>
- <div class='mt-3'>
-            <button type="submit" style='background:green; color:white' onclick="return confirm('select if this ticket has resolved the issue, or it will clear your message.)" class="btn btn-sm">Post Comment</button>
- </div>
-  </form>
+
+            <div class="form-group">
+                <label for="new-comment">Comment <span class="required">*</span></label>
+                <textarea id="new-comment" name="new-comment" rows="5" placeholder="Enter your comment..." maxlength="<?=max_msg_length?>" required></textarea>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label><strong>Update Status</strong></label>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; padding: 15px; background: white; border-radius: 6px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; border: 2px solid #ddd; border-radius: 6px; transition: all 0.3s;" onmouseover="this.style.borderColor='#6b46c1'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#ddd'">
+                        <input type="radio" name="status" value="open" checked style="width: 18px; height: 18px; cursor: pointer;" onclick="return confirm('Are you sure you want to open/re-open the ticket?')">
+                        <span style="font-weight: 500;">Keep Open</span>
+                    </label>
+                    
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; border: 2px solid #ddd; border-radius: 6px; transition: all 0.3s;" onmouseover="this.style.borderColor='#4a90e2'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#ddd'">
+                        <input type="radio" name="status" value="resolved" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="font-weight: 500; color: #4a90e2;">Mark Resolved</span>
+                    </label>
+                    
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; border: 2px solid #ddd; border-radius: 6px; transition: all 0.3s;" onmouseover="this.style.borderColor='#c00'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#ddd'">
+                        <input type="radio" name="status" value="closed" style="width: 18px; height: 18px; cursor: pointer;" onclick="return confirm('Are you sure you want to permanently close the ticket?')">
+                        <span style="font-weight: 500; color: #c00;">Close Permanently</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions" style="margin-top: 20px;">
+                <button type="submit" class="btn btn-primary">Post Comment</button>
+            </div>
+        </form>
         <?php endif; ?>
     </div>
 

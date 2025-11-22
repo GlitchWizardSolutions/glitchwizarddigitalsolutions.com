@@ -219,173 +219,230 @@ if (isset($_GET['id'])) {
 ?>
 <?=template_admin_header($page . ' Account', 'accounts', 'manage')?>
 
-
-
-    <?php if (isset($error_msg)): ?>
-    <div class="mar-top-4">
-        <div class="msg error">
-            <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
-            <p><?=$error_msg?></p>
-            <svg class="close" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
+<div class="content-title">
+    <div class="title">
+        <div class="icon alt">
+            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>
+        </div>
+        <div class="txt">
+            <h2 class="responsive-width-100"><?=$page?> Account</h2>
+            <p>Manage client account information and access</p>
         </div>
     </div>
-    <?php endif; ?>
+</div>
+
+<?php if (isset($error_msg)): ?>
+<div class="mar-top-4">
+    <div class="msg error">
+        <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
+        <p><?=$error_msg?></p>
+        <svg class="close" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
+    </div>
+</div>
+<?php endif; ?>
+
 <form action="" method="post" enctype="multipart/form-data">
-
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <h2 class="responsive-width-100"><?=$page?> Account</h2>
-        <a href="accounts.php" class="btn alt mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this account?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
-    </div>
-
-    <?php if (isset($error_msg)): ?>
-    <div class="mar-top-4">
-        <div class="msg error">
-            <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
-            <p><?=$error_msg?></p>
-            <svg class="close" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
-        </div>
-    </div>
-    <?php endif; ?>
-    
-
-
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
-            <label for="full_name">Full Name</label>
-            <input type="text" id="full_name" name="full_name" placeholder="Any identifying value" value="<?=$account['full_name']?>" required>
-      
-            <label for="document_path">Account File Access (Firstname_Lastname, otherwise Welcome)</label>
-            <input type="text" id="document_path" name="document_path" placeholder="Firstname_Lastname" value="<?=$account['document_path']?>" required>
+    <div class="form-professional">
+        
+        <!-- Account Information Section -->
+        <div class="form-section">
+            <h3 class="section-title">Account Information</h3>
             
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="" value="<?=$account['username']?>" required>
-
-            <label for="password"><?=$page == 'Edit' ? 'New ' : ''?>Password</label>
-            <input type="text" id="password" name="password" placeholder="" value=""<?=$page == 'Edit' ? '' : ' required'?>>
-
-            <label for="email"><i class="required">*</i> Email</label>
-            <input type="text" id="email" name="email" placeholder="" value="<?=$account['email']?>" required>
-
-            <label for="activation_code">Activation Code (leave blank to require validation)</label>
+            <div class="form-group">
+                <label for="full_name">Full Name <span class="required">*</span></label>
+                <input type="text" id="full_name" name="full_name" placeholder="Enter full name" value="<?=$account['full_name']?>" required>
+            </div>
             
-            <select id="activation_code" name="activation_code" style="margin-bottom: 30px;">
-                 <?php if($account['activation_code']=='activated') {
-                      $val='activated';
-                 }else if($account['activation_code']=='deactivated'){
-                      $val='deactivated';
-                      }else{
-                          $val='';
-                      }
-                 ?>
-               
-               <option value=""<?=$val==$account['activation_code']?' selected':''?>>N/A</option>
-                <option value="deactivated"<?=$val==$account['activation_code']?' selected':''?>>Deactivated</option>
-                 
-                  <option value="activated"<?=$val==$account['activation_code']?' selected':''?>>Activated</option>
-            </select>
-            <label for="role">Role</label>
-            <select id="role" name="role" style="margin-bottom: 30px;">
-                <?php foreach ($roles_list as $role): ?>
-                <option value="<?=$role?>"<?=$role==$account['role']?' selected':''?>><?=$role?></option>
-                <?php endforeach; ?>
-            </select>
-            <label for="access_level">Access Level</label>
-            <select id="access_level" name="access_level" style="margin-bottom: 30px;">
-                <?php foreach ($access_list as $access_level): ?>
-                <option value="<?=$access_level?>"<?=$access_level==$account['access_level']?' selected':''?>><?=$access_level?></option>
-                <?php endforeach; ?>
-            </select>
-  
-            <label for="phone">Phone</label>
-            <input type="text" id="phone" name="phone" placeholder="(000) 000-000" value="<?=$account['phone']?>">
-
-            <label for="address_street">Street Address</label>
-            <input type="text" id="address_street" name="address_street" placeholder="" value="<?=$account['address_street']?>">
-
-            <label for="address_city">City</label>
-            <input type="text" id="address_city" name="address_city" placeholder="" value="<?=$account['address_city']?>">
-
-            <label for="address_state">State</label>
-            <input type="text" id="address_state" name="address_state" placeholder="" value="<?=$account['address_state']?>">
-
-            <label for="address_zip">Zipcode</label>
-            <input type="text" id="address_zip" name="address_zip" placeholder="" value="<?=$account['address_zip']?>">
-
-            <label for="address_country">Country</label>
-            <input type="text" id="address_country" name="address_country" placeholder="" value="<?=$account['address_country']?>">
-
-            <label for="approved">Approval</label>
-            <select id="approved" name="approved" style="margin-bottom: 30px;">
-                 <?php if($account['approved']=='approved') {
-                      $val='approved';
-                 }else if($account['approved']==''){
-                      $val='';
-                      }else{
-                          $val='pending';
-                      }
-                 ?>
-               
-                <option value="approved"<?=$val==$account['approved']?' selected':''?>>Approved</option>
-                <option value="pending"<?=$val==$account['approved']?' selected':''?>>Pending</option>
-                 <option value=""<?=$val==$account['approved']?' selected':''?>>N/A</option>
-            </select>
-            <label for="method">Login Method</label>
-           
-             <select id="method" name="method" style="margin-bottom: 30px;">
-                 <?php if($account['method']=='microsoft') {
-                      $val='microsoft';
-                 }else if($account['method']=='google'){
-                      $val='google';
-                      }else{
-                          $val='password';
-                      }
-                 ?>
-               
-                <option value="google"<?=$val==$account['method']?' selected':''?>>Google</option>
-                <option value="microsoft"<?=$val==$account['method']?' selected':''?>>Microsoft</option>
-                 <option value="password"<?=$val==$account['method']?' selected':''?>>Password</option>
-            </select>
-            <label for="social_email">Social Email</label>
-            <input type="text" id="social_email" name="social_email" placeholder="" value="<?=$account['social_email']?>">
-                         
+            <div class="form-group">
+                <label for="document_path">Account File Access</label>
+                <input type="text" id="document_path" name="document_path" placeholder="Firstname_Lastname (or 'Welcome' for default)" value="<?=$account['document_path']?>" required>
+            </div>
             
-              <label for="last_seen">Last Seen</label>
-            <input id="last_seen" type="datetime-local" name="last_seen" value="<?=date('Y-m-d\TH:i:s', strtotime($account['last_seen']))?>"
-
-            <label for="registered">Registered Date</label>
-            <input id="registered" type="datetime-local" name="registered" value="<?=date('Y-m-d\TH:i:s', strtotime($account['registered']))?>" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="username">Username <span class="required">*</span></label>
+                    <input type="text" id="username" name="username" placeholder="Enter username" value="<?=$account['username']?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email <span class="required">*</span></label>
+                    <input type="text" id="email" name="email" placeholder="Enter email address" value="<?=$account['email']?>" required>
+                </div>
+            </div>
             
-           
-            <label for="blog_user">Blog User</label>
-           
-            <select id="blog_user" name="blog_user" style="margin-bottom: 30px;">
-                 <?php if($account['blog_user']==1) {
-                      $val=1;
-                 }else{
-                      $val=0;
-                      }
-                 ?>
-                <option value="1"<?=$val==$account['blog_user']?' selected':''?>>Yes</option>
-                <option value="0"<?=$val==$account['blog_user']?' selected':''?>>No</option>
-            </select>
-            
-            
-            
+            <div class="form-group">
+                <label for="password"><?=$page == 'Edit' ? 'New ' : ''?>Password<?=$page == 'Edit' ? ' (leave blank to keep current)' : ' <span class="required">*</span>'?></label>
+                <input type="text" id="password" name="password" placeholder="Enter password" value=""<?=$page == 'Edit' ? '' : ' required'?>>
+            </div>
         </div>
 
-    </div>
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <h2 class="responsive-width-100"><?=$page?> Account</h2>
-        <a href="accounts.php" class="btn alt mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this account?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
+        <!-- Access & Permissions Section -->
+        <div class="form-section">
+            <h3 class="section-title">Access & Permissions</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role">
+                        <?php foreach ($roles_list as $role): ?>
+                        <option value="<?=$role?>"<?=$role==$account['role']?' selected':''?>><?=$role?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="access_level">Access Level</label>
+                    <select id="access_level" name="access_level">
+                        <?php foreach ($access_list as $access_level): ?>
+                        <option value="<?=$access_level?>"<?=$access_level==$account['access_level']?' selected':''?>><?=$access_level?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="activation_code">Activation Status</label>
+                    <?php 
+                    if($account['activation_code']=='activated') {
+                        $val='activated';
+                    }else if($account['activation_code']=='deactivated'){
+                        $val='deactivated';
+                    }else{
+                        $val='';
+                    }
+                    ?>
+                    <select id="activation_code" name="activation_code">
+                        <option value=""<?=$val==$account['activation_code']?' selected':''?>>N/A</option>
+                        <option value="deactivated"<?=$val==$account['activation_code']?' selected':''?>>Deactivated</option>
+                        <option value="activated"<?=$val==$account['activation_code']?' selected':''?>>Activated</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="approved">Approval Status</label>
+                    <?php 
+                    if($account['approved']=='approved') {
+                        $val='approved';
+                    }else if($account['approved']==''){
+                        $val='';
+                    }else{
+                        $val='pending';
+                    }
+                    ?>
+                    <select id="approved" name="approved">
+                        <option value="approved"<?=$val==$account['approved']?' selected':''?>>Approved</option>
+                        <option value="pending"<?=$val==$account['approved']?' selected':''?>>Pending</option>
+                        <option value=""<?=$val==$account['approved']?' selected':''?>>N/A</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="method">Login Method</label>
+                    <?php 
+                    if($account['method']=='microsoft') {
+                        $val='microsoft';
+                    }else if($account['method']=='google'){
+                        $val='google';
+                    }else{
+                        $val='password';
+                    }
+                    ?>
+                    <select id="method" name="method">
+                        <option value="password"<?=$val==$account['method']?' selected':''?>>Password</option>
+                        <option value="google"<?=$val==$account['method']?' selected':''?>>Google</option>
+                        <option value="microsoft"<?=$val==$account['method']?' selected':''?>>Microsoft</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="social_email">Social Email</label>
+                    <input type="text" id="social_email" name="social_email" placeholder="Email from OAuth provider" value="<?=$account['social_email']?>">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="blog_user">Blog Access</label>
+                <?php 
+                if($account['blog_user']==1) {
+                    $val=1;
+                }else{
+                    $val=0;
+                }
+                ?>
+                <select id="blog_user" name="blog_user">
+                    <option value="1"<?=$val==$account['blog_user']?' selected':''?>>Yes</option>
+                    <option value="0"<?=$val==$account['blog_user']?' selected':''?>>No</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="form-section">
+            <h3 class="section-title">Contact Information</h3>
+            
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="text" id="phone" name="phone" placeholder="(000) 000-0000" value="<?=$account['phone']?>">
+            </div>
+            
+            <div class="form-group">
+                <label for="address_street">Street Address</label>
+                <input type="text" id="address_street" name="address_street" placeholder="Street address" value="<?=$account['address_street']?>">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="address_city">City</label>
+                    <input type="text" id="address_city" name="address_city" placeholder="City" value="<?=$account['address_city']?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="address_state">State</label>
+                    <input type="text" id="address_state" name="address_state" placeholder="State" value="<?=$account['address_state']?>">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="address_zip">Zipcode</label>
+                    <input type="text" id="address_zip" name="address_zip" placeholder="Zipcode" value="<?=$account['address_zip']?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="address_country">Country</label>
+                    <input type="text" id="address_country" name="address_country" placeholder="Country" value="<?=$account['address_country']?>">
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Activity Section -->
+        <div class="form-section">
+            <h3 class="section-title">Account Activity</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="registered">Registered Date <span class="required">*</span></label>
+                    <input id="registered" type="datetime-local" name="registered" value="<?=date('Y-m-d\TH:i:s', strtotime($account['registered']))?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="last_seen">Last Seen</label>
+                    <input id="last_seen" type="datetime-local" name="last_seen" value="<?=date('Y-m-d\TH:i:s', strtotime($account['last_seen']))?>">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="accounts.php" class="btn btn-secondary">Cancel</a>
+            <?php if ($page == 'Edit'): ?>
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this account?')">
+            <?php endif; ?>
+            <input type="submit" name="submit" value="<?=$page == 'Edit' ? 'Update' : 'Create'?> Account" class="btn btn-primary">
+        </div>
+
     </div>
 </form>
 

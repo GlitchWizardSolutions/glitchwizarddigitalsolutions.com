@@ -17,6 +17,8 @@ LOG NOTE: 2025-01-01 Created Admin only version
 *******************************************************************************/
 require 'assets/includes/admin_config.php';
 $path="client-dashboard/communication/";
+$ticket_uploads_path = public_path . "client-dashboard/communication/project-ticket-uploads/";
+$ticket_uploads_url = BASE_URL . "client-dashboard/communication/project-ticket-uploads/";
 $current_date=date('Y-m-d'); // Current date and time
 // Check if the user is logged-in
 check_loggedin($pdo, '../../index.php');
@@ -99,178 +101,219 @@ if (isset($_POST['new-comment'])) {
 }
 
 ?>
-<?=template_admin_header('Project Tickets', 'projects', 'manage')?>
+<?=template_admin_header('Project Tickets', 'ticketing', 'project')?>
 <div class="content-title">
     <div class="title">
         <div class="icon alt">
             <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.34C20.37 13.12 19.7 13 19 13V5H5V18.26L6 17.6L9 19.6L12 17.6L13.04 18.29C13 18.5 13 18.76 13 19C13 19.65 13.1 20.28 13.3 20.86L12 20L9 22L6 20L3 22V3H21V13.34M17 9V7H7V9H17M15 13V11H7V13H15M18 15V18H15V20H18V23H20V20H23V18H20V15H18Z" /></svg>
         </div>
         <div class="txt">
-             
-            </p>
-           <h2><?=htmlspecialchars($ticket['title'], ENT_QUOTES)?></h2>
-           <p>Viewing Project Ticket # <?=$ticket['id']?></p>
-           <?php $ticket_reminder_date = $ticket['reminder_date']?>
-           <?php if($ticket['reminder_date']=='9999-12-31'):?>
-           <p>This project is has no reminders set.</p>
-           <?php else:?>
-             <?php if ($current_date > $ticket['reminder_date']): ?>
-             <span style="color:red; font-size:18">This project was due to be reviewed&nbsp;<?=time_difference_string($ticket['reminder_date'])?></span>
-             <?php elseif ($current_date < $ticket['reminder_date']): ?>
-             <span style="color:blue; font-size:18">It is <?=time_difference_string($ticket['reminder_date'])?> this project is due for review </span>
-               <?php else: ?>  
-              <span style="color:green; font-size:18">This project is due for review today.</span>
-                            <?php endif; ?> 
-                             <?php endif; ?>
+            <h2 class="responsive-width-100">View Project Ticket</h2>
+            <p>Development project details and progress</p>
         </div>
     </div>
 </div>
-<div class="content-header responsive-flex-column pad-top-5">
-    <div class="btns">
-       <a href="tickets.php" class="btn alt mar-right-2">Cancel</a>
-       <a href="ticket.php?id=<?=$ticket['id']?>" class="btn btn-primary mar-right-2">Edit</a>
-       <a class="btn btn-danger mar-right-2" href="tickets.php?delete=<?=$ticket['id']?>" onclick="return confirm('Are you sure you want to delete this ticket?')">
-                                    Delete</a>
-    </div>
-</div>
- <div class="content-block" style="background:#EDE3FF">
-    <div class="table" style="background:#FFF">
-        <table>
-            <thead>
-                <tr>
-               <td style="font-size:1.3em; text-align:left; color:#7F50AB"><?=htmlspecialchars($ticket['title'], ENT_QUOTES)?></td>
-               <td colspan="3" style="font-size:1.3em; text-align:left; color:#7F50AB">Project Ticket # <?=$ticket['id']?></td>          
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td colspan="3" style="font-size:1.3em; text-align:left;  <p class="msg"><?=str_ireplace(['&lt;strong&gt;','&lt;/strong&gt;','&lt;u&gt;','&lt;/u&gt;','&lt;i&gt;','&lt;/i&gt;'], ['<strong>','</strong>','<u>','</u>','<i>','</i>'], nl2br(htmlspecialchars($ticket['msg'], ENT_QUOTES)))?></p></td></tr>
-                 <tr>
-                     <td>Created: &nbsp;<strong><?=date('F dS, Y', strtotime($ticket['created']))?></strong></td>
-                       <td> Updated: &nbsp;<strong><?=date('F dS, Y', strtotime($ticket['last_update']))?> </strong></td>
-            <?php if($ticket['reminder_date']=='9999-12-31'):?>
-           <td><p>This project is has no reminders set.</p></td>
-           <?php else:?>
-              <?php if ($current_date > $ticket['reminder_date']): ?>
-              <td> Reminder: &nbsp;<strong><span style="color:red; font-size:18"><?=date('F dS, Y', strtotime($ticket_reminder_date))?></span></strong></p></td>
-             <?php elseif ($current_date < $ticket['reminder_date']): ?>
-             <td> Reminder: &nbsp;<strong><span style="color:blue; font-size:18"><?=date('F dS, Y', strtotime($ticket_reminder_date))?> </strong></td>
-             <?php else: ?> 
-             <td> Reminder: &nbsp;<strong><span style="color:green; font-size:18"><?=date('F dS, Y', strtotime($ticket_reminder_date))?> </strong></td>
-                            <?php endif; ?> 
-                            <?php endif; ?> 
+
+<div class="form-professional" style="max-width: 1200px;">
     
-               
-                </tr><tr>
-                    <td>Status: &nbsp;
-                            <?php if ($ticket['ticket_status'] == 'open'): ?>
-                            <span class="green">Open</span>
-                            <?php elseif ($ticket['ticket_status'] == 'closed'): ?>
-                            <span class="red">Closed</span>
-                            <?php elseif ($ticket['ticket_status'] == 'paused'): ?>
-                            <span class="orange">Paused</span>
-                            <?php endif; ?>
-                   </td>
-                   <td>Priority: &nbsp;
-                            <?php if ($ticket['priority'] == 'low'): ?>
-                            <span class="grey">Low</span>
-                            <?php elseif ($ticket['priority'] == 'medium'): ?>
-                            <span class="blue">Medium</span>
-                            <?php elseif ($ticket['priority'] == 'high'): ?>
-                            <span class="orange">High</span>
-                            <?php elseif ($ticket['priority'] == 'critical'): ?>
-                            <span class="red">CRITICAL</span>
-                            <?php elseif ($ticket['priority'] == 'paused'): ?>
-                            <span class="grey">Paused</span>
-                            <?php else: ?>
-                            <span><?=$ticket['priority']?></span>
-                            <?php endif; ?> </td>
-                    <td><strong>Category: </strong>
-                    <?php if ($ticket['category'] == 'Bug Found'): ?>
-                            <span class="red">Bug Found</span>
-                            <?php elseif ($ticket['category'] == 'Request'): ?>
-                            <span class="red">Client Request</span>
-                            <?php elseif ($ticket['category'] == 'Brand'): ?>
-                            <span class="red">Client Branding</span>
-                            <?php elseif ($ticket['category'] == 'Function'): ?>
-                            <span class="blue">Functionality</span>
-                            <?php elseif ($ticket['category'] == 'Idea'): ?>
-                            <span class="grey">Paused</span>
-                            <?php else: ?>
-                            <span class="blue"><?=$ticket['category']?></span>
-                            <?php endif; ?> </td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Project Header Section -->
+    <div class="form-section">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
+            <div style="flex: 1;">
+                <h2 style="margin: 0 0 10px 0; color: #6b46c1;"><?=htmlspecialchars($ticket['title'], ENT_QUOTES)?></h2>
+                <p style="margin: 0; color: #666; font-size: 14px;">
+                    <strong>Ticket #<?=$ticket['id']?></strong> • Created: <?=date('F dS, Y', strtotime($ticket['created']))?>
+                    • Last Updated: <?=date('F dS, Y', strtotime($ticket['last_update']))?>
+                </p>
+                
+                <?php $ticket_reminder_date = $ticket['reminder_date']?>
+                <?php if($ticket['reminder_date']!='9999-12-31'): ?>
+                <p style="margin: 10px 0 0 0; padding: 8px 12px; border-radius: 6px; display: inline-block; font-size: 13px; font-weight: 500;
+                    <?php if ($current_date > $ticket['reminder_date']): ?>
+                        background: #fee; color: #c00; border: 1px solid #fcc;
+                    <?php elseif ($current_date < $ticket['reminder_date']): ?>
+                        background: #e6f2ff; color: #0066cc; border: 1px solid #b3d9ff;
+                    <?php else: ?>
+                        background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7;
+                    <?php endif; ?>">
+                    <i class="fas fa-bell" style="margin-right: 6px;"></i>
+                    <?php if ($current_date > $ticket['reminder_date']): ?>
+                        Review was due <?=time_difference_string($ticket['reminder_date'])?>
+                    <?php elseif ($current_date < $ticket['reminder_date']): ?>
+                        Review due <?=time_difference_string($ticket['reminder_date'])?>
+                    <?php else: ?>
+                        Review due today
+                    <?php endif; ?>
+                    (<?=date('F dS, Y', strtotime($ticket_reminder_date))?>)
+                </p>
+                <?php else: ?>
+                <p style="margin: 10px 0 0 0; color: #999; font-size: 13px;">
+                    <i class="fas fa-info-circle" style="margin-right: 4px;"></i> No review reminder set
+                </p>
+                <?php endif; ?>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <a href="tickets.php" class="btn btn-secondary">← Back to List</a>
+                <a href="ticket.php?id=<?=$ticket['id']?>" class="btn btn-primary">Edit</a>
+                <a class="btn btn-danger" href="tickets.php?delete=<?=$ticket['id']?>" onclick="return confirm('Are you sure you want to delete this ticket?')">Delete</a>
+            </div>
+        </div>
+
+        <div class="form-row" style="margin-top: 20px;">
+            <div class="form-group">
+                <label><strong>Status</strong></label>
+                <div>
+                    <?php if ($ticket['ticket_status'] == 'open'): ?>
+                        <span class="green" style="display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: 500;">Open</span>
+                    <?php elseif ($ticket['ticket_status'] == 'closed'): ?>
+                        <span class="grey" style="display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: 500;">Closed</span>
+                    <?php elseif ($ticket['ticket_status'] == 'paused'): ?>
+                        <span style="display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: 500; background: #fff3e0; color: #e65100;">Paused</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><strong>Priority</strong></label>
+                <div>
+                    <?php if ($ticket['priority'] == 'low'): ?>
+                        <span class="grey" style="display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: 500;">Low</span>
+                    <?php elseif ($ticket['priority'] == 'medium'): ?>
+                        <span class="blue" style="display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: 500;">Medium</span>
+                    <?php elseif ($ticket['priority'] == 'high'): ?>
+                        <span style="display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: 500; background: #fff3e0; color: #e65100;">High</span>
+                    <?php elseif ($ticket['priority'] == 'critical'): ?>
+                        <span style="display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: 500; background: #fee; color: #c00;">CRITICAL</span>
+                    <?php else: ?>
+                        <span style="display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: 500;"><?=$ticket['priority']?></span>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+            <label><strong>Category</strong></label>
+            <div>
+                <?php if ($ticket['category'] == 'Bug Found'): ?>
+                    <span style="color: #c00; font-weight: 500;">🐛 Bug Found</span>
+                <?php elseif ($ticket['category'] == 'Request'): ?>
+                    <span style="color: #c00; font-weight: 500;">📋 Client Request</span>
+                <?php elseif ($ticket['category'] == 'Brand'): ?>
+                    <span style="color: #c00; font-weight: 500;">🎨 Client Branding</span>
+                <?php elseif ($ticket['category'] == 'Function'): ?>
+                    <span style="color: #4a90e2; font-weight: 500;">⚙️ Functionality</span>
+                <?php elseif ($ticket['category'] == 'Idea'): ?>
+                    <span style="color: #999; font-weight: 500;">💡 Idea</span>
+                <?php else: ?>
+                    <span style="color: #666;"><?=$ticket['category']?></span>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
-</div>
- 
+
+    <!-- Description Section -->
+    <div class="form-section">
+        <h3 class="section-title">Project Description</h3>
+        <div style="padding: 15px; background: white; border: 1px solid #e0d4f7; border-radius: 6px; line-height: 1.6;">
+            <?=str_ireplace(['&lt;strong&gt;','&lt;/strong&gt;','&lt;u&gt;','&lt;/u&gt;','&lt;i&gt;','&lt;/i&gt;'], ['<strong>','</strong>','<u>','</u>','<i>','</i>'], nl2br(htmlspecialchars($ticket['msg'], ENT_QUOTES)))?>
+        </div>
+    </div>
+
     <?php if (!empty($ticket_uploads)): ?>
-    <h3 class="uploads-header">Attachment(s)</h3>
-      <div class="uploads">
-        <?php foreach($ticket_uploads as $ticket_upload): ?>
-        <?php $upload_path='../../' . $path . $ticket_upload['filepath']; ?>
-        <a title="download ticket" href="<?=$upload_path ?>" download>
-            <?php if (getimagesize($upload_path)): ?>
-               <img src="<?=$upload_path?>" width="80" height="80" alt="">
-            <?php else: ?>
-            <i class="fas fa-file"></i>
-            <span><?=pathinfo($upload_path, PATHINFO_EXTENSION)?></span>
-            <?php endif; ?>
-        </a>
-        <?php endforeach; ?>
-    </div><!--uploads-->
+    <!-- Attachments Section -->
+    <div class="form-section">
+        <h3 class="section-title">Attachments</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+            <?php foreach($ticket_uploads as $ticket_upload): ?>
+            <?php 
+                $upload_file_path = $ticket_uploads_path . $ticket_upload['filepath'];
+                $upload_url = $ticket_uploads_url . $ticket_upload['filepath'];
+            ?>
+            <a href="<?=$upload_url ?>" download style="display: flex; flex-direction: column; align-items: center; padding: 15px; border: 2px dashed #9f7aea; border-radius: 8px; text-decoration: none; background: white; transition: all 0.3s;" onmouseover="this.style.borderColor='#6b46c1'; this.style.background='#f8f4ff'" onmouseout="this.style.borderColor='#9f7aea'; this.style.background='white'">
+                <?php if (file_exists($upload_file_path) && @getimagesize($upload_file_path)): ?>
+                    <img src="<?=$upload_url?>" width="100" height="100" alt="" style="border-radius: 4px; object-fit: cover;">
+                <?php else: ?>
+                    <i class="fas fa-file" style="font-size: 48px; color: #6b46c1;"></i>
+                    <span style="margin-top: 8px; font-size: 12px; color: #666; text-transform: uppercase;"><?=pathinfo($upload_file_path, PATHINFO_EXTENSION)?></span>
+                <?php endif; ?>
+            </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
     <?php endif; ?>
 
-    <div class="comments">
-        <?php foreach($comments as $comment): ?>
-        <div class="comment">
-            
-            <p>
-                <span class="comment-header" style='background:grey'>
-                    <p style='color:purple'></p>
-                   
-                    <p><a class='btn btn-sm' href="comment.php?id=<?=$comment['id']?>" target="_blank" style="background:orange; color:black">Edit Comment</a> &nbsp; <?=date('F dS, Y h:ia', strtotime($comment['created']))?>&nbsp;
-                      </p>
-                </span>
-                <?=str_ireplace(['&lt;strong&gt;','&lt;/strong&gt;','&lt;u&gt;','&lt;/u&gt;','&lt;i&gt;','&lt;/i&gt;'], ['<strong>','</strong>','<u>','</u>','<i>','</i>'], nl2br(htmlspecialchars($comment['msg'], ENT_QUOTES)))?>
-            </p>
+    <!-- Comments Section -->
+    <div class="form-section">
+        <h3 class="section-title">Project Notes</h3>
+        
+        <?php if (empty($comments)): ?>
+        <p style="color: #999; font-style: italic; padding: 20px; text-align: center; background: white; border-radius: 6px;">No notes yet</p>
+        <?php else: ?>
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <?php foreach($comments as $comment): ?>
+            <div style="padding: 20px; background: white; border-left: 4px solid #6b46c1; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                    <div>
+                        <strong style="color: #6b46c1; font-size: 15px;">Development Team</strong>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color: #999; font-size: 13px; margin-bottom: 5px;">
+                            <?=date('F dS, Y h:ia', strtotime($comment['created']))?>
+                        </div>
+                        <a href="comment.php?id=<?=$comment['id']?>" target="_blank" class="btn" style="font-size: 11px; padding: 4px 10px; background: #6b46c1; color: white; text-decoration: none; border-radius: 4px;">
+                            Edit
+                        </a>
+                    </div>
+                </div>
+                <div style="color: #444; line-height: 1.6;">
+                    <?=str_ireplace(['&lt;strong&gt;','&lt;/strong&gt;','&lt;u&gt;','&lt;/u&gt;','&lt;i&gt;','&lt;/i&gt;'], ['<strong>','</strong>','<u>','</u>','<i>','</i>'], nl2br(htmlspecialchars($comment['msg'], ENT_QUOTES)))?>
+                </div>
+            </div>
+            <?php endforeach; ?>
         </div>
-        <?php endforeach; ?>
+        <?php endif; ?>
+
         <?php if (isset($_SESSION['loggedin']) && $ticket['ticket_status'] != 'closed'): ?>
- 
- <form action="" id='comment' class='form' method="post">
-   <div class="new-comment">
-     <textarea aria-labelledby="new_comment" name="new-comment" class='fs-6'  style='padding:10px; width:100%' placeholder="Enter your comment..."  maxlength="<?=max_msg_length?>" required></textarea>
-   </div>
-   	        <?php if ($msg): ?>
-                 <p class="error-msg"><?=$msg?></p>
+        <!-- Add New Note Form -->
+        <form action="" method="post" style="margin-top: 25px; padding: 25px; background: #f8f4ff; border: 2px solid #9f7aea; border-radius: 8px;">
+            <h4 style="margin: 0 0 15px 0; color: #6b46c1; font-size: 16px;">Add Project Note</h4>
+            
+            <?php if ($msg): ?>
+            <div style="padding: 12px; background: #fee; border: 1px solid #fcc; border-radius: 6px; color: #c00; margin-bottom: 15px;">
+                <?=$msg?>
+            </div>
             <?php endif; ?>
- 
-<div class="d-flex justify-content-start">
-<div style="text-align:center"> 
-  <label for="status"><span class='fs-6 mt-2 ms-4'>Close</span> 
-      
-<input name="status" aria-labelledby="status" type="radio" value="closed" id="status" onclick="return confirm('Are you sure you want to permenantly close the ticket?')" >
-           <span class="checkmark"></span></label> 
-  
-<label><span class='fs-6 ms-4 mt-2'>Open</span> 
-<input name="status" aria-labelledby="status" checked='checked' value="open" type="radio" id="status" onclick="return confirm('Are you sure you want to open/re-open the ticket?')" >
-           <span class="checkmark"></span></label> 
-<label><span class='fs-6 ms-4 mt-2'>Pause</span>             
-           <input aria-labelledby="status" id='status' type="radio" name="status" value='paused'>
-           <span class="checkmark"></span>
-</label> 
- </div>
-</div>
-           <div class='mt-3'>
-	        <?php if ($msg): ?>
-                 <p class="error-msg"><?=$msg?></p>
-            <?php endif; ?>
-</div>
- <div class='mt-3'>
-            <button type="submit" style='background:green; color:white' onclick="return confirm('select if this ticket has resolved the issue, or it will clear your message.)" class="btn btn-sm">Post Comment</button>
- </div>
-  </form>
+
+            <div class="form-group">
+                <label for="new-comment">Note / Update <span class="required">*</span></label>
+                <textarea id="new-comment" name="new-comment" rows="5" placeholder="Enter project note or update..." maxlength="<?=max_msg_length?>" required></textarea>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label><strong>Update Status</strong></label>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; padding: 15px; background: white; border-radius: 6px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; border: 2px solid #ddd; border-radius: 6px; transition: all 0.3s;" onmouseover="this.style.borderColor='#6b46c1'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#ddd'">
+                        <input type="radio" name="status" value="open" checked style="width: 18px; height: 18px; cursor: pointer;" onclick="return confirm('Are you sure you want to open/re-open the ticket?')">
+                        <span style="font-weight: 500;">Keep Open</span>
+                    </label>
+                    
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; border: 2px solid #ddd; border-radius: 6px; transition: all 0.3s;" onmouseover="this.style.borderColor='#e65100'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#ddd'">
+                        <input type="radio" name="status" value="paused" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="font-weight: 500; color: #e65100;">Pause Project</span>
+                    </label>
+                    
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; border: 2px solid #ddd; border-radius: 6px; transition: all 0.3s;" onmouseover="this.style.borderColor='#999'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#ddd'">
+                        <input type="radio" name="status" value="closed" style="width: 18px; height: 18px; cursor: pointer;" onclick="return confirm('Are you sure you want to permanently close the ticket?')">
+                        <span style="font-weight: 500; color: #999;">Close/Complete</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions" style="margin-top: 20px;">
+                <button type="submit" class="btn btn-primary">Post Note</button>
+            </div>
+        </form>
         <?php endif; ?>
     </div>
 

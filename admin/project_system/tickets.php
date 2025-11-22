@@ -17,9 +17,24 @@ LOG NOTE: PRODUCTION 2024-09-14
         : Ehancement 2025-06-11 Added Ticket Number to View.
 *******************************************************************************/
 require 'assets/includes/admin_config.php';
+$ticket_uploads_path = public_path . "client-dashboard/communication/project-ticket-uploads/";
 $current_date=date('Y-m-d'); // Current date and time
 // Delete ticket
 if (isset($_GET['delete'])) {
+    // Get uploaded files before deletion
+    $stmt = $pdo->prepare('SELECT filepath FROM project_tickets_uploads WHERE ticket_id = ?');
+    $stmt->execute([ $_GET['delete'] ]);
+    $uploads = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Delete physical files from server
+    foreach ($uploads as $upload) {
+        $file_path = $ticket_uploads_path . $upload['filepath'];
+        if (file_exists($file_path)) {
+            unlink($file_path);
+        }
+    }
+    
+    // Delete database records
     $stmt = $pdo->prepare('DELETE t, tc, tu FROM project_tickets t LEFT JOIN project_tickets_comments tc ON tc.ticket_id = t.id LEFT JOIN project_tickets_uploads tu ON tu.ticket_id = t.id WHERE t.id = ?');
     $stmt->execute([ $_GET['delete'] ]);
     header('Location: tickets.php?success_msg=3');
@@ -130,7 +145,7 @@ $stmt = $pdo->prepare('SELECT COUNT(*) AS total FROM project_tickets WHERE (tick
 $stmt->execute();
 $comment_awaiting_my_response = $stmt->fetchColumn();
 ?>
-<?=template_admin_header('Project Tickets', 'projects', 'manage')?>
+<?=template_admin_header('Project Tickets', 'ticketing', 'projects')?>
 <div class="content-title">
     <div class="title">
         <div class="icon alt">
@@ -151,42 +166,11 @@ $comment_awaiting_my_response = $stmt->fetchColumn();
 </div>
 <?php endif; ?>
 
-<div id="ticketing system" class="dashboard">
-    <div class="content-block stat green">
-        <div class="data">
-            <h3>New Projects</h3>
-           <p><?=$new_tickets ? number_format(count($new_tickets)) : 0?></p>
-        </div>
-    </div>
-    <div class="content-block stat red">
-        <div class="data">
-            <h3>New Notes</h3>
-             <p><?=number_format($comment_awaiting_my_response)?></p>
-  
-        </div>
-    </div>
-    
- 
-
-    
-    <div class="content-block stat cyan">
-        <div class="data">
-            <h3>Open Projects</h3>
-            <p><?=number_format($open_tickets_total)?></p>
-        </div>
-    </div>
-         <div class="content-block stat">
-        <div class="data">
-            <h3>Projects Done</h3>
-            <p><?=number_format($today_resolved_tickets_total)?></p>
-        </div>
-    </div>
-
-</div>
-
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="ticket.php" class="btn btn-primary">+ Ticket</a>
+        <a href="ticket.php" class="btn btn-primary">+ Create Ticket</a>
+        <a href="comments.php" class="btn btn-primary mar-left-1">Comments</a>
+        <a href="categories.php" class="btn btn-primary mar-left-1">Categories</a>
         <a href="tickets_import.php" class="btn btn-primary mar-left-1">Import</a>
         <a href="tickets_export.php" class="btn btn-primary mar-left-1">Export</a>
     </div>
