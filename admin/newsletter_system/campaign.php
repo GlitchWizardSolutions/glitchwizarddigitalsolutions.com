@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Default campaign values
 $campaign = [
     'title' => '',
@@ -114,22 +115,30 @@ if (isset($_GET['id'])) {
 ?>
 <?=template_admin_header($page . ' Campaign', 'campaigns', 'manage')?>
 
-<form method="post">
+<?=generate_breadcrumbs([
+    ['label' => 'Campaigns', 'url' => 'campaigns.php'],
+    ['label' => $page . ' Campaign']
+])?>
+
+<form method="post" class="form-professional">
 
     <div class="content-title">
-        <h2><?=$page?> Campaign</h2>
+        <div class="icon alt"><?=svg_icon_newsletter()?></div>
+        <div class="txt">
+            <h2><?=$page?> Campaign</h2>
+            <p class="subtitle"><?=$page == 'Edit' ? 'Modify campaign details' : 'Create new email campaign'?></p>
+        </div>
         <div class="btns">
-            <a href="campaigns.php" class="btn alt mar-right-1">Cancel</a>
+            <a href="campaigns.php" class="btn btn-secondary mar-right-1">Cancel</a>
             <?php if ($page == 'Edit'): ?>
-            <input type="submit" name="delete" value="Delete" class="btn red mar-right-1" onclick="return confirm('Are you sure you want to delete this campaign?')">
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-1" onclick="return confirm('Are you sure you want to delete this campaign?')">
             <?php endif; ?>
-            <input type="submit" name="submit" value="Save" class="btn">
+            <input type="submit" name="submit" value="Save" class="btn btn-success">
         </div>
     </div>
 
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
+    <div class="form-section">
+        <h3 class="section-title">Campaign Details</h3>
 
             <label for="title"><span class="required">*</span> Title</label>
             <input id="title" type="text" name="title" placeholder="Title" value="<?=htmlspecialchars($campaign['title'], ENT_QUOTES)?>" required>

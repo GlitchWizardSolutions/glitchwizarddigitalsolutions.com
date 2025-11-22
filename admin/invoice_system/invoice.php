@@ -2,6 +2,7 @@
 // 2024-12-09 Production.
 // 2025-06-15 Reworked.
 include_once 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 $date = new DateTime();
 $duedate = $date->modify('+7 days');
 // Default invoice values
@@ -151,32 +152,30 @@ if (isset($_GET['id'])) {
 ?>
 <?=template_admin_header($page . ' Invoice', 'invoices', 'invoices')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Invoices', 'url' => 'invoices.php'],
+    ['label' => $page . ' Invoice']
+])?>
+
 <div class="content-title">
-    <div class="title">
-        <div class="icon">
-            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 2H2V17H4V4H17V2M21 22L18.5 20.32L16 22L13.5 20.32L11 22L8.5 20.32L6 22V6H21V22M10 10V12H17V10H10M15 14H10V16H15V14Z" /></svg>
-        </div>
-        <div class="txt">
-      <h2 class="responsive-width-100"><?=$page?> Invoice</h2>
-      <p>Invoice clients, consistantly, for all work performed.</p>
-        </div>
+    <div class="icon alt"><?=svg_icon_invoice()?></div>
+    <div class="txt">
+        <h2><?=$page?> Invoice</h2>
+        <p class="subtitle">Invoice clients consistently for all work performed</p>
     </div>
 </div>
-<br>  
-                  <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-              
+
+<div class="content-title responsive-flex-wrap responsive-pad-bot-3">
     <a href="invoices.php" class="btn btn-primary">
         View Invoices
     </a>&nbsp;&nbsp;
-        <a href="invoices_import.php" class="btn btn-primary">
-      Import
+    <a href="invoices_import.php" class="btn btn-primary">
+        Import
     </a>&nbsp;&nbsp;
-        <a href="invoices_export.php" class="btn btn-primary">
-       Export
+    <a href="invoices_export.php" class="btn btn-primary">
+        Export
     </a>
-    <br>
-    </div>
-  <br><br>
+</div>
 
 <?php if (isset($success_msg)): ?>
 <div class="msg success">
@@ -186,20 +185,19 @@ if (isset($_GET['id'])) {
 </div>
 <?php endif; ?>
 
-<form action="" method="post">
+<form action="" method="post" class="form-professional">
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
- 
-        <a href="invoices.php" class="btn mar-right-2">Cancel</a>
+    <div class="form-actions">
+        <a href="invoices.php" class="btn btn-secondary">Cancel</a>
         <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this invoice?')">
+        <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this invoice?')">
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save Invoice" class="btn btn-success mar-right-2">
+        <input type="submit" name="submit" value="Save Invoice" class="btn btn-success">
         <?php if ($page == 'Edit'): ?>
             <?php if (isset($invoice['payment_status']) && $invoice['payment_status'] == 'Paid'): ?>
-        <input type="submit" name="send_receipt" value="Save & Send Receipt" class="btn" style="background:#28a745; color:white;" onclick="return confirm('Send payment receipt to client?')">
+        <input type="submit" name="send_receipt" value="Save & Send Receipt" class="btn btn-success" onclick="return confirm('Send payment receipt to client?')">
             <?php else: ?>
-        <input type="submit" name="send_email" value="Save & Send Email" class="btn" style="background:#0066cc; color:white;" onclick="return confirm('Send invoice email to client?')">
+        <input type="submit" name="send_email" value="Save & Send Email" class="btn btn-success" onclick="return confirm('Send invoice email to client?')">
             <?php endif; ?>
         <?php endif; ?>
     </div>
@@ -210,8 +208,10 @@ if (isset($_GET['id'])) {
     </div>
 
     <div class="content-block tab-content active">
+        <div class="form-section">
+            <div class="section-title">Invoice Details</div>
 
-        <div class="form responsive-width-100">
+            <div class="form responsive-width-100">
 
             <label for="client_id">Client</label>
     

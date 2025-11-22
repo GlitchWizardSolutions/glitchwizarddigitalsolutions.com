@@ -2,6 +2,7 @@
 // 2024-12-09 Production.
 // 2025-06-15 Reworked. VERIFIED.
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Check if the user is logged-in
 check_loggedin($pdo, '../../index.php');
 // Fetch account details associated with the logged-in user
@@ -53,13 +54,17 @@ $client_projects = $stmt->fetchALL(PDO::FETCH_ASSOC);
 $copy="";
 ?>
     <?=template_admin_header('Invoice Client View', 'clients', 'view')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Clients', 'url' => 'clients.php'],
+    ['label' => htmlspecialchars($record['business_name'], ENT_QUOTES)]
+])?>
+
 <div class="content-title">
-    <div class="title">
-       <i class="fa-solid fa-circle-info"></i>
-        <div class="txt">
-            <h2><?=htmlspecialchars($record['business_name'], ENT_QUOTES)?></h2>
-            <p><?=$page . ' Record # ' ?> <?=$record['id']?></p>
-        </div>
+    <div class="icon alt"><?=svg_icon_user()?></div>
+    <div class="txt">
+        <h2><?=htmlspecialchars($record['business_name'], ENT_QUOTES)?></h2>
+        <p class="subtitle"><?=$page . ' Client # ' ?><?=$record['id']?></p>
     </div>
 </div>
 
@@ -73,9 +78,9 @@ $copy="";
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="clients.php" class="btn" style='color:white; background:grey'>Return</a>
-        <a href="client.php?id=<?=$record['id']?>" class="btn" style='color:white; background:green'>Edit</a>
-        <a href="clients.php?delete=<?=$record['id']?>" style='color:white; background:red' onclick="return confirm('Are you sure you want to delete this record?')" class="btn">Delete</a>
+        <a href="clients.php" class="btn btn-secondary">Return</a>
+        <a href="client.php?id=<?=$record['id']?>" class="btn btn-primary">Edit</a>
+        <a href="clients.php?delete=<?=$record['id']?>" onclick="return confirm('Are you sure you want to delete this record?')" class="btn btn-danger">Delete</a>
     </div>
 </div>
 <div class="content-block"  style="background:#7F50AB">

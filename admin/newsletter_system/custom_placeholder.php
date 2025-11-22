@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Default placeholder values
 $custom_placeholder = [
     'placeholder_text' => '',
@@ -39,22 +40,30 @@ if (isset($_GET['id'])) {
 ?>
 <?=template_admin_header($page . ' Placeholder', 'settings', 'custom_placeholders')?>
 
-<form method="post">
+<?=generate_breadcrumbs([
+    ['label' => 'Custom Placeholders', 'url' => 'custom_placeholders.php'],
+    ['label' => $page . ' Placeholder']
+])?>
+
+<form method="post" class="form-professional">
 
     <div class="content-title">
-        <h2><?=$page?> Placeholder</h2>
+        <div class="icon alt"><?=svg_icon_settings()?></div>
+        <div class="txt">
+            <h2><?=$page?> Placeholder</h2>
+            <p class="subtitle"><?=$page == 'Edit' ? 'Modify custom placeholder' : 'Create new custom placeholder'?></p>
+        </div>
         <div class="btns">
-            <a href="custom_placeholders.php" class="btn alt mar-right-1">Cancel</a>
+            <a href="custom_placeholders.php" class="btn btn-secondary mar-right-1">Cancel</a>
             <?php if ($page == 'Edit'): ?>
-            <input type="submit" name="delete" value="Delete" class="btn red mar-right-1" onclick="return confirm('Are you sure you want to delete this placeholder?')">
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-1" onclick="return confirm('Are you sure you want to delete this placeholder?')">
             <?php endif; ?>
-            <input type="submit" name="submit" value="Save" class="btn">
+            <input type="submit" name="submit" value="Save" class="btn btn-success">
         </div>
     </div>
 
-    <div class="content-block">
-        
-        <div class="form responsive-width-100">
+    <div class="form-section">
+        <h3 class="section-title">Placeholder Details</h3>
 
             <label for="placeholder_text"><span class="required">*</span> Placeholder</label>
             <input id="placeholder_text" type="text" name="placeholder_text" placeholder="%example%" value="<?=htmlspecialchars($custom_placeholder['placeholder_text'], ENT_QUOTES)?>" required>

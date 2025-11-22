@@ -2,6 +2,7 @@
 //removed remember me 9/6/24
 //12/17/24 Works, ready for system formatting of form.
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Default input account values
 $account = [
     'username' => '',
@@ -218,6 +219,11 @@ if (isset($_GET['id'])) {
 }
 ?>
 <?=template_admin_header($page . ' Account', 'accounts', 'manage')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Accounts', 'url' => 'accounts.php'],
+    ['label' => $page . ' Account']
+])?>
 
 <div class="content-title">
     <div class="title">

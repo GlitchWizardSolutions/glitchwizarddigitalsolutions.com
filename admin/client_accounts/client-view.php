@@ -1,6 +1,7 @@
 <?php
 ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Check if the user is logged-in
 check_loggedin($pdo, '../../index.php');
 // Fetch account details associated with the logged-in user
@@ -55,13 +56,17 @@ $client_projects = $stmt->fetchALL(PDO::FETCH_ASSOC);
 $copy="";
 ?>
     <?=template_admin_header('Accounts', 'accounts', 'view')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Accounts', 'url' => 'accounts.php'],
+    ['label' => htmlspecialchars($record['username'], ENT_QUOTES)]
+])?>
+
 <div class="content-title">
-    <div class="title">
-       <i class="fa-solid fa-circle-info"></i>
-        <div class="txt">
-            <h2>Member <?=htmlspecialchars($record['username'], ENT_QUOTES)?></h2>
-            <p><?=$page . ' Record # ' ?> <?=$record['id']?></p>
-        </div>
+    <div class="icon alt"><?=svg_icon_user()?></div>
+    <div class="txt">
+        <h2><?=htmlspecialchars($record['full_name'], ENT_QUOTES)?></h2>
+        <p class="subtitle">Account ID: <?=$record['id']?> | Username: <?=htmlspecialchars($record['username'], ENT_QUOTES)?></p>
     </div>
 </div>
 
@@ -75,9 +80,9 @@ $copy="";
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="accounts.php" class="btn" style='color:white; background:grey'>Return</a>
-        <a href="account.php?id=<?=$record['id']?>" class="btn" style='color:white; background:green'>Edit</a>
-        <a href="accounts.php?delete=<?=$record['id']?>" style='color:white; background:red' onclick="return confirm('Are you sure you want to delete this record?')" class="btn">Delete</a>
+        <a href="accounts.php" class="btn btn-secondary">Back</a>
+        <a href="account.php?id=<?=$record['id']?>" class="btn btn-primary">Edit</a>
+        <a href="accounts.php?delete=<?=$record['id']?>" onclick="return confirm('Are you sure you want to delete this record?')" class="btn btn-danger">Delete</a>
     </div>
 </div>
 <div class="content-block"  style="background:#7F50AB">

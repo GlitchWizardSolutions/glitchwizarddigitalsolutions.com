@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Retrieve the GET request parameters (if specified)
 $pagination_page = isset($_GET['pagination_page']) ? $_GET['pagination_page'] : 1;
 $search = isset($_GET['search_query']) ? $_GET['search_query'] : '';
@@ -68,15 +69,15 @@ $url = 'custom_placeholders.php?search_query=' . $search;
 ?>
 <?=template_admin_header('Custom Placeholders', 'settings', 'custom_placeholders')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Custom Placeholders']
+])?>
+
 <div class="content-title">
-    <div class="title">
-        <div class="icon">
-            <svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.5,9A1.5,1.5 0 0,0 7,7.5A1.5,1.5 0 0,0 5.5,6A1.5,1.5 0 0,0 4,7.5A1.5,1.5 0 0,0 5.5,9M17.41,11.58C17.77,11.94 18,12.44 18,13C18,13.55 17.78,14.05 17.41,14.41L12.41,19.41C12.05,19.77 11.55,20 11,20C10.45,20 9.95,19.78 9.58,19.41L2.59,12.42C2.22,12.05 2,11.55 2,11V6C2,4.89 2.89,4 4,4H9C9.55,4 10.05,4.22 10.41,4.58L17.41,11.58M13.54,5.71L14.54,4.71L21.41,11.58C21.78,11.94 22,12.45 22,13C22,13.55 21.78,14.05 21.42,14.41L16.04,19.79L15.04,18.79L20.75,13L13.54,5.71Z" /></svg>
-        </div>
-        <div class="txt">
-            <h2>Custom Placeholders</h2>
-            <p>View, create and manage placeholders.</p>
-        </div>
+    <div class="icon alt"><?=svg_icon_settings()?></div>
+    <div class="txt">
+        <h2>Custom Placeholders</h2>
+        <p class="subtitle">Manage custom email template placeholders</p>
     </div>
 </div>
 
@@ -89,7 +90,7 @@ $url = 'custom_placeholders.php?search_query=' . $search;
 <?php endif; ?>
 
 <div class="content-header responsive-flex-column pad-top-5">
-    <a href="custom_placeholder.php" class="btn">
+    <a href="custom_placeholder.php" class="btn btn-success">
         <svg class="icon-left" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
         Create Placeholder
     </a>

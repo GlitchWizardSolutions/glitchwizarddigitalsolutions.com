@@ -12,6 +12,8 @@ DATABASE: TABLES tickets, project_tickets, tickets_comments, project_tickets_com
 LOG NOTE: Created 2025-01-21 - Unified ticketing dashboard
 *******************************************************************************/
 require 'assets/includes/admin_config.php';
+include_once 'assets/includes/components.php';
+
 $current_date = date('Y-m-d');
 
 // ===== CLIENT TICKETS STATS =====
@@ -88,6 +90,10 @@ $stmt->execute();
 $resolved_legal_today = $stmt->fetchColumn();
 ?>
 <?=template_admin_header('Ticketing Dashboard', 'ticketing', 'dashboard')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Ticketing Dashboard']
+])?>
 
 <div class="content-title">
     <div class="title">

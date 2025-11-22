@@ -2,6 +2,7 @@
 // 2024-12-09 Not Configured.
 // 2025-06-14 Reworked. VERIFIED
 include_once 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Configuration file
 $file = '../../client-invoices/' . 'defines.php';
 // Open the configuration file for reading
@@ -113,11 +114,23 @@ if (isset($_GET['error_msg'])) {
 ?>
 <?=template_admin_header('Settings', 'settings')?>
 
-<form action="" method="post">
+<?=generate_breadcrumbs([
+    ['label' => 'Invoices', 'url' => 'invoices.php'],
+    ['label' => 'Settings']
+])?>
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <h2 class="responsive-width-100">Settings</h2>
-        <input type="submit" name="submit" value="Save" class="btn">
+<div class="content-title">
+    <div class="icon alt"><?=svg_icon_settings()?></div>
+    <div class="txt">
+        <h2>Invoice Settings</h2>
+        <p class="subtitle">Configure invoice system parameters</p>
+    </div>
+</div>
+
+<form action="" method="post" class="form-professional">
+
+    <div class="form-actions">
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 
     <?php if (isset($success_msg)): ?>

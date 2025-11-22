@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Remove the time limit and file size limit
 set_time_limit(0);
 ini_set('post_max_size', '0');
@@ -52,19 +53,27 @@ if (isset($_FILES['file']) && !empty($_FILES['file']['tmp_name'])) {
 ?>
 <?=template_admin_header('Import Newsletters', 'newsletters', 'import')?>
 
-<form method="post" enctype="multipart/form-data">
+<?=generate_breadcrumbs([
+    ['label' => 'Newsletters', 'url' => 'newsletters.php'],
+    ['label' => 'Import Newsletters']
+])?>
+
+<form method="post" enctype="multipart/form-data" class="form-professional">
 
     <div class="content-title">
-        <h2>Import Newsletters</h2>
+        <div class="icon alt"><?=svg_icon_upload()?></div>
+        <div class="txt">
+            <h2>Import Newsletters</h2>
+            <p class="subtitle">Upload CSV, JSON, XML, or TXT file to import newsletters</p>
+        </div>
         <div class="btns">
-            <a href="newsletters.php" class="btn alt mar-right-1">Cancel</a>
-            <input type="submit" name="submit" value="Import" class="btn">
+            <a href="newsletters.php" class="btn btn-secondary mar-right-1">Cancel</a>
+            <input type="submit" name="submit" value="Import" class="btn btn-success">
         </div>
     </div>
 
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
+    <div class="form-section">
+        <h3 class="section-title">Upload File</h3>
 
             <label for="file"><span class="required">*</span> File</label>
             <input type="file" name="file" id="file" accept=".csv,.json,.xml,.txt" required>

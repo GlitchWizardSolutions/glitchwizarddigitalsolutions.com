@@ -200,6 +200,9 @@ $stmt = $pdo->prepare('SELECT COUNT(*) AS total FROM newsletters');
 $stmt->execute();
 $newsletters_total = $stmt->fetchColumn();
 
+// Include components for breadcrumbs
+include_once 'assets/includes/components.php';
+
 // SQL query to get all campaigns from the "campaigns" table
 $stmt = $pdo->prepare('SELECT 
     c.*, 
@@ -231,7 +234,15 @@ $stmt->execute();
 $media_awaiting_approval = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <?=template_admin_header('Dashboard', 'dashboard')?>
-<!--ACCOUNT SYSTEM 0VERVIEW-->
+
+<div class="content-title">
+    <div class="icon alt"><?=svg_icon_dashboard()?></div>
+    <div class="txt">
+        <h2>Admin Dashboard</h2>
+        <p class="subtitle">Overview of all systems and recent activity</p>
+    </div>
+</div>
+
 <h2>Action Items</h2>
 <div class="dashboard">
 

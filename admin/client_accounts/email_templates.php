@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Save the email templates
 if (isset($_POST['client_email_template'])) {
     if (file_put_contents(base_path . 'templates/client-email-template.html', $_POST['client_email_template']) === false) {
@@ -40,11 +41,20 @@ if (isset($_GET['error_msg'])) {
 ?>
 <?=template_admin_header('Email Templates', 'email_templates')?>
 
-<form action="" method="post" enctype="multipart/form-data">
+<?=generate_breadcrumbs([
+    ['label' => 'Accounts', 'url' => 'accounts.php'],
+    ['label' => 'Email Templates']
+])?>
+
+<form action="" method="post" enctype="multipart/form-data" class="form-professional">
 
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <h2 class="responsive-width-100">Invoice System Email Templates</h2>
-        <input type="submit" name="submit" value="Save" class="btn">
+        <div class="icon alt"><?=svg_icon_email()?></div>
+        <div class="txt">
+            <h2 class="responsive-width-100">Email Templates</h2>
+            <p class="subtitle">Customize account notification email templates</p>
+        </div>
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 
     <?php if (isset($success_msg)): ?>

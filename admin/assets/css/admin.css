@@ -769,3 +769,91 @@ input.btn-secondary:hover {
   border-color: #bcc5c8 !important;
   box-shadow: 0 0 0 0.25rem rgba(212, 219, 222, 0.5) !important;
 }
+
+/* Breadcrumbs */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 15px 0;
+  font-size: 14px;
+  color: #666;
+  flex-wrap: wrap;
+}
+
+.breadcrumbs a {
+  color: #6b46c1;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumbs a:hover {
+  color: #5a3aa3;
+  text-decoration: underline;
+}
+
+.breadcrumbs .separator {
+  color: #999;
+  margin: 0 5px;
+}
+
+.breadcrumbs .current {
+  color: #333;
+  font-weight: 500;
+}
+
+.breadcrumbs svg {
+  width: 14px;
+  height: 14px;
+  fill: #999;
+  vertical-align: middle;
+}
+
+/* Status Badges */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-green {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge-blue {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.badge-red {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.badge-orange {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.badge-grey {
+  background: #f5f5f5;
+  color: #757575;
+}
+
+.badge-purple {
+  background: #f3e5f5;
+  color: #6b46c1;
+}
+
+/* Professional Page Subtitle */
+.content-title .subtitle {
+  font-size: 14px;
+  color: #666;
+  font-weight: normal;
+  margin-top: 5px;
+}

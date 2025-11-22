@@ -2,6 +2,7 @@
 // 2024-12-09 Production
 // 2025-06-15 Refresh VERIFIED
 include_once 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 include '../../client-invoices/defines.php';
 
 // Handle status updates
@@ -166,17 +167,16 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
 ?>
 <?=template_admin_header('Manage Invoices', 'invoices', 'invoices')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Invoices']
+])?>
+
 <div class="content-title">
-    <div class="title">
-        <div class="icon">
-            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 2H2V17H4V4H17V2M21 22L18.5 20.32L16 22L13.5 20.32L11 22L8.5 20.32L6 22V6H21V22M10 10V12H17V10H10M15 14H10V16H15V14Z" /></svg>
-        </div>
-        <div class="txt">
-            <h2>Manage Invoices</h2>
-            <p>View, edit, and create invoices.</p>
-        </div>
+    <div class="icon alt"><?=svg_icon_invoice()?></div>
+    <div class="txt">
+        <h2>Manage Invoices</h2>
+        <p class="subtitle">View, edit, and create invoices</p>
     </div>
-             
 </div>
 
 <?php if (isset($success_msg)): ?>
@@ -186,18 +186,12 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
     <svg class="close" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
 </div>
 <?php endif; ?>
-<br><br>
- <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-              
-    <a href="invoice.php"class="btn btn-primary">
-        + Invoice
-    </a>&nbsp;&nbsp;
-        <a href="invoices_import.php" class="btn btn-primary">
-      Import
-    </a>&nbsp;&nbsp;
-        <a href="invoices_export.php" class="btn btn-primary">
-       Export
-    </a>
+
+<div class="content-title responsive-flex-wrap responsive-pad-bot-3">
+    <a href="invoice.php" class="btn btn-success">+ Invoice</a>&nbsp;&nbsp;
+    <a href="invoices_import.php" class="btn btn-primary">Import</a>&nbsp;&nbsp;
+    <a href="invoices_export.php" class="btn btn-primary">Export</a>
+</div>
     <br>
     </div>
 <div class="content-header responsive-flex-column pad-top-5">

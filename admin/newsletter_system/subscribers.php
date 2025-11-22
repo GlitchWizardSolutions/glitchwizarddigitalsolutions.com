@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Retrieve the GET request parameters (if specified)
 $pagination_page = isset($_GET['pagination_page']) ? $_GET['pagination_page'] : 1;
 $search = isset($_GET['search_query']) ? $_GET['search_query'] : '';
@@ -95,15 +96,15 @@ $url = 'subscribers.php?search_query=' . $search . (isset($_GET['status']) ? '&s
 ?>
 <?=template_admin_header('Subscribers', 'subscribers', 'view')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Subscribers']
+])?>
+
 <div class="content-title">
-    <div class="title">
-        <div class="icon">
-            <svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 17V19H2V17S2 13 9 13 16 17 16 17M12.5 7.5A3.5 3.5 0 1 0 9 11A3.5 3.5 0 0 0 12.5 7.5M15.94 13A5.32 5.32 0 0 1 18 17V19H22V17S22 13.37 15.94 13M15 4A3.39 3.39 0 0 0 13.07 4.59A5 5 0 0 1 13.07 10.41A3.39 3.39 0 0 0 15 11A3.5 3.5 0 0 0 15 4Z" /></svg>
-        </div>
-        <div class="txt">
-            <h2>Subscribers</h2>
-            <p>View, create and manage subscribers.</p>
-        </div>
+    <div class="icon alt"><?=svg_icon_user()?></div>
+    <div class="txt">
+        <h2>Subscribers</h2>
+        <p class="subtitle">Manage newsletter subscribers and subscriptions</p>
     </div>
 </div>
 
@@ -116,7 +117,7 @@ $url = 'subscribers.php?search_query=' . $search . (isset($_GET['status']) ? '&s
 <?php endif; ?>
 
 <div class="content-header responsive-flex-column pad-top-5">
-    <a href="subscriber.php" class="btn">
+    <a href="subscriber.php" class="btn btn-success">
         <svg class="icon-left" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
         Create Subscriber
     </a>

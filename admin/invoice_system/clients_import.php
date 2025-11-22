@@ -2,6 +2,7 @@
 // 2024-12-09 Production.
 // 2025-06-15 Reworked. VERIFIED.
 include_once 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 
 // Remove the time limit and file size limit
 set_time_limit(0);
@@ -58,17 +59,31 @@ if (isset($_FILES['file']) && !empty($_FILES['file']['tmp_name'])) {
 ?>
 <?=template_admin_header('Import Invoice Clients', 'invoices', 'clients')?>
 
-<form action="" method="post" enctype="multipart/form-data">
+<?=generate_breadcrumbs([
+    ['label' => 'Clients', 'url' => 'clients.php'],
+    ['label' => 'Import']
+])?>
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <h2 class="responsive-width-100">Import Clients</h2>
-        <a href="clients.php" class="btn alt mar-right-2">Cancel</a>
-        <input type="submit" name="submit" value="Import" class="btn">
+<div class="content-title">
+    <div class="icon alt"><?=svg_icon_upload()?></div>
+    <div class="txt">
+        <h2>Import Clients</h2>
+        <p class="subtitle">Batch import invoice clients from file</p>
+    </div>
+</div>
+
+<form action="" method="post" enctype="multipart/form-data" class="form-professional">
+
+    <div class="form-actions">
+        <a href="clients.php" class="btn btn-secondary">Cancel</a>
+        <input type="submit" name="submit" value="Import" class="btn btn-success">
     </div>
 
     <div class="content-block">
+        <div class="form-section">
+            <div class="section-title">Import File</div>
 
-        <div class="form responsive-width-100">
+            <div class="form responsive-width-100">
 
             <label for="file"><span class="required">*</span> File</label>
             <input type="file" name="file" id="file" accept=".csv,.json,.xml,.txt" required>

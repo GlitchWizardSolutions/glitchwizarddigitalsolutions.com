@@ -2,6 +2,7 @@
 // 2024-12-09 Production.
 // 2025-06-15 Reworked.
 include_once 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 
 // Remove the time limit and file size limit
 set_time_limit(0);
@@ -93,38 +94,36 @@ if (isset($_POST['file_type'], $_POST['table'])) {
 ?>
 <?=template_admin_header('Export Invoices', 'invoices', 'invoices')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Invoices', 'url' => 'invoices.php'],
+    ['label' => 'Export']
+])?>
+
 <div class="content-title">
-    <div class="title">
-        <div class="icon">
-            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 2H2V17H4V4H17V2M21 22L18.5 20.32L16 22L13.5 20.32L11 22L8.5 20.32L6 22V6H21V22M10 10V12H17V10H10M15 14H10V16H15V14Z" /></svg>
-        </div>
-        <div class="txt">
-            <h2 class="responsive-width-100">Export Invoices</h2>
-            <p>Batch Program.</p>
-        </div>
-    </div>
-              <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-              
-    <a href="invoices.php" class="btn btn-primary">
-        View Invoices
-    </a>&nbsp;&nbsp;
-        <a href="invoices_import.php" class="btn btn-primary">
-       Import
-    </a>
-    <br>
+    <div class="icon alt"><?=svg_icon_download()?></div>
+    <div class="txt">
+        <h2>Export Invoices</h2>
+        <p class="subtitle">Batch export invoices to file</p>
     </div>
 </div>
-<form action="" method="post">
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-      
-        <a href="invoices.php" class="btn alt mar-right-2">Cancel</a>
+<div class="content-title responsive-flex-wrap responsive-pad-bot-3">
+    <a href="invoices.php" class="btn btn-primary">View Invoices</a>&nbsp;&nbsp;
+    <a href="invoices_import.php" class="btn btn-primary">Import</a>
+</div>
+
+<form action="" method="post" class="form-professional">
+
+    <div class="form-actions">
+        <a href="invoices.php" class="btn btn-secondary">Cancel</a>
         <input type="submit" name="submit" value="Export" class="btn btn-success">
     </div>
 
     <div class="content-block">
+        <div class="form-section">
+            <div class="section-title">Export Options</div>
 
-        <div class="form responsive-width-100">
+            <div class="form responsive-width-100">
 
             <label for="table"><span class="required">*</span> Table</label>
             <select id="table" name="table" required>

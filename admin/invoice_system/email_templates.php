@@ -2,6 +2,7 @@
 // 2024-12-09 Production.
 // 2025-06-15 This does not display anything in the form. 
 include_once 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 
 // Save the email templates
 if (isset($_POST['client_email_template'])) {
@@ -43,19 +44,23 @@ if (isset($_GET['error_msg'])) {
 ?>
 <?=template_admin_header('Invoice', 'invoices', 'invoice_mail')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Invoices', 'url' => 'invoices.php'],
+    ['label' => 'Email Templates']
+])?>
+
 <div class="content-title">
-    <div class="title">
-     <i class="fa-solid fa-user-secret"></i>
-        <div class="txt">
-            <h2>Email Templates</h2>
-        </div>
+    <div class="icon alt"><?=svg_icon_email()?></div>
+    <div class="txt">
+        <h2>Email Templates</h2>
+        <p class="subtitle">Manage invoice email templates</p>
     </div>
 </div>
-<br><br>
-<form action="" method="post" enctype="multipart/form-data">
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <input type="submit" name="submit" value="Save" class="btn">
+<form action="" method="post" enctype="multipart/form-data" class="form-professional">
+
+    <div class="form-actions">
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 
     <?php if (isset($success_msg)): ?>

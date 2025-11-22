@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Default subscriber values
 $subscriber = [
     'email' => '',
@@ -96,16 +97,25 @@ if (isset($_GET['id'])) {
 ?>
 <?=template_admin_header($page . ' Subscriber', 'subscribers', 'manage')?>
 
-<form method="post">
+<?=generate_breadcrumbs([
+    ['label' => 'Subscribers', 'url' => 'subscribers.php'],
+    ['label' => $page . ' Subscriber']
+])?>
+
+<form method="post" class="form-professional">
 
     <div class="content-title">
-        <h2><?=$page?> Subscriber</h2>
+        <div class="icon alt"><?=svg_icon_user()?></div>
+        <div class="txt">
+            <h2><?=$page?> Subscriber</h2>
+            <p class="subtitle"><?=$page == 'Edit' ? 'Modify subscriber details' : 'Add new newsletter subscriber'?></p>
+        </div>
         <div class="btns">
-            <a href="subscribers.php" class="btn alt mar-right-1">Cancel</a>
+            <a href="subscribers.php" class="btn btn-secondary mar-right-1">Cancel</a>
             <?php if ($page == 'Edit'): ?>
-            <input type="submit" name="delete" value="Delete" class="btn red mar-right-1" onclick="return confirm('Are you sure you want to delete this subscriber?')">
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-1" onclick="return confirm('Are you sure you want to delete this subscriber?')">
             <?php endif; ?>
-            <input type="submit" name="submit" value="Save" class="btn">
+            <input type="submit" name="submit" value="Save" class="btn btn-success">
         </div>
     </div>
 

@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once 'assets/includes/components.php';
 // Save the email templates
 if (isset($_POST['activation_email_template'])) {
     file_put_contents('../activation-email-template.html', $_POST['activation_email_template']);
@@ -36,6 +37,10 @@ if (isset($_GET['success_msg'])) {
 }
 ?>
 <?=template_admin_header('Email Templates', 'emailtemplate')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Email Templates']
+])?>
 
 <div class="content-title">
     <div class="title">

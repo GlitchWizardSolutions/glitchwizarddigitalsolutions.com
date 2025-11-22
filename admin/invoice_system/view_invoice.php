@@ -2,6 +2,7 @@
 // Production 2024-12-09
 // Refresh    2025-06-14 VERIFIED
 include_once 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Check if the ID exists
 if (!isset($_GET['id'])) {
     exit('Invalid ID!');
@@ -31,20 +32,24 @@ if (!$invoice) {
 }
 ?>
 <?=template_admin_header('Invoice #' . $invoice['invoice_number'], 'invoices', 'invoices')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Invoices', 'url' => 'invoices.php'],
+    ['label' => 'Invoice #' . $invoice['invoice_number']]
+])?>
+
 <div class="content-title">
-    <div class="title">
-       <i class="fa-solid fa-circle-info"></i>
-        <div class="txt">
-            <h2 class="responsive-width-100">Invoice # &nbsp;<?=$invoice['invoice_number']?><?php if ($invoice['viewed']): ?><svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>The client has viewed the invoice.</title><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg><?php endif; ?></h2>
-            <p><?=' Invoice Status: ' ?> <?=$invoice['payment_status']?></p>
-        </div>
+    <div class="icon alt"><?=svg_icon_invoice()?></div>
+    <div class="txt">
+        <h2>Invoice #<?=$invoice['invoice_number']?><?php if ($invoice['viewed']): ?> <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>The client has viewed the invoice.</title><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg><?php endif; ?></h2>
+        <p class="subtitle">Status: <?=status_badge($invoice['payment_status'])?></p>
     </div>
 </div>
-<br><br>
+
 <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-    <a href="invoices.php" class="btn alt mar-right-2">Cancel</a>
-    <a href="invoices.php?delete=<?=$_GET['id']?>" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this invoice?')">Delete</a>
-    <a href="invoice.php?id=<?=$_GET['id']?>" class="btn btn-success">Edit</a>
+    <a href="invoices.php" class="btn btn-secondary">Back to Invoices</a>
+    <a href="invoice.php?id=<?=$_GET['id']?>" class="btn btn-primary">Edit</a>
+    <a href="invoices.php?delete=<?=$_GET['id']?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this invoice?')">Delete</a>
 </div>
 
 <div class="content-block-wrapper">

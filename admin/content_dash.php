@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once 'assets/includes/components.php';
 // New accounts created on the current date
 $accounts = $pdo->query('SELECT * FROM accounts WHERE cast(registered as DATE) = cast(now() as DATE) ORDER BY registered DESC')->fetchAll(PDO::FETCH_ASSOC);
 // Total accounts
@@ -83,12 +84,15 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <?=template_admin_header('Client Content Dashboard', 'allmedia', 'dash')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Content Dashboard']
+])?>
+
 <div class="content-title">
-    <div class="title">
-        <i class="fa-solid fa-gauge-high"></i>
-        <div class="txt">
-            <h2>Client Content Uploaded</h2>
-        </div>
+    <div class="icon alt"><?=svg_icon_content()?></div>
+    <div class="txt">
+        <h2>Client Content Dashboard</h2>
+        <p class="subtitle">Media uploads and approval management</p>
     </div>
 </div>
 

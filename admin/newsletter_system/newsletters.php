@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Delete the newsletter
 if (isset($_GET['delete'])) {
     // Delete the newsletter
@@ -80,15 +81,15 @@ $url = 'newsletters.php?search_query=' . $search . (isset($_GET['date_from']) ? 
 ?>
 <?=template_admin_header('Newsletters', 'newsletters', 'view')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Newsletters']
+])?>
+
 <div class="content-title">
-    <div class="title">
-        <div class="icon">
-            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>
-        </div>
-        <div class="txt">
-            <h2>Newsletters</h2>
-            <p>View, create and manage newsletters.</p>
-        </div>
+    <div class="icon alt"><?=svg_icon_newsletter()?></div>
+    <div class="txt">
+        <h2>Newsletters</h2>
+        <p class="subtitle">Manage email newsletter templates</p>
     </div>
 </div>
 
@@ -101,7 +102,7 @@ $url = 'newsletters.php?search_query=' . $search . (isset($_GET['date_from']) ? 
 <?php endif; ?>
 
 <div class="content-header responsive-flex-column pad-top-5">
-    <a href="newsletter.php" class="btn">
+    <a href="newsletter.php" class="btn btn-success">
         <svg class="icon-left" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
         Create Newsletter
     </a>

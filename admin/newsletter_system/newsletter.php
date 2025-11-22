@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Default newsletter values
 $newsletter = [
     'title' => '',
@@ -82,22 +83,30 @@ if (isset($_GET['copy'])) {
 ?>
 <?=template_admin_header($page . ' Newsletter', 'newsletters', 'manage')?>
 
-<form method="post" enctype="multipart/form-data">
+<?=generate_breadcrumbs([
+    ['label' => 'Newsletters', 'url' => 'newsletters.php'],
+    ['label' => $page . ' Newsletter']
+])?>
+
+<form method="post" enctype="multipart/form-data" class="form-professional">
 
     <div class="content-title">
-        <h2><?=$page?> Newsletter</h2>
+        <div class="icon alt"><?=svg_icon_newsletter()?></div>
+        <div class="txt">
+            <h2><?=$page?> Newsletter</h2>
+            <p class="subtitle"><?=$page == 'Edit' ? 'Modify newsletter template' : 'Create new newsletter template'?></p>
+        </div>
         <div class="btns">
-            <a href="newsletters.php" class="btn alt mar-right-1">Cancel</a>
+            <a href="newsletters.php" class="btn btn-secondary mar-right-1">Cancel</a>
             <?php if ($page == 'Edit'): ?>
-            <input type="submit" name="delete" value="Delete" class="btn red mar-right-1" onclick="return confirm('Are you sure you want to delete this newsletter?')">
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-1" onclick="return confirm('Are you sure you want to delete this newsletter?')">
             <?php endif; ?>
-            <input type="submit" name="submit" value="Save" class="btn">
+            <input type="submit" name="submit" value="Save" class="btn btn-success">
         </div>
     </div>
 
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
+    <div class="form-section">
+        <h3 class="section-title">Newsletter Details</h3>
 
             <label for="title"><span class="required">*</span> Title</label>
             <input id="title" type="text" name="title" placeholder="Title" value="<?=htmlspecialchars($newsletter['title'], ENT_QUOTES)?>" required>

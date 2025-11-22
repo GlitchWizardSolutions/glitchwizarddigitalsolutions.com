@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Delete campaign
 if (isset($_GET['delete'])) {
     $stmt = $pdo->prepare('DELETE c, ci, cc, co, cu FROM campaigns c LEFT JOIN campaign_items ci ON ci.campaign_id = c.id LEFT JOIN campaign_clicks cc ON cc.campaign_id = c.id LEFT JOIN campaign_opens co ON co.campaign_id = c.id LEFT JOIN campaign_unsubscribes cu ON cu.campaign_id = c.id WHERE c.id = ?');
@@ -92,15 +93,15 @@ $url = 'campaigns.php?search_query=' . $search . (isset($_GET['status']) ? '&sta
 ?>
 <?=template_admin_header('Campaigns', 'campaigns', 'view')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Campaigns']
+])?>
+
 <div class="content-title">
-    <div class="title">
-        <div class="icon">
-            <svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3M7 7H9V9H7V7M7 11H9V13H7V11M7 15H9V17H7V15M17 17H11V15H17V17M17 13H11V11H17V13M17 9H11V7H17V9Z" /></svg>
-        </div>
-        <div class="txt">
-            <h2>Campaigns</h2>
-            <p>View, create and manage campaigns.</p>
-        </div>
+    <div class="icon alt"><?=svg_icon_newsletter()?></div>
+    <div class="txt">
+        <h2>Campaigns</h2>
+        <p class="subtitle">Manage email campaigns and track performance</p>
     </div>
 </div>
 
@@ -113,7 +114,7 @@ $url = 'campaigns.php?search_query=' . $search . (isset($_GET['status']) ? '&sta
 <?php endif; ?>
 
 <div class="content-header responsive-flex-column pad-top-5">
-    <a href="campaign.php" class="btn">
+    <a href="campaign.php" class="btn btn-success">
         <svg class="icon-left" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
         Create Campaign
     </a>

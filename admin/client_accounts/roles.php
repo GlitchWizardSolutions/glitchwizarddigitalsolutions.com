@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Prepare roles query
 $roles = $pdo->query('SELECT role, COUNT(*) as total FROM accounts GROUP BY role')->fetchAll(PDO::FETCH_KEY_PAIR);
 foreach ($roles_list as $rl) {
@@ -18,12 +19,16 @@ $access_level_inactive = $pdo->query('SELECT access_level, COUNT(*) as total FRO
 ?>
 <?=template_admin_header('Account Access & Roles', 'accounts', 'roles')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Accounts', 'url' => 'accounts.php'],
+    ['label' => 'Roles & Access Levels']
+])?>
+
 <div class="content-title">
-    <div class="title">
-        <i class="fas fa-list"></i>
-        <div class="txt">
-            <h2>Roles & Acess Levels</h2>
-        </div>
+    <div class="icon alt"><?=svg_icon_user()?></div>
+    <div class="txt">
+        <h2>Roles & Access Levels</h2>
+        <p class="subtitle">View account distribution by role and access level</p>
     </div>
 </div>
 <br>

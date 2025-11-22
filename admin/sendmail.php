@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once 'assets/includes/components.php';
 // If submit form, send mail to the specified recipient
 if (isset($_POST['subject'])) {
     include 'functions.php';
@@ -12,19 +13,23 @@ $stmt->execute();
 $subscribers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <?=template_admin_header('Send Mail', 'newsletters', 'sendmail')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Send Mail']
+])?>
+
 <div class="content-title">
-    <div class="title">
-      <i class="fa-solid fa-paper-plane"></i>
-        <div class="txt">
-          <h2 class="responsive-width-100">Send Mail</h2>
-        </div>
+    <div class="icon alt"><?=svg_icon_email()?></div>
+    <div class="txt">
+        <h2>Send Mail</h2>
+        <p class="subtitle">Send bulk emails to subscribers</p>
     </div>
 </div>
 <form action="" method="post" class="send-mail-form">
 
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
        
-        <input type="submit" name="submit" value="Send" class="btn">
+        <input type="submit" name="submit" value="Send" class="btn btn-success">
     </div>
 
     <div class="content-block">

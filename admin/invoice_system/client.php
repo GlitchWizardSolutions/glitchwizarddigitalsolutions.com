@@ -2,6 +2,7 @@
 // 2024-12-09 Production.
 // 2025-06-15 Reworked. VERIFIED.
 include_once 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Check if the user is logged-in
 check_loggedin($pdo, '../../index.php');
 // Default client values
@@ -66,15 +67,25 @@ if (isset($_GET['id'])) {
 ?>
 <?=template_admin_header($page . ' Invoice Clients', 'invoices', 'clients')?>
 
-<form action="" method="post">
+<?=generate_breadcrumbs([
+    ['label' => 'Clients', 'url' => 'clients.php'],
+    ['label' => $page . ' Client']
+])?>
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <h2 class="responsive-width-100"><?=$page?> Client</h2>
-        <a href="clients.php" class="btn alt mar-right-2">Cancel</a>
+<div class="content-title">
+    <div class="icon alt"><?=svg_icon_user()?></div>
+    <div class="txt">
+        <h2><?=$page?> Client</h2>
+        <p class="subtitle">Manage invoice client information</p>
+    </div>
+</div>
+
+<form action="" method="post" class="form-professional">
+        <a href="clients.php" class="btn btn-secondary">Cancel</a>
         <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this client?')">
+        <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this client?')">
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 
     <?php if (isset($error_msg)): ?>
@@ -88,8 +99,10 @@ if (isset($_GET['id'])) {
     <?php endif; ?>
 
     <div class="content-block">
+        <div class="form-section">
+            <div class="section-title">Account & Contact Information</div>
         
-        <div class="form responsive-width-100">
+            <div class="form responsive-width-100">
             
             <label for="acc_id"><span class="required">*</span> Account Number</label>
            <select id="acc_id" name="acc_id" required>

@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Retrieve the GET request parameters (if specified)
 $pagination_page = isset($_GET['pagination_page']) ? $_GET['pagination_page'] : 1;
 $search = isset($_GET['search_query']) ? $_GET['search_query'] : '';
@@ -27,14 +28,14 @@ if ($date_to) {
     $where .= ($where ? 'AND ' : 'WHERE ') . 'submit_date <= :date_to ';
 }
 // Retrieve the total number of groups
-$stmt = $pdo->prepare('SELECT COUNT(*) AS total FROM groups ' . $where);
+$stmt = $pdo->prepare('SELECT COUNT(*) AS total FROM `groups` ' . $where);
 if ($search) $stmt->bindParam('search', $param3, PDO::PARAM_STR);
 if ($date_from) $stmt->bindParam('date_from', $date_from, PDO::PARAM_STR);
 if ($date_to) $stmt->bindParam('date_to', $date_to, PDO::PARAM_STR);
 $stmt->execute();
 $groups_total = $stmt->fetchColumn();
 // SQL query to get all groups from the "groups" table
-$stmt = $pdo->prepare('SELECT g.*, (SELECT COUNT(*) FROM group_subscribers gs WHERE gs.group_id = g.id) AS subscribers FROM groups g ' . $where . ' ORDER BY ' . $order_by . ' ' . $order . ' LIMIT :start_results,:num_results');
+$stmt = $pdo->prepare('SELECT g.*, (SELECT COUNT(*) FROM group_subscribers gs WHERE gs.group_id = g.id) AS subscribers FROM `groups` g ' . $where . ' ORDER BY ' . $order_by . ' ' . $order . ' LIMIT :start_results,:num_results');
 // Bind params
 $stmt->bindParam('start_results', $param1, PDO::PARAM_INT);
 $stmt->bindParam('num_results', $param2, PDO::PARAM_INT);
@@ -46,7 +47,7 @@ $stmt->execute();
 $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Delete group
 if (isset($_GET['delete'])) {
-    $stmt = $pdo->prepare('DELETE g, gs FROM groups g LEFT JOIN group_subscribers gs ON gs.group_id = g.id WHERE g.id = ?');
+    $stmt = $pdo->prepare('DELETE g, gs FROM `groups` g LEFT JOIN group_subscribers gs ON gs.group_id = g.id WHERE g.id = ?');
     $stmt->execute([ $_GET['delete'] ]);
     header('Location: groups.php?success_msg=3');
     exit;
@@ -71,15 +72,15 @@ $url = 'groups.php?search_query=' . $search . (isset($_GET['date_from']) ? '&dat
 ?>
 <?=template_admin_header('groups', 'subscribers', 'groups')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Groups']
+])?>
+
 <div class="content-title">
-    <div class="title">
-        <div class="icon">
-            <svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25M0,20V18.5C0,17.11 1.89,15.94 4.45,15.6C3.86,16.28 3.5,17.22 3.5,18.25V20H0M24,20H20.5V18.25C20.5,17.22 20.14,16.28 19.55,15.6C22.11,15.94 24,17.11 24,18.5V20Z" /></svg>
-        </div>
-        <div class="txt">
-            <h2>Groups</h2>
-            <p>View, create and manage groups.</p>
-        </div>
+    <div class="icon alt"><?=svg_icon_newsletter()?></div>
+    <div class="txt">
+        <h2>Subscriber Groups</h2>
+        <p class="subtitle">Organize subscribers into groups for targeted campaigns</p>
     </div>
 </div>
 
@@ -92,7 +93,7 @@ $url = 'groups.php?search_query=' . $search . (isset($_GET['date_from']) ? '&dat
 <?php endif; ?>
 
 <div class="content-header responsive-flex-column pad-top-5">
-    <a href="group.php" class="btn">
+    <a href="group.php" class="btn btn-success">
         <svg class="icon-left" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
         Create Group
     </a>

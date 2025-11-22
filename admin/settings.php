@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once 'assets/includes/components.php';
 // Configuration file
 $file = '../../private/config.php';
 // Open the configuration file for reading
@@ -79,11 +80,22 @@ if (isset($_GET['success_msg'])) {
 ?>
 <?=template_admin_header('Settings', 'settings')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Settings']
+])?>
+
+<div class="content-title">
+    <div class="icon alt"><?=svg_icon_settings()?></div>
+    <div class="txt">
+        <h2>Global Settings</h2>
+        <p class="subtitle">Configure system-wide settings and parameters</p>
+    </div>
+</div>
+
 <form action="" method="post">
 
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <h2 class="responsive-width-100">Settings</h2>
-        <input type="submit" name="submit" value="Save" class="btn">
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 
     <?php if (isset($success_msg)): ?>
