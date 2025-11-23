@@ -46,7 +46,7 @@ if (isset($_POST['add'])) {
             $new_string = str_shuffle($string);
             $location   = "../../client-dashboard/blog/uploads/posts/image_$new_string.$imageFileType";
             move_uploaded_file($_FILES["image"]["tmp_name"], $location);
-            $image = '/client-dashboard/blog/uploads/posts/image_' . $new_string . '.' . $imageFileType . '';
+            $image = 'client-dashboard/blog/uploads/posts/image_' . $new_string . '.' . $imageFileType . '';
 	   }
     }
     

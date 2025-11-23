@@ -65,7 +65,7 @@ if (isset($_GET['edit-id'])) {
                 $imageFileType = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
                 $location = "../../client-dashboard/blog/uploads/posts/image_$new_string.$imageFileType";
                 move_uploaded_file($_FILES["image"]["tmp_name"], $location);
-                $image = '/client-dashboard/blog/uploads/posts/image_' . $new_string . '.' . $imageFileType;
+                $image = 'client-dashboard/blog/uploads/posts/image_' . $new_string . '.' . $imageFileType;
             }
         }
         
