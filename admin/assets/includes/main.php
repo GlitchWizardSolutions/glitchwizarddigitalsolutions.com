@@ -179,19 +179,6 @@ function template_admin_header($title, $selected = 'dashboard', $selected_child 
 <!--Feedback - REMOVED: poll_system directory does not exist-->
 <!--Contract Approvals - REMOVED: contract_system directory does not exist-->
 <!--Newsletter System-->
-        <a href= "' . $base_url . '/newsletter_system/campaigns.php"' . ($selected == 'campaigns' ? ' class="selected"' : '') . ' title="Campaigns">
-            <span class="icon">
-                <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3M7 7H9V9H7V7M7 11H9V13H7V11M7 15H9V17H7V15M17 17H11V15H17V17M17 13H11V11H17V13M17 9H11V7H17V9Z" /></svg>
-            </span>
-            <span class="txt">Campaigns</span>
-            <span class="note">' . number_format($campaigns_total) . '</span>
-        </a>
-        <div class="sub">
-            <a href= "' . $base_url . '/newsletter_system/campaigns.php"' . ($selected == 'campaigns' && $selected_child == 'view' ? ' class="selected"' : '') . '><span class="square"></span>View Campaigns</a>
-            <a href= "' . $base_url . '/newsletter_system/campaign.php"' . ($selected == 'campaigns' && $selected_child == 'manage' ? ' class="selected"' : '') . '><span class="square"></span>Create Campaign</a>
-            <a href= "' . $base_url . '/newsletter_system/campaigns_export.php"' . ($selected == 'campaigns' && $selected_child == 'export' ? ' class="selected"' : '') . '><span class="square"></span>Export Campaigns</a>
-            <a href= "' . $base_url . '/newsletter_system/campaigns_import.php"' . ($selected == 'campaigns' && $selected_child == 'import' ? ' class="selected"' : '') . '><span class="square"></span>Import Campaigns</a>
-        </div>
        <a href= "' . $base_url . '/newsletter_system/newsletters.php"' . ($selected == 'newsletters' ? ' class="selected"' : '') . ' title="Newsletters">
             <span class="icon">
                 <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>
@@ -200,10 +187,11 @@ function template_admin_header($title, $selected = 'dashboard', $selected_child 
             <span class="note">' . number_format($newsletters_total) . '</span>
         </a>
         <div class="sub">
-            <a href= "' . $base_url . '/newsletter_system/newsletters.php"' . ($selected == 'newsletters' && $selected_child == 'view' ? ' class="selected"' : '') . '><span class="square"></span>View Newsletters</a>
-            <a href= "' . $base_url . '/newsletter_system/newsletter.php"' . ($selected == 'newsletters' && $selected_child == 'manage' ? ' class="selected"' : '') . '><span class="square"></span>Create Newsletter</a>
-            <a href= "' . $base_url . '/newsletter_system/subscribers.php"' . ($selected == 'newsletters' && $selected_child == 'subscribers' ? ' class="selected"' : '') . '><span class="square"></span>Subscribers</a>
-            <a href= "' . $base_url . '/newsletter_system/sendmail.php"' . ($selected == 'newsletters' && $selected_child == 'sendmail' ? ' class="selected"' : '') . '><span class="square"></span>Send Mail</a>
+            <a href= "' . $base_url . '/newsletter_system/newsletters.php"' . ($selected == 'newsletters' && $selected_child == 'view' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>View Newsletters</a>
+            <a href= "' . $base_url . '/newsletter_system/newsletter.php"' . ($selected == 'newsletters' && $selected_child == 'manage' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Create Newsletter</a>
+            <a href= "' . $base_url . '/newsletter_system/campaigns.php"' . ($selected == 'campaigns' || ($selected == 'newsletters' && $selected_child == 'campaigns') ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Campaigns</a>
+            <a href= "' . $base_url . '/newsletter_system/subscribers.php"' . ($selected == 'newsletters' && $selected_child == 'subscribers' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Subscribers</a>
+            <a href= "' . $base_url . '/newsletter_system/sendmail.php"' . ($selected == 'newsletters' && $selected_child == 'sendmail' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Send Mail</a>
         </div>
 
             

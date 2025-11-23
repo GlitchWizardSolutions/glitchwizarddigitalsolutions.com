@@ -5,11 +5,11 @@ $noted      = 'public_html/admin/resource_system/error-logs.php';
 
 // Connect to the On the Go Database using the PDO interface
 try {
-	$error_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name9 . ';charset=' . db_charset, db_user9, db_pass);
+	$error_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name9 . ';charset=' . db_charset, db_user9, db_pass9);
 	$error_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $exception) {
 	// If there is an error with the connection, stop the script and display the error.
-	exit('! Failed to connect to the on the error handling database!');
+	exit('Failed to connect to the error handling database: ' . $exception->getMessage());
 }
  
 //$stmt =$error_db->prepare('SELECT * FROM error_handling ORDER BY "id" LIMIT 1');

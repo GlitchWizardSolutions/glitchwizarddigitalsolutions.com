@@ -1,6 +1,14 @@
 <?php
 require 'assets/includes/admin_config.php';
 include_once '../assets/includes/components.php';
+
+// Num format function for newsletter system
+if (!function_exists('num_format')) {
+    function num_format($num, $decimals = 0, $decimal_separator = '.', $thousands_separator = ',') {
+        return number_format(empty($num) || $num == null || !is_numeric($num) ? 0 : $num, $decimals, $decimal_separator, $thousands_separator);
+    }
+}
+
 // Retrieve the campaign from the database
 $stmt = $pdo->prepare('SELECT 
     c.*, 
@@ -136,7 +144,7 @@ if (isset($_GET['send'])) {
                     return '../' . $attachment;
                 }, $attachments);
                 // Attempt to send the newsletter
-                $response = send_mail(mail_from, mail_from_name, $recipient['email'], $newsletter['title'], $content, $attachments);
+                $response = admin_sendmail(mail_from, mail_from_name, $recipient['email'], $newsletter['title'], $content, $attachments);
                 // If the newsletter was sent successfully
                 if ($response == 'success') {
                     $stmt = $pdo->prepare('UPDATE campaign_items ci SET ci.update_date = ?, ci.status = "Completed", ci.fail_text = "" WHERE ci.id = ?');

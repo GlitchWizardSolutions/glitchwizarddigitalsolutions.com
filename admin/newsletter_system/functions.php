@@ -17,10 +17,12 @@ function send_confirmation_email($email, $id) {
 }
 // Send mail function
 function admin_sendmail($from, $name, $to, $subject, $content, $attachments = []) {
-	// Include PHPMailer library
-	require_once 'lib/phpmailer/Exception.php';
-	require_once 'lib/phpmailer/PHPMailer.php';
-	require_once 'lib/phpmailer/SMTP.php';
+	// Include PHPMailer library only if not already loaded
+	if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
+		require_once 'lib/phpmailer/Exception.php';
+		require_once 'lib/phpmailer/PHPMailer.php';
+		require_once 'lib/phpmailer/SMTP.php';
+	}
     // Create an instance; passing `true` enables exceptions
     $mail = new PHPMailer(true);
     // Try to send the mail 

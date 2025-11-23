@@ -1,6 +1,14 @@
 <?php
 require 'assets/includes/admin_config.php';
 include_once '../assets/includes/components.php';
+
+// Num format function for newsletter system
+if (!function_exists('num_format')) {
+    function num_format($num, $decimals = 0, $decimal_separator = '.', $thousands_separator = ',') {
+        return number_format(empty($num) || $num == null || !is_numeric($num) ? 0 : $num, $decimals, $decimal_separator, $thousands_separator);
+    }
+}
+
 // Delete campaign
 if (isset($_GET['delete'])) {
     $stmt = $pdo->prepare('DELETE c, ci, cc, co, cu FROM campaigns c LEFT JOIN campaign_items ci ON ci.campaign_id = c.id LEFT JOIN campaign_clicks cc ON cc.campaign_id = c.id LEFT JOIN campaign_opens co ON co.campaign_id = c.id LEFT JOIN campaign_unsubscribes cu ON cu.campaign_id = c.id WHERE c.id = ?');
@@ -114,9 +122,17 @@ $url = 'campaigns.php?search_query=' . $search . (isset($_GET['status']) ? '&sta
 <?php endif; ?>
 
 <div class="content-header responsive-flex-column pad-top-5">
-    <a href="campaign.php" class="btn btn-success">
+    <a href="campaign.php" class="btn btn-primary">
         <svg class="icon-left" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
         Create Campaign
+    </a>
+    <a href="campaigns_import.php" class="btn btn-primary">
+        <svg class="icon-left" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M288 109.3V352c0 17.7-14.3 32-32 32s-32-14.3-32-32V109.3l-73.4 73.4c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l128-128c12.5-12.5 32.8-12.5 45.3 0l128 128c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L288 109.3zM64 352H192c0 35.3 28.7 64 64 64s64-28.7 64-64H448c35.3 0 64 28.7 64 64v32c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V416c0-35.3 28.7-64 64-64zM432 456a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
+        Bulk Import
+    </a>
+    <a href="campaigns_export.php" class="btn btn-primary">
+        <svg class="icon-left" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
+        Bulk Export
     </a>
     <form action="campaigns.php" method="get">
         <div class="filters">
@@ -179,7 +195,7 @@ $url = 'campaigns.php?search_query=' . $search . (isset($_GET['status']) ? '&sta
 
 <div class="content-block no-pad">
     <div class="table">
-        <table class="ajax-update">
+        <table>
             <thead>
                 <tr>
                     <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=title'?>">Title<?=$order_by=='title' ? $table_icons[strtolower($order)] : ''?></a></td>
@@ -257,20 +273,19 @@ $url = 'campaigns.php?search_query=' . $search . (isset($_GET['status']) ? '&sta
                             </div>
                         </div>
                     </td>
-                    <td class="responsive-hidden status-container">
+                    <td class="responsive-hidden">
                         <?php if ($campaign['status'] == 'Completed'): ?>
-                        <span class="green small">Completed</span>
+                        <span class="green">Completed</span>
+                        <?php elseif ($campaign['status'] == 'Active'): ?>
+                        <span class="green">Active</span>
+                        <?php elseif ($campaign['status'] == 'Inactive'): ?>
+                        <span class="gray">Inactive</span>
+                        <?php elseif ($campaign['status'] == 'Paused'): ?>
+                        <span class="orange">Paused</span>
+                        <?php elseif ($campaign['status'] == 'Cancelled'): ?>
+                        <span class="red">Cancelled</span>
                         <?php else: ?>
-                        <div class="status" data-id="<?=$campaign['id']?>">
-                            <span title="<?=htmlspecialchars($campaign['status'], ENT_QUOTES)?>" class="<?=strtolower(htmlspecialchars($campaign['status'], ENT_QUOTES))?>"></span>
-                            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7,10L12,15L17,10H7Z" /></svg>
-                            <div class="status-dropdown">
-                                <a href="#" data-value="Active" data-id="<?=$campaign['id']?>">Active</a>
-                                <a href="#" data-value="Inactive" data-id="<?=$campaign['id']?>">Inactive</a>
-                                <a href="#" data-value="Paused" data-id="<?=$campaign['id']?>">Pause</a>
-                                <a href="#" data-value="Cancelled" data-id="<?=$campaign['id']?>" class="red">Cancel</a>
-                            </div>
-                        </div>
+                        <span><?=htmlspecialchars($campaign['status'], ENT_QUOTES)?></span>
                         <?php endif; ?>
                     </td>
                     <td class="alt"><?=date('F j, Y H:ia', strtotime($campaign['submit_date']))?></td>
@@ -323,4 +338,10 @@ $url = 'campaigns.php?search_query=' . $search . (isset($_GET['status']) ? '&sta
     <?php endif; ?>
 </div>
 
-<?=template_admin_footer()?>
+<?=template_admin_footer('
+<link href="' . $base_url . '/newsletter_system/admin.css" rel="stylesheet" type="text/css">
+<script src="' . $base_url . '/newsletter_system/admin.js"></script>
+<script>
+if (typeof initTableDropdown === "function") initTableDropdown();
+</script>
+')?>
