@@ -76,17 +76,16 @@ function emoticons($text){
 }//function exists
 if (!function_exists('post_author')){
 function post_author($author_id){
-    include "config.php";
+    global $blog_pdo;
     
     $author = '-';
     
-    $queryauthp = mysqli_query($connect, "SELECT username FROM `users` WHERE id='$author_id' LIMIT 1");
-    $countauthp = mysqli_num_rows($queryauthp);
+    $stmt = $blog_pdo->prepare("SELECT username FROM users WHERE id = ? LIMIT 1");
+    $stmt->execute([$author_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($countauthp > 0) {
-    
-        $rowauthp = mysqli_fetch_assoc($queryauthp);
-        $author   = $rowauthp['username'];
+    if ($result) {
+        $author = $result['username'];
     }
  
     return $author;
@@ -94,17 +93,16 @@ function post_author($author_id){
 }//function exists
 if (!function_exists('post_title')){
 function post_title($post_id){
-    include 'config.php';
+    global $blog_pdo;
     
     $title = '-';
     
-    $querytitlep = mysqli_query($connect, "SELECT title FROM `posts` WHERE id='$post_id' LIMIT 1");
-    $counttitlep = mysqli_num_rows($querytitlep);
+    $stmt = $blog_pdo->prepare("SELECT title FROM posts WHERE id = ? LIMIT 1");
+    $stmt->execute([$post_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($counttitlep > 0) {
-    
-        $rowtitlep = mysqli_fetch_assoc($querytitlep);
-        $title     = $rowtitlep['title'];
+    if ($result) {
+        $title = $result['title'];
     }
  
     return $title;
@@ -112,16 +110,16 @@ function post_title($post_id){
 }//function exists
 if (!function_exists('post_category')){
 function post_category($category_id){
-    include "config.php";
+    global $blog_pdo;
     
     $category = '-';
 
-    $querycat = mysqli_query($connect, "SELECT category FROM `categories` WHERE id='$category_id' LIMIT 1");
-    $countcat = mysqli_num_rows($querycat);
+    $stmt = $blog_pdo->prepare("SELECT category FROM categories WHERE id = ? LIMIT 1");
+    $stmt->execute([$category_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($countcat > 0) {
-        $rowcat   = mysqli_fetch_assoc($querycat);
-        $category = $rowcat['category'];
+    if ($result) {
+        $category = $result['category'];
     }
  
     return $category;
@@ -129,16 +127,16 @@ function post_category($category_id){
 }//function exists
 if (!function_exists('post_slug')){
 function post_slug($post_id){
-    include "config.php";
+    global $blog_pdo;
     
     $post_slug = '';
 
-    $querypost = mysqli_query($connect, "SELECT slug FROM `posts` WHERE id='$post_id' LIMIT 1");
-    $countpost = mysqli_num_rows($querypost);
+    $stmt = $blog_pdo->prepare("SELECT slug FROM posts WHERE id = ? LIMIT 1");
+    $stmt->execute([$post_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($countpost > 0) {
-        $rowpost   = mysqli_fetch_assoc($querypost);
-        $post_slug = $rowpost['slug'];
+    if ($result) {
+        $post_slug = $result['slug'];
     }
  
     return $post_slug;
@@ -146,49 +144,52 @@ function post_slug($post_id){
 }//function exists
 if (!function_exists('post_categoryslug')){
 function post_categoryslug($category_id){
-    include "config.php";
+    global $blog_pdo;
     
     $category_slug = '';
 
-    $querycat = mysqli_query($connect, "SELECT slug FROM `categories` WHERE id='$category_id' LIMIT 1");
-    $countcat = mysqli_num_rows($querycat);
+    $stmt = $blog_pdo->prepare("SELECT slug FROM categories WHERE id = ? LIMIT 1");
+    $stmt->execute([$category_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($countcat > 0) {
-        $rowcat   = mysqli_fetch_assoc($querycat);
-        $category_slug = $rowcat['slug'];
+    if ($result) {
+        $category_slug = $result['slug'];
     }
  
     return $category_slug;
 }
 }//function exists
 if (!function_exists('post_commentscount')){
-function post_commentscount($post_id){
-    include "config.php";
+function post_commentscount($post_id, $blog_pdo = null){
+    global $blog_pdo;
     
     $comments_count = '0';
 
-    $querycc = mysqli_query($connect, "SELECT id FROM `comments` WHERE post_id='$post_id'");
-    $countc  = mysqli_num_rows($querycc);
-
-    $comments_count = $countc;
+    $stmt = $blog_pdo->prepare("SELECT COUNT(id) as count FROM comments WHERE post_id = ?");
+    $stmt->execute([$post_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $comments_count = $result['count'];
  
     return $comments_count;
 }
 }//function exists
 if (!function_exists('head')){
 function head(){
-    include 'config.php';
+    global $blog_pdo, $settings;
     if (!isset($_SESSION['sec-username'])) {
         $logged = 'No';
     } else {
         
         $username = $_SESSION['sec-username'];
         
-        $querych = mysqli_query($connect, "SELECT * FROM `users` WHERE username='$username' LIMIT 1");
-        if (mysqli_num_rows($querych) == 0) {
+        $stmt = $blog_pdo->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
+        $stmt->execute([$username]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$result) {
             $logged = 'No';
         } else {
-            $rowusers   = $querych->fetch_array();
+            $rowusers = $result;
             $logged = 'Yes';
         }
     }
@@ -264,12 +265,14 @@ $rtl = $settings['rtl'] ?? 'off';
             exit;
         }
         
-        $runpt = mysqli_query($connect, "SELECT title, slug, image, content FROM `posts` WHERE slug='$slug'");
-        if (mysqli_num_rows($runpt) == 0) {
+        $stmt = $blog_pdo->prepare("SELECT title, slug, image, content FROM posts WHERE slug = ?");
+        $stmt->execute([$slug]);
+        $rowpt = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$rowpt) {
             echo '<meta http-equiv="refresh" content="0; url=blog">';
             exit;
         }
-        $rowpt = mysqli_fetch_assoc($runpt);
         
         $pagetitle   = $rowpt['title'];
 		$description = short_text(strip_tags(html_entity_decode($rowpt['content'])), 150);
@@ -295,12 +298,14 @@ $rtl = $settings['rtl'] ?? 'off';
             exit;
         }
         
-        $runpp = mysqli_query($connect, "SELECT title, content FROM `pages` WHERE slug='$slug'");
-        if (mysqli_num_rows($runpp) == 0) {
+        $stmt = $blog_pdo->prepare("SELECT title, content FROM pages WHERE slug = ?");
+        $stmt->execute([$slug]);
+        $rowpp = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$rowpp) {
             echo '<meta http-equiv="refresh" content="0; url=' . $settings['site_url'] . '">';
             exit;
         }
-        $rowpp = mysqli_fetch_assoc($runpp);
         
         $pagetitle   = $rowpp['title'];
 		$description = short_text(strip_tags(html_entity_decode($rowpp['content'])), 150);
@@ -313,12 +318,14 @@ $rtl = $settings['rtl'] ?? 'off';
             exit;
         }
         
-        $runct = mysqli_query($connect, "SELECT category FROM `categories` WHERE slug='$slug'");
-        if (mysqli_num_rows($runct) == 0) {
+        $stmt = $blog_pdo->prepare("SELECT category FROM categories WHERE slug = ?");
+        $stmt->execute([$slug]);
+        $rowct = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$rowct) {
             echo '<meta http-equiv="refresh" content="0; url=blog">';
             exit;
         }
-        $rowct = mysqli_fetch_assoc($runct);
         
         $pagetitle   = $rowct['category'];
 		$description = 'View all blog posts from ' . $rowct['category'] . ' category.';
@@ -483,8 +490,9 @@ if ($rowusers['role'] == 'Admin') {
 				</ul>
 <?php
 if ($rowusers['role'] == 'Admin') {
-	$msgcount_query  = mysqli_query($connect, "SELECT id FROM messages WHERE viewed = 'No'");
-	$unread_messages = mysqli_num_rows($msgcount_query);
+	$stmt = $blog_pdo->prepare("SELECT id FROM messages WHERE viewed = 'No'");
+	$stmt->execute();
+	$unread_messages = $stmt->rowCount();
 ?>
 			
 			<a class="nav-link text-secondary" href="../admin/blog/messages.php">
@@ -579,8 +587,8 @@ if ($settings['layout'] == 'Wide') {
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav me-auto">
 <?php
-	$runq       = mysqli_query($connect, "SELECT * FROM `menu`");
-    while ($row = mysqli_fetch_assoc($runq)) {
+	$stmt = $blog_pdo->query("SELECT * FROM menu");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
         if ($row['path'] == 'blog') {
 			
@@ -595,8 +603,8 @@ if ($settings['layout'] == 'Wide') {
 						</a>
 						<ul class="dropdown-menu">
 							<li><a class="dropdown-item" href="blog">View all posts</a></li>';
-            $run2 = mysqli_query($connect, "SELECT * FROM `categories` ORDER BY category ASC");
-            while ($row2 = mysqli_fetch_array($run2)) {
+            $stmt2 = $blog_pdo->query("SELECT * FROM categories ORDER BY category ASC");
+            while ($row2 = $stmt2->fetch(PDO::FETCH_ASSOC)) {
                 echo '		<li><a class="dropdown-item" href="category?name=' . $row2['slug'] . '"><i class="fas fa-chevron-right"></i> ' . $row2['category'] . '</a></li>';
             }
             echo '		</ul>
@@ -697,12 +705,12 @@ if ($settings['layout'] == 'Wide') {
                     <div class="marquee-content">
                     <?php /*    This is scrolling text. It's accessible and standards-compliant! */?>
                       <?php
-                        $run   = mysqli_query($connect, "SELECT * FROM `posts` WHERE active='Yes' ORDER BY id DESC LIMIT 6");
-                        $count = mysqli_num_rows($run);
-                        if ($count <= 0) {
+                        $stmt = $blog_pdo->query("SELECT * FROM posts WHERE active='Yes' ORDER BY id DESC LIMIT 6");
+                        $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        if (count($posts) == 0) {
                              echo 'There are no published posts';
                         } else {
-                            while ($row = mysqli_fetch_assoc($run)) {
+                            foreach ($posts as $row) {
                                 echo '<a href="post?name=' . $row['slug'] . '">' . $row['title'] . '</a>
                                 &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;';
                             }
@@ -726,8 +734,8 @@ if ($settings['layout'] == 'Wide') {
 ?> mt-3">
 	
 <?php
-$run = mysqli_query($connect, "SELECT * FROM `widgets` WHERE position = 'header' ORDER BY id ASC");
-while ($row = mysqli_fetch_assoc($run)) {
+$stmt = $blog_pdo->query("SELECT * FROM widgets WHERE position = 'header' ORDER BY id ASC");
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     echo '
 		<div class="card mb-3">
 			<div class="card-header">' . $row['title'] . '</div>
@@ -745,8 +753,11 @@ while ($row = mysqli_fetch_assoc($run)) {
 /**
  * Get avatar, author name, and badge for a comment author.
  *
- * @param mysqli $connect The database connection
- * @param string $user_id The username or user ID from the comment
+ * @param PDO $blog_pdo The blog database PDO connection
+ * @param PDO $pdo The main database PDO connection
+ * @param string $username The username from the comment
+ * @param string $user_id The user ID from the comment
+ * @param string $account_id The account ID from the comment
  * @param string $guest 'Yes' if the user is a guest, otherwise 'No'
  * @return array Associative array with 'avatar', 'author', and 'badge'
  */
@@ -817,7 +828,7 @@ function get_user_avatar_info($blog_pdo, $pdo, string $username, string $user_id
 if (!function_exists('sidebar')){
 function sidebar() {
 	
-    include "config.php";
+    global $blog_pdo, $settings;
 ?>
 			<div id="sidebar" class="col-md-4">
 
@@ -826,11 +837,12 @@ function sidebar() {
 					<div class="card-body">
 						<ul class="list-group">
 <?php
-    $runq = mysqli_query($connect, "SELECT * FROM `categories` ORDER BY category ASC");
-    while ($row = mysqli_fetch_assoc($runq)) {
+    $stmt = $blog_pdo->query("SELECT * FROM categories ORDER BY category ASC");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $category_id = $row['id'];
-        $postc_query = mysqli_query($connect, "SELECT id FROM `posts` WHERE category_id = '$category_id' AND active = 'Yes'");
-		$posts_count = mysqli_num_rows($postc_query);
+        $stmt_count = $blog_pdo->prepare("SELECT id FROM posts WHERE category_id = ? AND active = 'Yes'");
+        $stmt_count->execute([$category_id]);
+		$posts_count = $stmt_count->rowCount();
         echo '
 							<a href="category?name=' . $row['slug'] . '">
 								<li class="list-group-item d-flex justify-content-between align-items-center">
@@ -864,12 +876,12 @@ function sidebar() {
 						<div class="tab-content">
 							<div id="popular" class="tab-pane fade show active">
 <?php
-    $run   = mysqli_query($connect, "SELECT * FROM `posts` WHERE active='Yes' ORDER BY views, id DESC LIMIT 4");
-    $count = mysqli_num_rows($run);
-    if ($count <= 0) {
+    $stmt = $blog_pdo->query("SELECT * FROM posts WHERE active='Yes' ORDER BY views, id DESC LIMIT 4");
+    $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (count($posts) == 0) {
         echo '<div class="alert alert-info">There are no published posts</div>';
     } else {
-        while ($row = mysqli_fetch_assoc($run)) {
+        foreach ($posts as $row) {
             
             $image = "";
             if($row['image'] != "") {
@@ -906,12 +918,12 @@ function sidebar() {
 							</div>
 							<div id="commentss" class="tab-pane fade">
 <?php
-    $query = mysqli_query($connect, "SELECT * FROM `comments` WHERE approved='Yes' ORDER BY `id` DESC LIMIT 4");
-    $cmnts = mysqli_num_rows($query);
-    if ($cmnts == "0") {
+    $stmt = $blog_pdo->query("SELECT * FROM comments WHERE approved='Yes' ORDER BY id DESC LIMIT 4");
+    $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (count($comments) == 0) {
         echo "There are no comments";
     } else {
-        while ($row = mysqli_fetch_array($query)) {
+        foreach ($comments as $row) {
 			
 			$badge = '';
 			$acuthor = $row['user_id'];
@@ -919,17 +931,19 @@ function sidebar() {
                 $acavatar = 'assets/img/avatar.png';
 				$badge = ' <span class="badge bg-secondary">Guest</span>';
             } else {
-                $querych = mysqli_query($connect, "SELECT * FROM `users` WHERE id='$acuthor' LIMIT 1");
-                if (mysqli_num_rows($querych) > 0) {
-                    $rowch = mysqli_fetch_assoc($querych);
-                    
+                $stmt_user = $blog_pdo->prepare("SELECT * FROM users WHERE id = ? LIMIT 1");
+                $stmt_user->execute([$acuthor]);
+                $rowch = $stmt_user->fetch(PDO::FETCH_ASSOC);
+                
+                if ($rowch) {
                     $acavatar = $rowch['avatar'];
                     $acuthor = $rowch['username'];
                 }
             }
 			
-            $query2 = mysqli_query($connect, "SELECT * FROM `posts` WHERE active='Yes' AND id='$row[post_id]'");
-            while ($row2 = mysqli_fetch_array($query2)) {
+            $stmt_post = $blog_pdo->prepare("SELECT * FROM posts WHERE active='Yes' AND id = ?");
+            $stmt_post->execute([$row['post_id']]);
+            while ($row2 = $stmt_post->fetch(PDO::FETCH_ASSOC)) {
 				echo '
 								<div class="mb-2 d-flex flex-start align-items-center bg-light rounded border">
 									<a href="post?name=' . $row2['slug'] . '#comments" class="ms-2">
@@ -976,12 +990,15 @@ function sidebar() {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             echo '<div class="alert alert-danger">The entered E-Mail Address is invalid</div>';
         } else {
-            $queryvalid = mysqli_query($connect, "SELECT * FROM `newsletter` WHERE email='$email' LIMIT 1");
-            $validator  = mysqli_num_rows($queryvalid);
-            if ($validator > 0) {
+            $stmt = $blog_pdo->prepare("SELECT * FROM newsletter WHERE email = ? LIMIT 1");
+            $stmt->execute([$email]);
+            $validator = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($validator) {
                 echo '<div class="alert alert-warning">This E-Mail Address is already subscribed.</div>';
             } else {
-                $run = mysqli_query($connect, "INSERT INTO `newsletter` (email) VALUES ('$email')");
+                $stmt_insert = $blog_pdo->prepare("INSERT INTO newsletter (email) VALUES (?)");
+                $stmt_insert->execute([$email]);
                 echo '<div class="alert alert-success">You have successfully subscribed to our newsletter.</div>';
             }
         }
@@ -990,8 +1007,8 @@ function sidebar() {
 				</div>
 
 <?php
-    $run = mysqli_query($connect, "SELECT * FROM `widgets` WHERE position = 'sidebar' ORDER BY id ASC");
-    while ($row = mysqli_fetch_assoc($run)) {
+    $stmt = $blog_pdo->query("SELECT * FROM widgets WHERE position = 'sidebar' ORDER BY id ASC");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         echo '	
 				<div class="card mt-3">
 					  <div class="card-header">' . $row['title'] . '</div>
@@ -1009,7 +1026,7 @@ function sidebar() {
 }//function exists
 if (!function_exists('footer')){
 function footer(){
-    include 'config.php';
+    global $settings, $phpblog_version;
 	echo '<footer class="footer border-top px-4 py-3 mt-3" style="background:#BFA4EF;">
 		<div class="row">
 			<div class="col-md-4 mb-3">

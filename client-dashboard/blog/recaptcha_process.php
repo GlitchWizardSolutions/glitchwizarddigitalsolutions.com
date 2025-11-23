@@ -62,7 +62,8 @@ if ($verification['success'] && $verification['score'] >= 0.5) {
                         $success = 'Your comment has been successfully posted.';
                         $success_encoded = urlencode($error);
     
-                        $runq = mysqli_query($connect, "INSERT INTO `comments` (`post_id`, `comment`, `user_id`, `date`, `time`, `guest`, `ip`) VALUES ('$row[id]', '$comment', '$author', '$date', '$time', '$guest', $remoteIp)");
+                        $stmt = $blog_pdo->prepare("INSERT INTO comments (post_id, comment, user_id, date, time, guest, ip) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([$row['id'], $comment, $author, $date, $time, $guest, $remoteIp]);
                         $errors=$errors . ' Insert Comment Complete. ';
                         header("Location: post?name=$slug&success=$success_encoded#comments");
                         exit;

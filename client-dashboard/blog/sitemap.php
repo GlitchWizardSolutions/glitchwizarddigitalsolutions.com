@@ -1,9 +1,10 @@
 <?php
 //This is redundant for a sitemap, likely won't be checked by crawlers since there is an xml file produced with chron.
 //If this code is reused in another application that does not use auto updates, include this file.
+include 'core.php';
 header('Content-type: application/xml');
 
-$get_result = mysqli_query($connect, "SELECT * FROM `menu` WHERE path != 'index.php'");
+$stmt = $blog_pdo->query("SELECT * FROM menu WHERE path != 'index.php'");
 
 echo "<?xml version='1.0' encoding='UTF-8'?>"."\n";
 echo "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>"."\n";
@@ -14,7 +15,7 @@ echo "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>"."\n";
 	echo "<priority>1.0</priority>";
 	echo "</url>";
 
-while($link = mysqli_fetch_array($get_result)) {
+while($link = $stmt->fetch(PDO::FETCH_ASSOC)) {
 	echo "<url>";
 	echo '<loc>' . $settings['site_url'] . '/' . $link['path'] . '</loc>';
 	echo "<changefreq>always</changefreq>";
@@ -22,8 +23,8 @@ while($link = mysqli_fetch_array($get_result)) {
 	echo "</url>";
 }
 
-$categories = mysqli_query($connect, "SELECT * FROM `categories`");
-while($cat = mysqli_fetch_array($categories)) {
+$stmt_cat = $blog_pdo->query("SELECT * FROM categories");
+while($cat = $stmt_cat->fetch(PDO::FETCH_ASSOC)) {
 	echo "<url>";
 	echo '<loc>' . $settings['site_url'] . '/category?name=' . $cat['slug'] . '</loc>';
 	echo "<changefreq>always</changefreq>";

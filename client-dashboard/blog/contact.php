@@ -87,7 +87,8 @@ if (isset($_POST['send'])) {
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 echo '<div class="alert alert-danger">The entered E-Mail Address is invalid.</div>';
             } else {
-                $query = mysqli_query($connect, "INSERT INTO messages (name, email, content, date, time) VALUES('$name','$email','$content','$date','$time')");
+                $stmt = $blog_pdo->prepare("INSERT INTO messages (name, email, content, date, time) VALUES(?, ?, ?, ?, ?)");
+                $stmt->execute([$name, $email, $content, $date, $time]);
                 echo '<div class="alert alert-success">Your message has been sent successfully.</div>';
             }
         }
