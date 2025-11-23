@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Connect to the On the Go Database using the PDO interface
 try {
 	$onthego_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name2 . ';charset=' . db_charset, db_user, db_pass);
@@ -67,9 +68,15 @@ if (isset($_GET['success_msg'])) {
 $url = 'financial-institutions.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' . $_GET['page_id'] : '');
 ?>
 <?=template_admin_header('Financial Institutions', 'resources', 'cards')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Financial Institutions']
+])?>
+
 <div class="content-title">
     <div class="title">
-     <i class="fa-solid fa-user-secret"></i>
+       <i class="fa-solid fa-credit-card"></i>
         <div class="txt">
             <h2>Financial Institutions</h2>
             <p>Bank & Card Data</p>
@@ -87,7 +94,7 @@ $url = 'financial-institutions.php?search=' . $search . (isset($_GET['page_id'])
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="financial-institution.php" class="btn">+ Create Financial Record</a>
+        <a href="financial-institution.php" class="btn btn-primary">+ Create Financial Institution</a>
         <a href="financial-institution-impt.php" class="btn mar-left-1">Import</a>
         <a href="financial-institution-expt.php" class="btn mar-left-1">Export</a>
     </div>

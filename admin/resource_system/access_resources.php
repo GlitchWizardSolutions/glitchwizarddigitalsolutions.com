@@ -6,6 +6,7 @@ Would like to bring the project name from another table, just as the project_id 
 Prevent inserting duplicate record
 */
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 try {
 	$access_resource = new PDO('mysql:host=' . db_host . ';dbname=' . db_name5 . ';charset=' . db_charset, db_user, db_pass);
 	$access_resource->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -71,12 +72,17 @@ $url = 'access_resources.php?search=' . $search . (isset($_GET['page_id']) ? '&p
 ?>
 <?=template_admin_header('Access Resources', 'secret', 'access')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Access Resources']
+])?>
+
 <div class="content-title">
     <div class="title">
-     <i class="fa-solid fa-user-secret"></i>
+       <i class="fa-solid fa-key"></i>
         <div class="txt">
             <h2>Access Resources</h2>
-           
+            <p>Manage database and hosting access credentials</p>
         </div>
     </div>
 </div>
@@ -91,7 +97,7 @@ $url = 'access_resources.php?search=' . $search . (isset($_GET['page_id']) ? '&p
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="access_resource.php" class="btn">+ Create Access</a>
+        <a href="access_resource.php" class="btn btn-primary">+ Create Access Resource</a>
         <a href="access_resource_impt.php" class="btn mar-left-1">Import</a>
         <a href="access_resource_expt.php" class="btn mar-left-1">Export</a>
     </div>

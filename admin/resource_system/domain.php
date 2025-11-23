@@ -5,6 +5,7 @@ This means accessing the login database.
 
 */
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
  
 
 try {
@@ -75,12 +76,18 @@ if (isset($_GET['id'])) {
 ?>
 <?=template_admin_header($page . ' Domains', 'resources', 'domains')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Domains', 'url' => 'domains.php'],
+    ['label' => $page . ' Domain']
+])?>
+
 <div class="content-title">
     <div class="title">
-     <i class="fa-solid fa-user-secret"></i>
+       <i class="fa-solid fa-globe"></i>
         <div class="txt">
-             <h2 class="responsive-width-100"><?=$page?> Record</h2>
-            <p>Domains Data</p>
+             <h2 class="responsive-width-100"><?=$page?> Domain</h2>
+            <p>Domain registration and renewal information</p>
         </div>
     </div>
 </div>
@@ -146,11 +153,11 @@ if (isset($_GET['id'])) {
 
     </div>
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="domains.php" class="btn alt mar-right-2">Cancel</a>
+        <a href="domains.php" class="btn btn-secondary mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
+        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 </form>
 <script src="assets/js/resource-system-script.js"></script>

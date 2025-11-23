@@ -55,9 +55,15 @@ $client_projects = $stmt->fetchALL(PDO::FETCH_ASSOC);
 $copy="";
 ?>
     <?=template_admin_header('Accounts', 'accounts', 'view')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Client Accounts', 'url' => 'accounts.php'],
+    ['label' => htmlspecialchars($record['username'], ENT_QUOTES)]
+])?>
+
 <div class="content-title">
     <div class="title">
-       <i class="fa-solid fa-circle-info"></i>
+       <i class="fa-solid fa-file-invoice-dollar"></i>
         <div class="txt">
             <h2>Member <?=htmlspecialchars($record['username'], ENT_QUOTES)?></h2>
             <p><?=$page . ' Record # ' ?> <?=$record['id']?></p>
@@ -75,9 +81,9 @@ $copy="";
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="accounts.php" class="btn" style='color:white; background:grey'>Return</a>
-        <a href="account.php?id=<?=$record['id']?>" class="btn" style='color:white; background:green'>Edit</a>
-        <a href="accounts.php?delete=<?=$record['id']?>" style='color:white; background:red' onclick="return confirm('Are you sure you want to delete this record?')" class="btn">Delete</a>
+        <a href="accounts.php" class="btn btn-secondary">Return</a>
+        <a href="account.php?id=<?=$record['id']?>" class="btn btn-primary">Edit</a>
+        <a href="accounts.php?delete=<?=$record['id']?>" onclick="return confirm('Are you sure you want to delete this record?')" class="btn btn-danger">Delete</a>
     </div>
 </div>
 <div class="content-block"  style="background:#7F50AB">
@@ -310,5 +316,4 @@ $copy="";
         </table>
     </div>
 </div>
-<script src="assets/js/resource-system-script.js"></script>
 <?=template_admin_footer()?>

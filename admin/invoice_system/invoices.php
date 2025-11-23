@@ -190,7 +190,7 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
 <?php endif; ?>
 
 <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-    <a href="invoice.php" class="btn btn-success">+ Invoice</a>&nbsp;&nbsp;
+    <a href="invoice.php" class="btn btn-primary">+ Invoice</a>&nbsp;&nbsp;
     <a href="invoices_import.php" class="btn btn-primary">Import</a>&nbsp;&nbsp;
     <a href="invoices_export.php" class="btn btn-primary">Export</a>
 </div>

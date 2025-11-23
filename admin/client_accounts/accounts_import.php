@@ -57,15 +57,17 @@ if (isset($_FILES['file']) && !empty($_FILES['file']['tmp_name'])) {
 <?=template_admin_header('Import Accounts', 'accounts', 'import')?>
 
 <?=generate_breadcrumbs([
-    ['label' => 'Accounts', 'url' => 'accounts.php'],
+    ['label' => 'Client Accounts', 'url' => 'accounts.php'],
     ['label' => 'Import Accounts']
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_upload()?></div>
-    <div class="txt">
-        <h2>Import Client Accounts</h2>
-        <p class="subtitle">Upload CSV, JSON, XML, or TXT file to import accounts</p>
+    <div class="title">
+       <i class="fa-solid fa-file-import"></i>
+        <div class="txt">
+            <h2>Import Client Accounts</h2>
+            <p>Upload CSV, JSON, XML, or TXT file to import accounts</p>
+        </div>
     </div>
 </div>
 

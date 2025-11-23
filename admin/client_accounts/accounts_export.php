@@ -90,15 +90,17 @@ if (isset($_POST['file_type'])) {
 <?=template_admin_header('Export Accounts', 'accounts', 'export')?>
 
 <?=generate_breadcrumbs([
-    ['label' => 'Accounts', 'url' => 'accounts.php'],
+    ['label' => 'Client Accounts', 'url' => 'accounts.php'],
     ['label' => 'Export Accounts']
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_download()?></div>
-    <div class="txt">
-        <h2>Export Client Accounts</h2>
-        <p class="subtitle">Download account data as CSV, JSON, XML, or TXT</p>
+    <div class="title">
+       <i class="fa-solid fa-file-export"></i>
+        <div class="txt">
+            <h2>Export Client Accounts</h2>
+            <p>Download account data as CSV, JSON, XML, or TXT</p>
+        </div>
     </div>
 </div>
 

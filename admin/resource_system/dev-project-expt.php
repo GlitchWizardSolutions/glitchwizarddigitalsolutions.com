@@ -96,7 +96,7 @@ if (isset($_POST['file_type'])) {
 
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
         <a href="dev-projects.php" class="btn alt mar-right-2">Cancel</a>
-        <input type="submit" name="submit" value="Export" class="btn">
+        <input type="submit" name="submit" value="Export" class="btn btn-success">
     </div>
 
     <div class="content-block">

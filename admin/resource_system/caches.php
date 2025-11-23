@@ -112,7 +112,7 @@ $url = 'caches.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' .
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="cache.php" class="btn">+ Create New Cache Item</a>
+        <a href="cache.php" class="btn btn-primary">+ Create Cache Item</a>
     </div>
     <form action="" method="get">
         <div class="search">

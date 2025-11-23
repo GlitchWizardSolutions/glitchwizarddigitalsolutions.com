@@ -6,6 +6,7 @@ Would like to bring the project name from another table, just as the project_id 
 Prevent inserting duplicate record
 */
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 try {
 	$login_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name . ';charset=' . db_charset, db_user, db_pass); 
 	$login_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -71,12 +72,17 @@ $url = 'project-types.php?search=' . $search . (isset($_GET['page_id']) ? '&page
 ?>
 <?=template_admin_header('Project Types', 'resources', 'types')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Project Types']
+])?>
+
 <div class="content-title">
     <div class="title">
-     <i class="fa-solid fa-user-secret"></i>
+       <i class="fa-solid fa-layer-group"></i>
         <div class="txt">
-            <h2>Maintain Project Types</h2>
-           
+            <h2>Project Types</h2>
+            <p>Manage project type categories and rates</p>
         </div>
     </div>
 </div>
@@ -91,7 +97,7 @@ $url = 'project-types.php?search=' . $search . (isset($_GET['page_id']) ? '&page
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="project-type.php" class="btn"> + Create Project Type</a>
+        <a href="project-type.php" class="btn btn-primary">+ Create Project Type</a>
     </div>
     <form action="" method="get">
         <div class="search">

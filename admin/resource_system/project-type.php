@@ -80,11 +80,11 @@ if (isset($_GET['id'])) {
 <form action="" method="post">
 
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="project-types.php" class="btn alt mar-right-2">Cancel</a>
+        <a href="project-types.php" class="btn btn-secondary mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
+        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
  
     <div class="content-block">
@@ -118,11 +118,11 @@ if (isset($_GET['id'])) {
 
     </div>
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="project-types.php" class="btn alt mar-right-2">Cancel</a>
+        <a href="project-types.php" class="btn btn-secondary mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
+        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 </form>
 <script src="assets/js/resource-system-script.js"></script>

@@ -93,7 +93,7 @@ $url = 'dev-projects.php?search=' . $search . (isset($_GET['page_id']) ? '&page_
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="dev-project.php" class="btn">Create Warranty Record</a>
+        <a href="warranty.php" class="btn btn-primary">Create Warranty Record</a>
     </div>
     <form action="" method="get">
         <div class="search">
@@ -110,6 +110,7 @@ $url = 'dev-projects.php?search=' . $search . (isset($_GET['page_id']) ? '&page_
         <table>
             <thead>
                 <tr>
+                    <td class="responsive-hidden">Image</td>
                     <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=title'?>">Title<?php if ($order_by=='title'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
                     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=msg'?>">Message<?php if ($order_by=='msg'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
                     <td class="responsive-hidden">Status&nbsp;&nbsp;</td>
@@ -130,9 +131,34 @@ $url = 'dev-projects.php?search=' . $search . (isset($_GET['page_id']) ? '&page_
                     $stmt = $onthego_db->prepare('SELECT * FROM warranty_types WHERE id = ?');
                     $stmt->execute([$record['warranty_type_id']]);
                     $waranty_type_id = $stmt->fetch();
+                    
+                    // Get first uploaded image for thumbnail
+                    $stmt = $onthego_db->prepare('SELECT * FROM warranty_tickets_uploads WHERE ticket_id = ? LIMIT 1');
+                    $stmt->execute([$record['id']]);
+                    $first_upload = $stmt->fetch(PDO::FETCH_ASSOC);
                     ?>
                      
                 <tr>
+                    <td class="responsive-hidden">
+                        <?php if ($first_upload): ?>
+                        <?php 
+                        $file_path = warranty_resource_uploads_path . $first_upload['filepath'];
+                        $file_url = warranty_resource_uploads_url . $first_upload['filepath'];
+                        $is_image = @getimagesize($file_path) !== false;
+                        ?>
+                        <?php if ($is_image): ?>
+                        <a href="warranty-view.php?id=<?=$record['id']?>">
+                            <img src="<?=$file_url?>" width="50" height="50" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;" alt="Thumbnail">
+                        </a>
+                        <?php else: ?>
+                        <a href="warranty-view.php?id=<?=$record['id']?>">
+                            <i class="fas fa-file" style="font-size: 30px; color: #6b46c1;"></i>
+                        </a>
+                        <?php endif; ?>
+                        <?php else: ?>
+                        <i class="fas fa-image" style="font-size: 30px; color: #ccc;"></i>
+                        <?php endif; ?>
+                    </td>
                     <td><?=htmlspecialchars($record['title'], ENT_QUOTES)?></td>
                      <td class="responsive-hidden"><?=htmlspecialchars($record['msg'], ENT_QUOTES)?></td>
                        <td class="responsive-hidden"><?=htmlspecialchars($record['ticket_status'], ENT_QUOTES)?></td>&nbsp;&nbsp;

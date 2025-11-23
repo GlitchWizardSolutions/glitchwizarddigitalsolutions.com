@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Connect to the Login Database using the PDO interface
 try {
 	$login_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name . ';charset=' . db_charset, db_user, db_pass);
@@ -69,12 +70,17 @@ $url = 'client-projects-logs.php?search=' . $search . (isset($_GET['page_id']) ?
 ?>
 <?=template_admin_header('Client Projects Logs', 'resources', 'logs')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Client Project Logs']
+])?>
+
 <div class="content-title">
     <div class="title">
-    <i class="fa-regular fa-handshake"></i>
+       <i class="fa-solid fa-clipboard-list"></i>
         <div class="txt">
-            <h2>Client Projects Logs</h2>
-            <p>All Client Projects Logs</p>
+            <h2>Client Project Logs</h2>
+            <p>Project activity and communication history</p>
         </div>
     </div>
 </div>
@@ -89,7 +95,7 @@ $url = 'client-projects-logs.php?search=' . $search . (isset($_GET['page_id']) ?
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="client-project-log.php" class="btn">+ Create Project Log</a>
+        <a href="client-project-log.php" class="btn btn-primary">+ Create Project Log</a>
     </div>
     <form action="" method="get">
         <div class="search">

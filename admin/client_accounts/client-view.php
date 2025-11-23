@@ -58,15 +58,17 @@ $copy="";
     <?=template_admin_header('Accounts', 'accounts', 'view')?>
 
 <?=generate_breadcrumbs([
-    ['label' => 'Accounts', 'url' => 'accounts.php'],
+    ['label' => 'Client Accounts', 'url' => 'accounts.php'],
     ['label' => htmlspecialchars($record['username'], ENT_QUOTES)]
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_user()?></div>
-    <div class="txt">
-        <h2><?=htmlspecialchars($record['full_name'], ENT_QUOTES)?></h2>
-        <p class="subtitle">Account ID: <?=$record['id']?> | Username: <?=htmlspecialchars($record['username'], ENT_QUOTES)?></p>
+    <div class="title">
+       <i class="fa-solid fa-user"></i>
+        <div class="txt">
+            <h2><?=htmlspecialchars($record['full_name'], ENT_QUOTES)?></h2>
+            <p>Account ID: <?=$record['id']?> | Username: <?=htmlspecialchars($record['username'], ENT_QUOTES)?></p>
+        </div>
     </div>
 </div>
 
@@ -86,16 +88,16 @@ $copy="";
     </div>
 </div>
 <div class="content-block"  style="background:#7F50AB">
-    <div class="table"> 
-        <table>
+    <div class="table" style="background:transparent !important"> 
+        <table style="background:transparent !important">
             <thead>
-                <tr>
-                    <td colspan=3 style='text-align:center; color:white; text-transform: uppercase'><strong><?=htmlspecialchars($record['full_name'], ENT_QUOTES)?></strong></td>
+                <tr style="background:transparent !important">
+                    <td colspan=3 style='text-align:center; color:white !important; text-transform: uppercase; background:transparent !important'><strong><?=htmlspecialchars($record['full_name'], ENT_QUOTES)?></strong></td>
                 </tr>
-                <tr style='text-align:center'>
-                <td style='color:white'></td>
-                <td style='color:white'><?=htmlspecialchars($record['access_level'], ENT_QUOTES)?></td>
-                <td style='color:white'>Active <?=time_elapsed_string($record['last_seen'])?></td>
+                <tr style='text-align:center; background:transparent !important'>
+                <td style='color:white !important; background:transparent !important'></td>
+                <td style='color:white !important; background:transparent !important'><?=htmlspecialchars($record['access_level'], ENT_QUOTES)?></td>
+                <td style='color:white !important; background:transparent !important'>Active <?=time_elapsed_string($record['last_seen'])?></td>
                 </tr>
                  
             </thead>
@@ -315,5 +317,4 @@ $copy="";
         </table>
     </div>
 </div>
-<script src="assets/js/resource-system-script.js"></script>
 <?=template_admin_footer()?>

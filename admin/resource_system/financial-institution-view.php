@@ -55,9 +55,9 @@ $copy="";
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="financial-institutions.php" class="btn">Return</a>
-        <a href="financial-institution.php?id=<?=$record['id']?>" class="btn">Edit</a>
-        <a href="financial-institutions.php?delete=<?=$record['id']?>" onclick="return confirm('Are you sure you want to delete this record?')" class="btn">Delete</a>
+        <a href="financial-institutions.php" class="btn btn-secondary">Return</a>
+        <a href="financial-institution.php?id=<?=$record['id']?>" class="btn btn-primary">Edit</a>
+        <a href="financial-institutions.php?delete=<?=$record['id']?>" onclick="return confirm('Are you sure you want to delete this record?')" class="btn btn-danger">Delete</a>
     </div>
 </div>
 

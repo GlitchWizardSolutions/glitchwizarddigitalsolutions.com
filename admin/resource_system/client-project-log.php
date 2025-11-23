@@ -97,7 +97,7 @@ if (isset($_GET['id'])) {
         <?php if ($page == 'Edit'): ?>
         <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this log?')">
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 
     <div class="content-block">

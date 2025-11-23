@@ -85,15 +85,17 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?=template_admin_header('Account Dashboard', 'accounts')?>
 
 <?=generate_breadcrumbs([
-    ['label' => 'Accounts', 'url' => 'accounts.php'],
+    ['label' => 'Client Accounts', 'url' => 'accounts.php'],
     ['label' => 'Dashboard']
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_dashboard()?></div>
-    <div class="txt">
-        <h2>Account Dashboard</h2>
-        <p class="subtitle">Overview of account statistics and activity</p>
+    <div class="title">
+       <i class="fa-solid fa-chart-line"></i>
+        <div class="txt">
+            <h2>Account Dashboard</h2>
+            <p>Overview of account statistics and activity</p>
+        </div>
     </div>
 </div>
 

@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Connect to the On the Go Database using the PDO interface
 try {
 	$onthego_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name2 . ';charset=' . db_charset, db_user, db_pass);
@@ -66,13 +67,18 @@ if (isset($_GET['success_msg'])) {
 // Determine the URL
 $url = 'sass-accounts.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' . $_GET['page_id'] : '');
 ?>
-<?=template_admin_header('SASS Accounts', 'resources', 'sass')?>
+<?=template_admin_header('SaaS Accounts', 'resources', 'sass')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'SaaS Accounts']
+])?>
 
 <div class="content-title">
     <div class="title">
-     <i class="fa-solid fa-user-secret"></i>
+       <i class="fa-solid fa-cloud"></i>
         <div class="txt">
-            <h2>SASS Accounts</h2>
+            <h2>SaaS Accounts</h2>
             <p>Online Resources Login Data</p>
         </div>
     </div>
@@ -88,7 +94,7 @@ $url = 'sass-accounts.php?search=' . $search . (isset($_GET['page_id']) ? '&page
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="sass-account.php" class="btn">+ Create SASS</a>
+        <a href="sass-account.php" class="btn btn-primary">+ Create SaaS Account</a>
         <a href="sass-account-impt.php" class="btn mar-left-1">Import</a>
         <a href="sass-account-expt.php" class="btn mar-left-1">Export</a>
     </div>

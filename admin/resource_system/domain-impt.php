@@ -64,7 +64,7 @@ if (isset($_POST['submit'])) {
 
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
         <a href="domains.php" class="btn alt mar-right-2">Cancel</a>
-        <button type="submit" name="submit" class="btn">Import</button>
+        <button type="submit" name="submit" class="btn btn-success">Import</button>
     </div>
     <div class="content-block">
 

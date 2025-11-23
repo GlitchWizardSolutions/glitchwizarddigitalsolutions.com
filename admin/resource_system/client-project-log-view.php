@@ -69,9 +69,9 @@ $copy="";
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="client-projects.php" class="btn">Return</a>
-        <a href="client-project.php?id=<?=$record['id']?>" class="btn">Edit</a>
-        <a href="client-projects.php?delete=<?=$record['id']?>" onclick="return confirm('Are you sure you want to delete this record?')" class="btn">Delete</a>
+        <a href="client-project-logs.php" class="btn btn-secondary">Return</a>
+        <a href="client-project-log.php?id=<?=$record['id']?>" class="btn btn-primary">Edit</a>
+        <a href="client-project-logs.php?delete=<?=$record['id']?>" onclick="return confirm('Are you sure you want to delete this record?')" class="btn btn-danger">Delete</a>
     </div>
 </div>
 <div class="content-block">

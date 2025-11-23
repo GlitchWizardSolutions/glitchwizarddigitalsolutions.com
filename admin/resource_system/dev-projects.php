@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Connect to the login accounts Database using the PDO interface
 try {
 	$login_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name . ';charset=' . db_charset, db_user, db_pass);
@@ -82,14 +83,19 @@ if (isset($_GET['success_msg'])) {
 // Determine the URL
 $url = 'dev-projects.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' . $_GET['page_id'] : '');
 ?>
-<?=template_admin_header('Domains', 'resources', 'financials')?>
+<?=template_admin_header('Dev Projects', 'resources', 'financials')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Dev Projects']
+])?>
 
 <div class="content-title">
     <div class="title">
-     <i class="fa-solid fa-user-secret"></i>
+       <i class="fa-solid fa-code"></i>
         <div class="txt">
-            <h2>Projects</h2>
-       
+            <h2>Dev Projects</h2>
+            <p>Manage development project records</p>
         </div>
     </div>
 </div>
@@ -104,9 +110,9 @@ $url = 'dev-projects.php?search=' . $search . (isset($_GET['page_id']) ? '&page_
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="dev-project.php" class="btn">Create Project Record</a>
-        <a href="dev-project-impt.php" class="btn mar-left-1">Import</a>
-        <a href="dev-project-expt.php" class="btn mar-left-1">Export</a>
+        <a href="dev-project.php" class="btn btn-primary">+ Create Dev Project</a>
+        <a href="dev-project-impt.php" class="btn btn-primary mar-left-1">Import</a>
+        <a href="dev-project-expt.php" class="btn btn-primary mar-left-1">Export</a>
     </div>
     <form action="" method="get">
         <div class="search">

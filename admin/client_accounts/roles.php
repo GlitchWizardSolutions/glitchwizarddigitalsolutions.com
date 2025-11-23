@@ -20,15 +20,17 @@ $access_level_inactive = $pdo->query('SELECT access_level, COUNT(*) as total FRO
 <?=template_admin_header('Account Access & Roles', 'accounts', 'roles')?>
 
 <?=generate_breadcrumbs([
-    ['label' => 'Accounts', 'url' => 'accounts.php'],
+    ['label' => 'Client Accounts', 'url' => 'accounts.php'],
     ['label' => 'Roles & Access Levels']
 ])?>
 
 <div class="content-title">
-    <div class="icon alt"><?=svg_icon_user()?></div>
-    <div class="txt">
-        <h2>Roles & Access Levels</h2>
-        <p class="subtitle">View account distribution by role and access level</p>
+    <div class="title">
+       <i class="fa-solid fa-user-shield"></i>
+        <div class="txt">
+            <h2>Roles & Access Levels</h2>
+            <p>View account distribution by role and access level</p>
+        </div>
     </div>
 </div>
 <br>

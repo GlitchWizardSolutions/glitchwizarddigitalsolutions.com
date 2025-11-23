@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Check if the user is logged-in
 check_loggedin($pdo, '../../index.php');
 // Fetch account details associated with the logged-in user
@@ -69,14 +70,20 @@ if (isset($_GET['id'])) {
             }
 }
 ?>
-<?=template_admin_header($page . ' Financial Instututions', 'resources', 'cards')?>
+<?=template_admin_header($page . ' Financial', 'resources', 'cards')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Financial Institutions', 'url' => 'financial-institutions.php'],
+    ['label' => $page . ' Record']
+])?>
+
 <div class="content-title">
     <div class="title">
-      <i class="fa-solid fa-user-secret"></i>
+       <i class="fa-solid fa-credit-card"></i>
         <div class="txt">
-             <h2 class="responsive-width-100"><?=$page?>&nbsp;<?=htmlspecialchars($record['description'], ENT_QUOTES)?></h2>
-             <p>Online Financial Data</p>
-            
+             <h2 class="responsive-width-100"><?=$page?> Financial Record</h2>
+             <p>Bank and card information</p>
         </div>
     </div>
 </div>
@@ -84,11 +91,11 @@ if (isset($_GET['id'])) {
 <form action="" method="post">
 
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="financial-institutions.php" class="btn alt mar-right-2">Cancel</a>
+        <a href="financial-institutions.php" class="btn btn-secondary mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
+        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 
     <div class="content-block">

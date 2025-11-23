@@ -221,17 +221,15 @@ if (isset($_GET['id'])) {
 <?=template_admin_header($page . ' Account', 'accounts', 'manage')?>
 
 <?=generate_breadcrumbs([
-    ['label' => 'Accounts', 'url' => 'accounts.php'],
+    ['label' => 'Client Accounts', 'url' => 'accounts.php'],
     ['label' => $page . ' Account']
 ])?>
 
 <div class="content-title">
     <div class="title">
-        <div class="icon alt">
-            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>
-        </div>
+       <i class="fa-solid fa-user-pen"></i>
         <div class="txt">
-            <h2 class="responsive-width-100"><?=$page?> Account</h2>
+            <h2><?=$page?> Account</h2>
             <p>Manage client account information and access</p>
         </div>
     </div>
@@ -446,7 +444,7 @@ if (isset($_GET['id'])) {
             <?php if ($page == 'Edit'): ?>
             <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this account?')">
             <?php endif; ?>
-            <input type="submit" name="submit" value="<?=$page == 'Edit' ? 'Update' : 'Create'?> Account" class="btn btn-primary">
+            <input type="submit" name="submit" value="<?=$page == 'Edit' ? 'Update' : 'Create'?> Account" class="btn btn-success">
         </div>
 
     </div>

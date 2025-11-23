@@ -42,17 +42,19 @@ if (isset($_GET['error_msg'])) {
 <?=template_admin_header('Email Templates', 'email_templates')?>
 
 <?=generate_breadcrumbs([
-    ['label' => 'Accounts', 'url' => 'accounts.php'],
+    ['label' => 'Client Accounts', 'url' => 'accounts.php'],
     ['label' => 'Email Templates']
 ])?>
 
 <form action="" method="post" enctype="multipart/form-data" class="form-professional">
 
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <div class="icon alt"><?=svg_icon_email()?></div>
-        <div class="txt">
-            <h2 class="responsive-width-100">Email Templates</h2>
-            <p class="subtitle">Customize account notification email templates</p>
+        <div class="title">
+           <i class="fa-solid fa-envelope"></i>
+            <div class="txt">
+                <h2 class="responsive-width-100">Email Templates</h2>
+                <p>Customize account notification email templates</p>
+            </div>
         </div>
         <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>

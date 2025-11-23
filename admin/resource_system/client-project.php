@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 
 // Check if the user is logged-in
 check_loggedin($pdo, '../../index.php');
@@ -83,11 +84,19 @@ if (isset($_GET['id'])) {
 }
 ?>
 <?=template_admin_header($page . ' Client Projects', 'resources', 'projects')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Client Projects', 'url' => 'client-projects.php'],
+    ['label' => $page . ' Project']
+])?>
+
 <div class="content-title">
     <div class="title">
-     <i class="fa-solid fa-user-secret"></i>
+       <i class="fa-solid fa-diagram-project"></i>
         <div class="txt">
              <h2 class="responsive-width-100"><?=$page?> Client Project</h2>
+            <p>Manage client project details and assignments</p>
         </div>
     </div>
 </div>
@@ -176,6 +185,15 @@ if (isset($_GET['id'])) {
 
     </div>
 
+    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
+        <a href="client-projects.php" class="btn btn-secondary mar-right-2">Cancel</a>
+        <?php if ($page == 'Edit'): ?>
+        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this project AND it\'s logs?')">
+        <?php endif; ?>
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
+    </div>
+
 </form>
+
 <script src="assets/js/resource-system-script.js"></script>
 <?=template_admin_footer()?>

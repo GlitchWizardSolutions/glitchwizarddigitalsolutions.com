@@ -231,13 +231,16 @@ $resolved_legal_today = $stmt->fetchColumn();
     <?php endif; ?>
 </div>
 
-<!-- Legal Filings Section -->
-<h3 style="margin-top: 40px; margin-bottom: 20px; color: #6b46c1; border-bottom: 2px solid #6b46c1; padding-bottom: 10px;">
-    <svg width="18" height="18" style="vertical-align: middle; margin-right: 8px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#6b46c1"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" /></svg>
-    Legal Filings Overview
-</h3>
+<!-- LEGAL FILINGS SECTION -->
+<div class="content-block" style="margin-top: 30px;">
+    <h3 style="padding: 15px; background: #6b46c1; color: white; margin: 0;">
+        <svg width="16" height="16" style="margin-right: 10px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" /></svg>
+        Legal Filings Overview
+        <a href="gws_legal_system/tickets.php" class="btn btn-sm" style="float: right; background: white; color: #6b46c1;">View All Legal Filings →</a>
+    </h3>
+</div>
 
-<div class="dashboard">
+<div id="legal-filings-dashboard" class="dashboard">
     <div class="content-block stat green">
         <div class="data">
             <h3>New Requirements</h3>

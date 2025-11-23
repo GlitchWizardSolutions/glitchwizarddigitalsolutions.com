@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 $application= 'Resource System - Error Logs';
 $noted      = 'public_html/admin/resource_system/error-logs.php';
 
@@ -76,12 +77,17 @@ $url = 'error-logs.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id
 ?>
 <?=template_admin_header('Error Logs', 'resources', 'errors')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Error Logs']
+])?>
+
 <div class="content-title">
     <div class="title">
-    <i class="fa-regular fa-handshake"></i>
+       <i class="fa-solid fa-triangle-exclamation"></i>
         <div class="txt">
             <h2>Error Logs</h2>
-            <p>All Errors</p>
+            <p>System error tracking and monitoring</p>
         </div>
     </div>
 </div>

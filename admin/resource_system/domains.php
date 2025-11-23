@@ -6,6 +6,7 @@ Would like to bring the project name from another table, just as the project_id 
 Prevent inserting duplicate record
 */
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 try {
 	$login_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name . ';charset=' . db_charset, db_user, db_pass); 
 	$login_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -71,12 +72,17 @@ $url = 'domains.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' 
 ?>
 <?=template_admin_header('Domains', 'resources', 'domains')?>
 
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Domains']
+])?>
+
 <div class="content-title">
     <div class="title">
-     <i class="fa-solid fa-user-secret"></i>
+       <i class="fa-solid fa-globe"></i>
         <div class="txt">
             <h2>Domains</h2>
-           
+            <p>Manage domain registrations and renewals</p>
         </div>
     </div>
 </div>
@@ -91,9 +97,9 @@ $url = 'domains.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' 
 
 <div class="content-header responsive-flex-column pad-top-5">
     <div class="btns">
-        <a href="domain.php" class="btn">+ Create Domain</a>
-        <a href="domain-impt.php" class="btn mar-left-1">Import</a>
-        <a href="domain-expt.php" class="btn mar-left-1">Export</a>
+        <a href="domain.php" class="btn btn-primary">+ Create Domain</a>
+        <a href="domain-impt.php" class="btn btn-primary mar-left-1">Import</a>
+        <a href="domain-expt.php" class="btn btn-primary mar-left-1">Export</a>
     </div>
     <form action="" method="get">
         <div class="search">
