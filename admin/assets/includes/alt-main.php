@@ -69,20 +69,22 @@ function template_admin_header($title, $selected = 'dashboard', $selected_child 
             <span class="txt"> Return to Home</span>
             </a>           
 <!--Resource Systems-->
-   <a href= "' . $base_url . '/resource_system/client-projects.php"' . ($selected == 'resources' ? '      class="selected"' : '') . ' title="Resource System">
+   <a href= "' . $base_url . '/resource_system/index.php"' . ($selected == 'resources' ? '      class="selected"' : '') . ' title="Resource System">
             <span class="icon"><svg width="15" height="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 2H2V17H4V4H17V2M21 22L18.5 20.32L16 22L13.5 20.32L11 22L8.5 20.32L6 22V6H21V22M10 10V12H17V10H10M15 14H10V16H15V14Z" /></svg></span>
             <span class="txt">Resource System</span>
             </a>
             <div class="sub">
+                <a href= "' . $base_url . '/resource_system/index.php"'                  . ($selected == 'resources' && $selected_child == 'dashboard' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Dashboard</a>
+                <a href= "' . $base_url . '/resource_system/domains.php"'                . ($selected == 'resources' && $selected_child == 'domains' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Domains</a>
+                <a href= "' . $base_url . '/resource_system/dev-projects.php"'           . ($selected == 'resources' && $selected_child == 'dev' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Dev Projects</a>
                 <a href= "' . $base_url . '/resource_system/client-projects.php"'        . ($selected == 'resources' && $selected_child == 'projects' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Client Projects</a>
-                <a href= "' . $base_url . '/resource_system/client-project-logs.php"'    . ($selected == 'resources' && $selected_child == 'logs' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Client Project Logs</a>
-                <a href= "' . $base_url . '/resource_system/sass-accounts.php"'          . ($selected == 'resources' && $selected_child == 'sass' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Software Services</a>
-                <a href= "' . $base_url . '/resource_system/financial-institutions.php"' . ($selected == 'resources' && $selected_child == 'cards' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Financial Services</a>
-                <a href= "' . $base_url . '/resource_system/domains.php"'                . ($selected == 'resources' && $selected_child == 'domains' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Domain Reservations</a>
-                <a href= "' . $base_url . '/resource_system/project-types.php"'          . ($selected == 'resources' && $selected_child == 'types' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Project Types</a>
+                <a href= "' . $base_url . '/resource_system/sass-accounts.php"'          . ($selected == 'resources' && $selected_child == 'sass' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>SaaS Accounts</a>
+                <a href= "' . $base_url . '/resource_system/financial-institutions.php"' . ($selected == 'resources' && $selected_child == 'cards' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Financial Institutions</a>
+                <a href= "' . $base_url . '/resource_system/warranties.php"'             . ($selected == 'resources' && $selected_child == 'warranties' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Warranties</a>
+                <a href= "' . $base_url . '/resource_system/access-resources.php"'       . ($selected == 'resources' && $selected_child == 'access' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Access Resources</a>
                 <a href= "' . $base_url . '/resource_system/error-logs.php"'             . ($selected == 'resources' && $selected_child == 'errors' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Error Logs</a>
-                <a href= "' . $base_url . '/resource_system/warranties.php"'             . ($selected == 'resources' && $selected_child == 'warranty' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Warranties</a>
-                <a href= "' . $base_url . '/resource_system/otrta.php"'             . ($selected == 'resources' && $selected_child == 'otrta' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>OTRTA</a>
+                <a href= "' . $base_url . '/resource_system/project-types.php"'          . ($selected == 'resources' && $selected_child == 'types' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Project Types</a>
+                <a href= "' . $base_url . '/resource_system/caches.php"'                 . ($selected == 'resources' && $selected_child == 'cache' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Caches</a>
             </div>
     <!--Client Ticket System-->
    <a href= "' . $base_url . '/ticket_system/tickets.php"' . ($selected == 'tickets' ? ' class="selected"' : '') . ' title="Tickets">
