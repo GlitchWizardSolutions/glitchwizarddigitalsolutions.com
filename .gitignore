@@ -47,7 +47,7 @@ node_modules/
 package-lock.json
 
 # Composer (if added for dependency management)
-vendor/
+# vendor/ - Now tracking client-dashboard vendor libraries in Git
 composer.lock
 
 # OS Generated Files

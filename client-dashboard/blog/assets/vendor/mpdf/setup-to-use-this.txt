@@ -1,0 +1,27 @@
+// 2025-06-25 this does not yet utilize account id or client id, but will be useful for later and should be added to the programming of this system, soon.
+
+STEP 1 DATABASE CHANGES:
+
+CREATE TABLE audit_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    account_id INT,
+    client_id INT,
+    client_name VARCHAR(255),
+    document_title VARCHAR(255),
+    file_type ENUM('pdf', 'docx', 'csv', 'xlsx'),
+    file_path TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ip_address VARCHAR(45),
+    user_agent TEXT
+);
+
+STEP 2 FILE SYSTEM CHANGES
+
+Create or use this file system:
+/assets/vendor/mpdf/ & get a copy of mpdf folder (or download from mpdf.com)
+/uploads/preview/
+Relocate mpdf-business-pdf-template.php to the root directory you want to use this in.
+In the roo
+
+STEP 3 INDIVIDUAL FILE PLACEMENT
+
