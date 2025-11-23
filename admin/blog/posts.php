@@ -210,7 +210,13 @@ foreach ($posts as $row) {
 					<tr>
 						<td class="img">';
     if ($row['image'] != '') {
-        echo '<img src="' . BASE_URL . htmlspecialchars($row['image']) . '" width="45px" height="45px" style="object-fit: cover; border-radius: 5px;" />';
+        // Normalize image path - remove leading slash and ensure proper path
+        $image_path = ltrim($row['image'], '/');
+        // If path doesn't include client-dashboard/blog, prepend it
+        if (strpos($image_path, 'client-dashboard/blog/') !== 0 && strpos($image_path, 'uploads/') === 0) {
+            $image_path = 'client-dashboard/blog/' . $image_path;
+        }
+        echo '<img src="' . BASE_URL . htmlspecialchars($image_path) . '" width="45px" height="45px" style="object-fit: cover; border-radius: 5px;" />';
     }
     echo '</td>
 						<td>' . htmlspecialchars($row['title']) . $featured . '</td>
