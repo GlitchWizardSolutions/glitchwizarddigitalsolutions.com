@@ -8,4 +8,5 @@ include ('../../../private/invoice_system_config.php');
 include admin_includes_path . 'main.php';
 include admin_includes_path . 'admin_page_setup.php';
 include client_invoice_defines . 'defines.php';
-// Unified email system already loaded by invoice_system_config.php?>
+// Unified email system already loaded by invoice_system_config.php
+?>

@@ -23,29 +23,9 @@
  */
 
 /**
- * Get error database connection
- * @return PDO|null Returns PDO connection or null on failure
+ * Note: get_error_db() function is provided by database-system.php
+ * It uses DatabasePool to manage the error database connection.
  */
-function get_error_db() {
-    static $error_db = null;
-    
-    if ($error_db === null) {
-        try {
-            $error_db = new PDO(
-                'mysql:host=' . db_host . ';dbname=glitchwizarddigi_error_handling;charset=' . db_charset,
-                db_user,
-                db_pass
-            );
-            $error_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            // Fallback to file logging if database connection fails
-            error_log('Error DB Connection Failed: ' . $e->getMessage());
-            return null;
-        }
-    }
-    
-    return $error_db;
-}
 
 /**
  * Simple error logging function
