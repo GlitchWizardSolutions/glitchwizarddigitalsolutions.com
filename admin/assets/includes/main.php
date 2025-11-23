@@ -241,11 +241,11 @@ echo '<!DOCTYPE html>
         <title>' . $title . '</title>
         <!--<script src="https://cdn.tiny.cloud/1/clsvhjw7tz9roxwuptbq27vjj5em0lyxkitpdd1p2xed6jpx/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>-->
         <link rel="icon" type="image/png" <a href= "' . $outside_url . '/assets/imgs/purple-logo-sm.png">
-        <link href= "' . $outside_url . '/assets/css/css_handler/invoice-system-admin.css" rel="stylesheet" type="text/css">
+        <link href= "' . $outside_url . '/assets/css/css_handler/invoice-system-admin.css?v=' . time() . '" rel="stylesheet" type="text/css">
         <!-- Removed missing files: mdb.min.css and styles.css -->
         <!-- <link rel="stylesheet" href= "' . $base_url. '/cms/assets/css/mdb.min.css" /> -->
         <!-- <link rel="stylesheet" href= "' . $base_url. '/cms/assets/css/styles.css" /> -->
-        <link href= "' . $base_url. '/assets/css/admin.css" rel="stylesheet" type="text/css"> 
+        <link href= "' . $base_url. '/assets/css/admin.css?v=' . time() . '" rel="stylesheet" type="text/css"> 
         <!--Upgraded to 3.7.1 6-19-25 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">--> 
            <!-- Bootstrap 5 -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
