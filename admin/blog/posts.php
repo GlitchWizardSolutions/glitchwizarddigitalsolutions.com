@@ -210,7 +210,7 @@ foreach ($posts as $row) {
 					<tr>
 						<td class="img">';
     if ($row['image'] != '') {
-        echo '<img src="/public_html' . htmlspecialchars($row['image']) . '" width="45px" height="45px" style="object-fit: cover; border-radius: 5px;" />';
+        echo '<img src="' . BASE_URL . htmlspecialchars($row['image']) . '" width="45px" height="45px" style="object-fit: cover; border-radius: 5px;" />';
     }
     echo '</td>
 						<td>' . htmlspecialchars($row['title']) . $featured . '</td>
