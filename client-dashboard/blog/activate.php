@@ -40,8 +40,8 @@ include includes_path . 'public-page-setup.php';
 ?>
 		<div class="login">
 		<div class="brand-bg" style='height:65px'>
-		<img class="r-logo-public" src="<?php echo(site_menu_base) ?>assets/imgs/black_logo.png"  alt="logo"/></a>
-        <span class="r-biz-name-public" href="<?php echo(site_menu_base) ?>index.php">GlitchWizard Solutions</span>
+		<img class="r-logo-public" src="<?php echo site_menu_base ?>assets/imgs/black_logo.png"  alt="logo"/></a>
+        <span class="r-biz-name-public" href="<?php echo site_menu_base ?>index.php">GlitchWizard Solutions</span>
 			</div>
 			<h1>Account Status</h1>
 			<form action="" method="">

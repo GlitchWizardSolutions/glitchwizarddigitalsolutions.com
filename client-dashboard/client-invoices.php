@@ -76,7 +76,7 @@ include includes_path . 'page-setup.php';
         <h1>My Invoices</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="<?php echo(site_menu_base) ?>client-dashboard/index.php">Home</a></li>
+                <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/index.php">Home</a></li>
                 <li class="breadcrumb-item active">My Invoices</li>
             </ol>
         </nav>
@@ -211,7 +211,7 @@ include includes_path . 'page-setup.php';
                                             </span>
                                         </td>
                                         <td class="text-nowrap">
-                                            <a href="<?php echo(site_menu_base) ?>client-invoices/invoice.php?id=<?= $invoice['invoice_number'] ?>" 
+                                            <a href="<?php echo site_menu_base ?>client-invoices/invoice.php?id=<?= $invoice['invoice_number'] ?>" 
                                                class="btn btn-sm btn-primary" target="_blank" 
                                                style="padding: 0.25rem 0.5rem; font-size: 0.875rem;"
                                                title="View Invoice">
@@ -219,14 +219,14 @@ include includes_path . 'page-setup.php';
                                             </a>
                                             
                                             <?php if ($invoice['payment_status'] == 'Unpaid'): ?>
-                                            <a href="<?php echo(site_menu_base) ?>client-invoices/pay-invoice.php?id=<?= $invoice['invoice_number'] ?>" 
+                                            <a href="<?php echo site_menu_base ?>client-invoices/pay-invoice.php?id=<?= $invoice['invoice_number'] ?>" 
                                                class="btn btn-sm btn-success" target="_blank"
                                                style="padding: 0.25rem 0.5rem; font-size: 0.875rem;"
                                                title="Pay Invoice">
                                                 <i class="bi bi-credit-card"></i>
                                             </a>
                                             <?php elseif ($invoice['payment_status'] == 'Paid'): ?>
-                                            <a href="<?php echo(site_menu_base) ?>client-invoices/invoice.php?id=<?= $invoice['invoice_number'] ?>" 
+                                            <a href="<?php echo site_menu_base ?>client-invoices/invoice.php?id=<?= $invoice['invoice_number'] ?>" 
                                                class="btn btn-sm btn-secondary" target="_blank"
                                                style="padding: 0.25rem 0.5rem; font-size: 0.875rem;"
                                                onclick="setTimeout(function() { var w = window.open(this.href); setTimeout(function() { w.print(); }, 500); }.bind(this), 100); return false;"

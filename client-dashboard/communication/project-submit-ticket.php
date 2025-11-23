@@ -111,7 +111,7 @@ include includes_path . 'page-setup.php';
     <div class="pagetitle">
       <nav> <span class='fs-7' style='float:right'> <?=date('M d, Y h:ia')?></span>
         <ol class="breadcrumb">
-         <li class="breadcrumb-item"><a href="<?php echo(site_menu_base)?>client-dashboard/index.php">Home</a></li>
+         <li class="breadcrumb-item"><a href="<?php echo site_menu_base?>client-dashboard/index.php">Home</a></li>
          <li class="breadcrumb-item active">Submit Projects</li> 
         </ol>
       </nav>

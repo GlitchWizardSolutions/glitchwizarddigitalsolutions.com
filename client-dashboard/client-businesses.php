@@ -78,8 +78,8 @@ include includes_path . 'page-setup.php';
     <div class="pagetitle"><span class='right'><a class='btn btn-primary' href='client-business-create.php'>Create New Business</a></span>
       <nav>
         <ol class="breadcrumb">
-         <li class="breadcrumb-item"><a href="<?php echo(site_menu_base) ?>client-dashboard/index.php">&nbsp;Home</a></li>
-         <li class="breadcrumb-item"><a href="<?php echo(site_menu_base) ?>client-dashboard/users-profile-edit.php">My Account</a></li> 
+         <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/index.php">&nbsp;Home</a></li>
+         <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/users-profile-edit.php">My Account</a></li> 
          <li class="breadcrumb-item active">My Business Profiles</li>
         </ol>
       </nav>

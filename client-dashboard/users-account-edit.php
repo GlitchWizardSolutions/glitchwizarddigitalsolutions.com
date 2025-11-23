@@ -49,7 +49,7 @@ if (isset($_POST['newPassword'], $_POST['confirmPassword'])) {
     <div class="pagetitle">
       <nav>
         <ol class="breadcrumb">
-         <li class="breadcrumb-item"><a href="<?php echo(site_menu_base) ?>client-dashboard/index.php"?>&nbsp;Home</a></li>
+         <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/index.php"?>&nbsp;Home</a></li>
          <li class="breadcrumb-item">My Account</li>
          <li class="breadcrumb-item active">My Settings</li>
         </ol>

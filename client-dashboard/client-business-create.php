@@ -81,9 +81,9 @@ include includes_path . 'page-setup.php';
     <div class="pagetitle">
       <nav>
         <ol class="breadcrumb">
-         <li class="breadcrumb-item"><a href="<?php echo(site_menu_base) ?>client-dashboard/index.php">&nbsp;Home</a></li>
-         <li class="breadcrumb-item"><a href="<?php echo(site_menu_base) ?>client-dashboard/users-profile-edit.php">My Account</a></li> 
-         <li class="breadcrumb-item"><a href="<?php echo(site_menu_base) ?>client-dashboard/client-businesses.php">My Businesses</a></li> 
+         <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/index.php">&nbsp;Home</a></li>
+         <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/users-profile-edit.php">My Account</a></li> 
+         <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/client-businesses.php">My Businesses</a></li> 
          <li class="breadcrumb-item active">Create Business Profile</li>
         </ol>
       </nav>

@@ -8,7 +8,7 @@ include includes_path . 'page-setup.php';
     <div class="pagetitle">
       <nav>
         <ol class="breadcrumb">
-         <li class="breadcrumb-item"><a href="<?php echo(site_menu_base) ?>client-dashboard/index.php">Home</a></li>
+         <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/index.php">Home</a></li>
          <li class="breadcrumb-item">Contract Forms</li>
           <li class="breadcrumb-item active">Project Agreement</li>
         </ol>

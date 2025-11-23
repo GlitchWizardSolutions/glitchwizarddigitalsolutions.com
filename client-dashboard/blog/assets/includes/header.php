@@ -3,8 +3,8 @@
  include includes_path . 'close-open.php';?>
   <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="d-flex align-items-center justify-content-between">
-      <a href="<?php echo(site_menu_base) ?>client-dashboard/index.php" class="logo d-flex align-items-center">
-       <img class="r-logo-public" src="<?php echo(site_menu_base) ?>assets/imgs/purple-on-white-logo.png" alt="Logo" aria-label="logo">
+      <a href="<?php echo $base_url; ?>/index.php" class="logo d-flex align-items-center">
+       <img class="r-logo-public" src="<?php echo site_menu_base ?>assets/imgs/purple-on-white-logo.png" alt="Logo" aria-label="logo">
       <span class="ps-3 d-none no-hover d-lg-block r-biz-name">GlitchWizard Solutions</span>
       </a>
       <i class="ps-3 bi bi-list toggle-sidebar-btn" id='toggle-sidebar-btn'></i>
@@ -60,7 +60,7 @@
                      <hr class="dropdown-divider">
             </li>
             <li class="dropdown-footer">
-              <a href="<?php echo(site_menu_base) ?>client-dashboard/communication/review-responses.php">All Tickets</a>
+              <a href="<?php echo $base_url; ?>/communication/review-responses.php">All Tickets</a>
             </li>
            </div>
      </div>  
@@ -118,7 +118,7 @@
                      <hr class="dropdown-divider">
             </li>
             <li class="dropdown-footer">
-              <a href="<?php echo(site_menu_base) ?>client-dashboard/communication/review-responses.php">All Tickets</a>
+              <a href="<?php echo $base_url; ?>/communication/review-responses.php">All Tickets</a>
             </li>
            </div>
      </div>  
@@ -175,7 +175,7 @@
                      <hr class="dropdown-divider">
             </li>
             <li class="dropdown-footer">
-              <a href="<?php echo(site_menu_base) ?>client-dashboard/communication/review-responses.php">All Tickets</a>
+              <a href="<?php echo $base_url; ?>/communication/review-responses.php">All Tickets</a>
             </li>
            </div>
      </div>  
@@ -230,7 +230,7 @@
                      <hr class="dropdown-divider">
             </li>
             <li class="dropdown-footer">
-              <a href="<?php echo(site_menu_base) ?>client-dashboard/communication/project-review-responses.php">All Projects</a>
+              <a href="<?php echo $base_url; ?>/communication/project-review-responses.php">All Projects</a>
             </li>
            </div>
      </div>  
@@ -284,7 +284,7 @@
                      <hr class="dropdown-divider">
             </li>
             <li class="dropdown-footer">
-              <a href="<?php echo(site_menu_base) ?>client-dashboard/communication/project-review-responses.php">All Projects</a>
+              <a href="<?php echo $base_url; ?>/communication/project-review-responses.php">All Projects</a>
             </li>
            </div>
      </div>  
@@ -310,7 +310,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="<?php echo(site_menu_base) ?>client-dashboard/users-profile-edit.php">
+              <a class="dropdown-item d-flex align-items-center" href="<?php echo $base_url; ?>/users-profile-edit.php">
                 <i class="bi bi-person"></i>
                 <span>My Profile</span>
               </a>
@@ -320,7 +320,7 @@
             </li>
             <?php if ($account['role'] == 'Admin'): ?>
              <li>
-              <a class="dropdown-item d-flex align-items-center" href="<?php echo(site_menu_base) ?>admin/">
+              <a class="dropdown-item d-flex align-items-center" href="<?php echo site_menu_base ?>admin/">
                 <i class="bi bi-person"></i>
                 <span>Administration</span>
               </a>
@@ -347,7 +347,7 @@
             </li>-->
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="<?php echo(site_menu_base) ?>logout.php">
+              <a class="dropdown-item d-flex align-items-center" href="<?php echo site_menu_base ?>logout.php">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>

@@ -164,7 +164,7 @@
        <?php endif; ?>
                      <hr class="dropdown-divider">
             <li class="dropdown-footer">
-              <a href="<?php echo(site_menu_base) ?>client-documents/system-client-data.php">All Documents</a>
+              <a href="<?php echo site_menu_base ?>client-documents/system-client-data.php">All Documents</a>
             </li>
           </ul>
 
@@ -304,7 +304,7 @@
        <?php endif; ?>
          <hr class="dropdown-divider">
             <li class="dropdown-footer">
-              <a href="<?php echo(site_menu_base) ?>admin/resource_system/domains.php">All Domains</a>
+              <a href="<?php echo site_menu_base ?>admin/resource_system/domains.php">All Domains</a>
             </li>
           </ul><!-- End Notification Dropdown Items -->
         </li><!-- End Notification Nav -->
@@ -337,7 +337,7 @@
             </li>
             <?php if ($account['role'] == 'Admin'): ?>
              <li>
-              <a class="dropdown-item d-flex align-items-center" href="<?php echo(site_menu_base) ?>admin/">
+              <a class="dropdown-item d-flex align-items-center" href="<?php echo site_menu_base ?>admin/">
                 <i class="bi bi-person"></i>
                 <span>Administration</span>
               </a>
@@ -364,7 +364,7 @@
             </li>-->
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="<?php echo(site_menu_base) ?>logout.php">
+              <a class="dropdown-item d-flex align-items-center" href="<?php echo site_menu_base ?>logout.php">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>
