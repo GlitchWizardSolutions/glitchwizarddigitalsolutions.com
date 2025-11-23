@@ -3,9 +3,9 @@ require 'assets/includes/admin_config.php';
 $application= 'Resource System - Error Logs';
 $noted      = 'public_html/admin/resource_system/error-logs.php';
 
-// Connect to the On the Go Database using the PDO interface
+// Connect to the Error Handling Database using the PDO interface
 try {
-	$error_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name9 . ';charset=' . db_charset, db_user9, db_pass9);
+	$error_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name9 . ';charset=' . db_charset, db_user, db_pass);
 	$error_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $exception) {
 	// If there is an error with the connection, stop the script and display the error.
@@ -31,8 +31,8 @@ $status = isset($_GET['status']) ? $_GET['status'] : '';
 // Order by column
 $order = isset($_GET['order']) && $_GET['order'] == 'DESC' ? 'DESC' : 'ASC';
 // Add/remove columns to the whitelist array
-$order_by_whitelist = ['id','application','pagename','path','section','inputs','outputs','thrown','noted','timestamp' ];
-$order_by = isset($_GET['order_by']) && in_array($_GET['order_by'], $order_by_whitelist) ? $_GET['order_by'] : 'id';
+$order_by_whitelist = ['id','application','pagename','path','section','error_type','severity','error_code','thrown','inputs','outputs','noted','status','timestamp'];
+$order_by = isset($_GET['order_by']) && in_array($_GET['order_by'], $order_by_whitelist) ? $_GET['order_by'] : 'timestamp';
 // Number of results per pagination page
 $results_per_page = 15;
 // Declare query param variables
@@ -41,7 +41,7 @@ $param2 = $results_per_page;
 $param3 = '%' . $search . '%';
 // SQL where clause
 $where = '';
-$where .= $search ? 'WHERE (application LIKE :search OR pagename LIKE :search OR section LIKE :search OR noted LIKE :search OR timestamp LIKE :search) ' : '';
+$where .= $search ? 'WHERE (application LIKE :search OR pagename LIKE :search OR section LIKE :search OR error_type LIKE :search OR severity LIKE :search OR thrown LIKE :search OR noted LIKE :search OR timestamp LIKE :search) ' : '';
 // Retrieve the total number of records from the database
 $stmt = $error_db->prepare('SELECT COUNT(*) AS total FROM error_handling ' . $where);
 if ($search) $stmt->bindParam('search', $param3, PDO::PARAM_STR);
@@ -111,13 +111,12 @@ $url = 'error-logs.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id
         <table>
             <thead>
                 <tr>  
-                    
                     <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=timestamp'?>">Timestamp<?php if ($order_by=='timestamp'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
-                    
-                    <td ><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=thrown'?>">Thrown<?php if ($order_by=='thrown'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
-                    <td ><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=pagename'?>">Pagename<?php if ($order_by=='pagename'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
-                    <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=noted'?>">Noted<?php if ($order_by=='noted'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
-                   
+                    <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=severity'?>">Severity<?php if ($order_by=='severity'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
+                    <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=application'?>">Application<?php if ($order_by=='application'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
+                    <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=pagename'?>">Page<?php if ($order_by=='pagename'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
+                    <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=section'?>">Section<?php if ($order_by=='section'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
+                    <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=thrown'?>">Error<?php if ($order_by=='thrown'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
                     <td>Actions</td>
                 </tr>
             </thead>
@@ -130,11 +129,23 @@ $url = 'error-logs.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id
                 <?php foreach ($records as $record): ?>
                 <tr>
                      <td><?=date('m-d-y h:ia', strtotime($record['timestamp']))?></td>
-                     <td><?=htmlspecialchars($record['thrown'], ENT_QUOTES)?></td>
-                    
+                     <td>
+                        <?php
+                        $severity_class = [
+                            'Critical' => 'red',
+                            'Error' => 'red',
+                            'Warning' => 'orange',
+                            'Notice' => 'gray',
+                            'Info' => 'green'
+                        ];
+                        $class = $severity_class[$record['severity']] ?? 'gray';
+                        ?>
+                        <span class="<?=$class?>"><?=htmlspecialchars($record['severity'], ENT_QUOTES)?></span>
+                     </td>
+                     <td><?=htmlspecialchars($record['application'], ENT_QUOTES)?></td>
                      <td><?=htmlspecialchars($record['pagename'], ENT_QUOTES)?></td>
-                     
-                     <td><?=htmlspecialchars($record['noted'], ENT_QUOTES)?></td>
+                     <td><?=htmlspecialchars($record['section'], ENT_QUOTES)?></td>
+                     <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="<?=htmlspecialchars($record['thrown'], ENT_QUOTES)?>"><?=htmlspecialchars(substr($record['thrown'], 0, 100), ENT_QUOTES)?><?=strlen($record['thrown']) > 100 ? '...' : ''?></td>
                      
                      <td class="actions">
                         <div class="table-dropdown">

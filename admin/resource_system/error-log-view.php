@@ -18,13 +18,13 @@ try {
 	// If there is an error with the connection, stop the script and display the error.
 	exit('Failed to connect to the logon database!');
 }
-// Connect to the On the Go Database using the PDO interface
+// Connect to the Error Handling Database using the PDO interface
 try {
-	$error_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name9 . ';charset=' . db_charset, db_user9, db_pass);
+	$error_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name9 . ';charset=' . db_charset, db_user, db_pass);
 	$error_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $exception) {
 	// If there is an error with the connection, stop the script and display the error.
-	exit('! Failed to connect to the on the error handling database!');
+	exit('Failed to connect to the error handling database: ' . $exception->getMessage());
 }
 $page = 'View';
 // Retrieve records from the database
@@ -71,58 +71,127 @@ $copy="";
         <table>
             <thead> 
                 <tr>
-                    <td style='text-align:center; background:grey; color:white; text-transform: uppercase'><strong><?=htmlspecialchars($record['application'], ENT_QUOTES)?></strong></td>
-                    <td style='text-align:center; background:grey; color:white; text-transform: uppercase'><strong><?=date('M d, Y', strtotime($record['timestamp']?? ''))?></strong></td>
+                    <td style='text-align:center; background:grey; color:white; text-transform: uppercase' colspan="2"><strong><?=htmlspecialchars($record['application'], ENT_QUOTES)?></strong></td>
                 </tr>
-                 </thead>
-          <tbody>       
-             <tr>
-                   <td style='text-align: start; background:#F8F4FF'><strong>Path:</strong><br><?=htmlspecialchars($record['path'], ENT_QUOTES)?></td>
-                   <td style='text-align: start; background:#F8F4FF'><strong><?=htmlspecialchars($record['pagename'], ENT_QUOTES)?></strong></td>
-                   
-                </tr>    
-           
-            
                 <tr>
-                  <td style='text-align: start; background:#F5F5F5'><strong>Section:</strong><br><?=htmlspecialchars($record['section'], ENT_QUOTES)?></td>  
-                  <td style='text-align: start; background:#F5F5F5'><strong>Noted:</strong><br><?=htmlspecialchars($record['noted'], ENT_QUOTES)?></td>  
-               </tr>
-               <tr>
-                  <td style='text-align: start; background:#FFF0F5'><strong>Inputs:</strong><br><?=htmlspecialchars($record['inputs'], ENT_QUOTES)?></td>  
-                  <td style='text-align: start; background:#FFF0F5'><strong>Outputs:</strong><br><?=htmlspecialchars($record['outputs'], ENT_QUOTES)?></td>
-               </tr>
-
-                
+                    <td style='text-align:center; background:#<?=$record['severity']=='Critical'?'8B0000':($record['severity']=='Error'?'DC143C':($record['severity']=='Warning'?'FFA500':'6c757d'))?>; color:white;'><strong><?=htmlspecialchars($record['severity'], ENT_QUOTES)?></strong></td>
+                    <td style='text-align:center; background:grey; color:white;'><strong><?=date('M d, Y h:i A', strtotime($record['timestamp']?? ''))?></strong></td>
+                </tr>
+            </thead>
+            <tbody>       
+                <tr>
+                    <td style='text-align: start; background:#F8F4FF'><strong>Page:</strong></td>
+                    <td style='text-align: start; background:#F8F4FF'><?=htmlspecialchars($record['pagename'], ENT_QUOTES)?></td>
+                </tr>    
+                <tr>
+                    <td style='text-align: start; background:#F5F5F5'><strong>Path:</strong></td>
+                    <td style='text-align: start; background:#F5F5F5'><?=htmlspecialchars($record['path'], ENT_QUOTES)?></td>
+                </tr>
+                <tr>
+                    <td style='text-align: start; background:#F8F4FF'><strong>Section:</strong></td>  
+                    <td style='text-align: start; background:#F8F4FF'><?=htmlspecialchars($record['section'], ENT_QUOTES)?></td>
+                </tr>
+                <?php if (!empty($record['error_type'])): ?>
+                <tr>
+                    <td style='text-align: start; background:#F5F5F5'><strong>Error Type:</strong></td>  
+                    <td style='text-align: start; background:#F5F5F5'><?=htmlspecialchars($record['error_type'], ENT_QUOTES)?></td>
+                </tr>
+                <?php endif; ?>
+                <?php if (!empty($record['error_code'])): ?>
+                <tr>
+                    <td style='text-align: start; background:#F8F4FF'><strong>Error Code:</strong></td>  
+                    <td style='text-align: start; background:#F8F4FF'><?=htmlspecialchars($record['error_code'], ENT_QUOTES)?></td>
+                </tr>
+                <?php endif; ?>
+                <?php if (!empty($record['user_id'])): ?>
+                <tr>
+                    <td style='text-align: start; background:#F5F5F5'><strong>User ID:</strong></td>  
+                    <td style='text-align: start; background:#F5F5F5'><?=htmlspecialchars($record['user_id'], ENT_QUOTES)?></td>
+                </tr>
+                <?php endif; ?>
+                <?php if (!empty($record['ip_address'])): ?>
+                <tr>
+                    <td style='text-align: start; background:#F8F4FF'><strong>IP Address:</strong></td>  
+                    <td style='text-align: start; background:#F8F4FF'><?=htmlspecialchars($record['ip_address'], ENT_QUOTES)?></td>
+                </tr>
+                <?php endif; ?>
+                <?php if (!empty($record['request_method']) || !empty($record['request_uri'])): ?>
+                <tr>
+                    <td style='text-align: start; background:#F5F5F5'><strong>Request:</strong></td>  
+                    <td style='text-align: start; background:#F5F5F5'><?=htmlspecialchars($record['request_method'], ENT_QUOTES)?> <?=htmlspecialchars($record['request_uri'], ENT_QUOTES)?></td>
+                </tr>
+                <?php endif; ?>
+                <?php if (!empty($record['noted'])): ?>
+                <tr>
+                    <td style='text-align: start; background:#F8F4FF'><strong>Notes:</strong></td>  
+                    <td style='text-align: start; background:#F8F4FF'><?=htmlspecialchars($record['noted'], ENT_QUOTES)?></td>
+                </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
 </div>
- 
- 
-    <div class="content-block">
-        <div class="data">
-          <div class="table">
-              
-			<table>
-				<thead>
-				   	<tr>
-						<td colspan=4><strong>Error Thrown</strong></td>
-				
-					</tr>
-				</thead>
-				<tbody>
-				 
-			      
-					<tr>
-					<td colspan=4 style='text-align: start; background:#F5F5F5'><strong><?=htmlspecialchars($record['outputs']?? '', ENT_QUOTES)?></strong></td>
- 
-					</tr>
-					 
-	   </tbody>
-	  </table>
-     </div>
+
+<?php if (!empty($record['inputs'])): ?>
+<div class="content-block">
+    <div class="table">
+        <table>
+            <thead>
+                <tr>
+                    <td colspan="2"><strong>Request Parameters</strong></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2" style='text-align: start; background:#F5F5F5'>
+                        <pre style="margin: 0; white-space: pre-wrap; font-family: monospace; font-size: 12px;"><?=htmlspecialchars($record['inputs'], ENT_QUOTES)?></pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-   </div> 
+</div>
+<?php endif; ?>
+
+<div class="content-block">
+    <div class="table">
+        <table>
+            <thead>
+                <tr>
+                    <td colspan="2"><strong>Error Message</strong></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2" style='text-align: start; background:#FFF0F5; color: #dc3545; font-weight: bold;'>
+                        <?=nl2br(htmlspecialchars($record['thrown'] ?? '', ENT_QUOTES))?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<?php if (!empty($record['outputs'])): ?>
+<div class="content-block">
+    <div class="table">
+        <table>
+            <thead>
+                <tr>
+                    <td colspan="2"><strong>Stack Trace / Additional Output</strong></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2" style='text-align: start; background:#F5F5F5'>
+                        <pre style="margin: 0; white-space: pre-wrap; font-family: monospace; font-size: 11px;"><?=htmlspecialchars($record['outputs'], ENT_QUOTES)?></pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<?php endif; ?> 
  
 <script src="assets/js/resource-system-script.js"></script>
 <?=template_admin_footer()?>
