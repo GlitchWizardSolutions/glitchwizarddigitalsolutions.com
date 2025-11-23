@@ -70,7 +70,7 @@ if (isset($_GET['success_msg'])) {
     }
 }
 // Determine the URL
-$url = 'dev-projects.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' . $_GET['page_id'] : '');
+$url = 'warranties.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' . $_GET['page_id'] : '');
 ?>
 <?=template_admin_header('Warranties', 'resources', 'warranties')?>
 

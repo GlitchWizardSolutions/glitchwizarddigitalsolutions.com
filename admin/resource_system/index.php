@@ -39,6 +39,17 @@ try {
 	exit('Failed to connect to error handling database! ' . $exception->getMessage());
 }
 
+// Handle clear all errors action
+if (isset($_GET['clear_errors']) && $_GET['clear_errors'] == '1') {
+	try {
+		$error_db->exec('TRUNCATE TABLE error_handling');
+		header('Location: index.php?cleared=1');
+		exit;
+	} catch (PDOException $exception) {
+		exit('Failed to clear error logs: ' . $exception->getMessage());
+	}
+}
+
 // Get resource counts with error handling
 try {
 	// Login DB (db_name)
@@ -171,7 +182,12 @@ try {
                 No errors in 24h ✓
             </div>
             <?php endif; ?>
-            <a href="error-logs.php" style="display: inline-block; margin-top: 15px; color: #333; text-decoration: none; opacity: 0.8;">View All →</a>
+            <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
+                <a href="error-logs.php" style="color: #333; text-decoration: none; opacity: 0.8;">View All →</a>
+                <?php if ($error_logs_total > 0): ?>
+                <a href="?clear_errors=1" onclick="return confirm('Are you sure you want to delete ALL error logs? This cannot be undone.')" style="font-size: 12px; padding: 5px 10px; background: rgba(220,53,69,0.8); color: white; border-radius: 4px; text-decoration: none;">Clear All</a>
+                <?php endif; ?>
+            </div>
         </div>
 
         <!-- Project Types Card -->
@@ -200,31 +216,6 @@ try {
             <a href="caches.php" style="display: inline-block; margin-top: 15px; color: #333; text-decoration: none; opacity: 0.8;">View All →</a>
         </div>
 
-    </div>
-
-    <!-- Quick Actions -->
-    <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; border-left: 4px solid #6b46c1;">
-        <h3 style="margin-top: 0; color: #333;"><i class="fa-solid fa-bolt"></i> Quick Actions</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-            <a href="domains.php" class="btn btn-primary" style="text-align: center; padding: 12px;">
-                <i class="fa-solid fa-globe"></i> Manage Domains
-            </a>
-            <a href="dev-projects.php" class="btn btn-primary" style="text-align: center; padding: 12px;">
-                <i class="fa-solid fa-code"></i> Dev Projects
-            </a>
-            <a href="client-projects.php" class="btn btn-primary" style="text-align: center; padding: 12px;">
-                <i class="fa-solid fa-diagram-project"></i> Client Projects
-            </a>
-            <a href="warranties.php" class="btn btn-primary" style="text-align: center; padding: 12px;">
-                <i class="fa-solid fa-shield-halved"></i> Warranties
-            </a>
-            <a href="sass-accounts.php" class="btn btn-primary" style="text-align: center; padding: 12px;">
-                <i class="fa-solid fa-cloud"></i> SaaS Accounts
-            </a>
-            <a href="error-logs.php" class="btn btn-primary" style="text-align: center; padding: 12px;">
-                <i class="fa-solid fa-triangle-exclamation"></i> Error Logs
-            </a>
-        </div>
     </div>
 </div>
 
