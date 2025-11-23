@@ -11,10 +11,7 @@
  */
 function generate_breadcrumbs($crumbs) {
     $html = '<div class="breadcrumbs">';
-    $html .= '<a href="../../index.php">';
-    $html .= '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">';
-    $html .= '<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>';
-    $html .= ' Dashboard</a>';
+    $html .= '<a href="../../index.php">Dashboard</a>';
     
     foreach ($crumbs as $index => $crumb) {
         $html .= '<span class="separator">›</span>';

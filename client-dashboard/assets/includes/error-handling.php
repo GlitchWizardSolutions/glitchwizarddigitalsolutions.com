@@ -2,7 +2,7 @@
 /* THE FOLLOWING ERROR HANDLING CODE IS SITE WIDE */
 //Establish connection with the error handling database (on glitchwi)
 try {
-	$error_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name9 . ';charset=' . db_charset, db_user9, db_pass);
+	$error_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name9 . ';charset=' . db_charset, db_user, db_pass);
 	$error_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $exception) {
 	// If there is an error with the connection, stop the script and display the error.
@@ -28,7 +28,8 @@ error_reporting(0);
 
 // This is the custom error handling function used in all GWS Web Applications.
 Function errorHandler($errno, $errmsg, $filename, $linenum, $vars, $path, $outputs, $noted){
-    
+    global $error_db;
+    $dt = date('Y-m-d H:i:s');
        
     // Define an assoc array of error strings
     // (Common:) E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING and E_USER_NOTICE
@@ -60,7 +61,7 @@ Function errorHandler($errno, $errmsg, $filename, $linenum, $vars, $path, $outpu
     $err .= "\t<scriptlinenum>" . $linenum . "</scriptlinenum>\n";            
     
     if (in_array($errno, $user_errors)) {
-        $err .= "\t<vartrace>" . wddx_serialize_value($vars, "Variables") . "</vartrace>\n";
+        $err .= "\t<vartrace>" . serialize($vars) . "</vartrace>\n";
     }
     $err .= "</errorentry>\n\n";
   
@@ -68,9 +69,9 @@ Function errorHandler($errno, $errmsg, $filename, $linenum, $vars, $path, $outpu
    //   echo $err;
     //SAVE TO DATABASE
     $application = $filename;
-    $section =$linenum;
-    $inputs = $vars;
-    $outputs =$outputs;
+    $section = $linenum;
+    $inputs = serialize($vars);
+    $outputs = is_array($outputs) ? serialize($outputs) : $outputs;
     $thrown = $err;
     $noted = $_SERVER['SCRIPT_NAME'];
     $stmt = $error_db->prepare('INSERT INTO error_handling (application,pagename,path,section,inputs,outputs,thrown,noted) VALUES (?,?,?,?,?,?,?,?)');
@@ -84,4 +85,4 @@ Function errorHandler($errno, $errmsg, $filename, $linenum, $vars, $path, $outpu
     //     mail("sidewaysy@gmail.com", "Critical User Error", $err); 
     //}        
 }//This ends the errorHandler function.
-Set_error_handler(‘errorHandler’,  E_ALL ); 
+set_error_handler('errorHandler', E_ALL);
