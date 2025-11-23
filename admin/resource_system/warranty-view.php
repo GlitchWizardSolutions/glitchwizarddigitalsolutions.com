@@ -98,11 +98,6 @@ if (!$record) {
             <label>Reminder Date:</label>
             <p><?=$record['reminder_date'] ? date('F j, Y', strtotime($record['reminder_date'])) : 'N/A'?></p>
         </div>
-        
-        <div class="view-field">
-            <label>Created:</label>
-            <p><?=date('F j, Y g:i A', strtotime($record['created']))?></p>
-        </div>
 
         <?php if ($record['warranty_expiration_date']): ?>
         <?php 
@@ -134,9 +129,11 @@ if (!$record) {
             <label>Attachments:</label>
             <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
                 <?php foreach($uploads as $upload): ?>
-                <?php 
-                $file_path = warranty_resource_uploads_path . $upload['filepath'];
-                $file_url = warranty_resource_uploads_url . $upload['filepath'];
+                <?php
+                // Handle old database paths that include 'warranty-ticket-uploads/' prefix
+                $clean_filepath = str_replace('warranty-ticket-uploads/', '', $upload['filepath']);
+                $file_path = warranty_resource_uploads_path . $clean_filepath;
+                $file_url = warranty_resource_uploads_url . $clean_filepath;
                 $is_image = @getimagesize($file_path) !== false;
                 ?>
                 <div style="text-align: center;">

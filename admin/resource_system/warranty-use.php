@@ -147,9 +147,11 @@ if ($record['warranty_expiration_date']) {
         <h3><i class="fa-solid fa-paperclip"></i> Attachments</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
             <?php foreach($uploads as $upload): ?>
-            <?php 
-            $file_path = warranty_resource_uploads_path . $upload['filepath'];
-            $file_url = warranty_resource_uploads_url . $upload['filepath'];
+            <?php
+            // Handle old database paths that include 'warranty-ticket-uploads/' prefix
+            $clean_filepath = str_replace('warranty-ticket-uploads/', '', $upload['filepath']);
+            $file_path = warranty_resource_uploads_path . $clean_filepath;
+            $file_url = warranty_resource_uploads_url . $clean_filepath;
             $is_image = @getimagesize($file_path) !== false;
             ?>
             <div class="attachment-card">

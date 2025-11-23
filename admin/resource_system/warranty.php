@@ -97,7 +97,9 @@ if (isset($_GET['id'])) {
         
         // Delete physical files
         foreach ($uploads as $upload) {
-            $file_path = warranty_resource_uploads_path . $upload['filepath'];
+            // Handle old database paths that include 'warranty-ticket-uploads/' prefix
+            $clean_filepath = str_replace('warranty-ticket-uploads/', '', $upload['filepath']);
+            $file_path = warranty_resource_uploads_path . $clean_filepath;
             if (file_exists($file_path)) {
                 unlink($file_path);
             }
@@ -241,9 +243,11 @@ if (isset($_GET['id'])) {
                 <strong>Current Attachments:</strong>
                 <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
                     <?php foreach($existing_uploads as $upload): ?>
-                    <?php 
-                    $file_path = warranty_resource_uploads_path . $upload['filepath'];
-                    $file_url = warranty_resource_uploads_url . $upload['filepath'];
+                    <?php
+                    // Handle old database paths that include 'warranty-ticket-uploads/' prefix
+                    $clean_filepath = str_replace('warranty-ticket-uploads/', '', $upload['filepath']);
+                    $file_path = warranty_resource_uploads_path . $clean_filepath;
+                    $file_url = warranty_resource_uploads_url . $clean_filepath;
                     $is_image = @getimagesize($file_path) !== false;
                     ?>
                     <div style="text-align: center;">

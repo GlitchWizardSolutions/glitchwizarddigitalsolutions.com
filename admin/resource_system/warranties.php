@@ -141,9 +141,11 @@ $url = 'dev-projects.php?search=' . $search . (isset($_GET['page_id']) ? '&page_
                 <tr>
                     <td class="responsive-hidden">
                         <?php if ($first_upload): ?>
-                        <?php 
-                        $file_path = warranty_resource_uploads_path . $first_upload['filepath'];
-                        $file_url = warranty_resource_uploads_url . $first_upload['filepath'];
+                        <?php
+                        // Handle old database paths that include 'warranty-ticket-uploads/' prefix
+                        $clean_filepath = str_replace('warranty-ticket-uploads/', '', $first_upload['filepath']);
+                        $file_path = warranty_resource_uploads_path . $clean_filepath;
+                        $file_url = warranty_resource_uploads_url . $clean_filepath;
                         $is_image = @getimagesize($file_path) !== false;
                         ?>
                         <?php if ($is_image): ?>

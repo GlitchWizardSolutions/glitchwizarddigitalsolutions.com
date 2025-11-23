@@ -303,9 +303,67 @@ Update resource system menu to have dashboard + submenus:
 - [x] Fix warranties.php "Create Warranty Record" button link (was pointing to dev-project.php)
 - [x] Create warranty-view.php (full details with status badges and date calculations)
 - [x] Create warranty-use.php (quick reference with visual status card)
-- [ ] Test warranty CRUD functionality
-- [ ] Review barb-resources files for useful features
-- [ ] Delete barb-resources/ subdirectory after testing
+- [x] Add file upload functionality to warranty.php (preserves filenames, auto-numbering for duplicates)
+- [x] Add image/attachment display to warranty-view.php and warranty-use.php
+- [x] Add thumbnail column to warranties.php list
+- [x] Delete uploaded files when warranty record is deleted
+- [ ] Test warranty CRUD functionality with file uploads
+- [ ] Delete barb-resources/ subdirectory after confirming functionality
+
+### Phase 2: Standardize All Resource System Styling
+
+**IMPORTANT:** All resource system pages need consistent styling updates that have been applied to other admin sections:
+
+#### Forms Styling Standards
+- [ ] Update all form layouts to match standardized structure
+- [ ] Ensure proper form field spacing and labels
+- [ ] Add field icons where appropriate
+- [ ] Consistent input/textarea/select styling
+- [ ] Proper required field indicators
+- [ ] File upload fields styled consistently
+
+#### Buttons Already Standardized (✅ Completed in previous session)
+- Link buttons (Create, Import, Export, Edit): `btn btn-primary`
+- Submit buttons (Save, Create, Update): `btn btn-success`
+- Delete buttons: `btn btn-danger`
+- Cancel/Return/Back buttons: `btn btn-secondary`
+
+#### Tables & Lists Styling
+- [ ] Standardize table borders (consistent border styles)
+- [ ] Update table header backgrounds (match admin theme)
+- [ ] Ensure responsive table classes applied
+- [ ] Consistent row hover effects
+- [ ] Proper column alignment
+- [ ] Action dropdown styling
+
+#### Page Layout & Components
+- [ ] Breadcrumbs: Ensure all pages use `generate_breadcrumbs()` with components.php include
+- [ ] Page headers: Consistent title styling with icons
+- [ ] Content blocks: Proper padding and spacing
+- [ ] Cards/sections: Consistent background colors and borders
+- [ ] Success/error messages: Standardized alert styling
+
+#### Resource Types Needing Style Updates
+1. **Warranties** (ALL pages - just created, needs styling)
+   - warranties.php (list page)
+   - warranty.php (form page)
+   - warranty-view.php (detail view)
+   - warranty-use.php (practical use view)
+
+2. **Review & Update Other Resource Pages** (if needed)
+   - Domains (6 files)
+   - Dev Projects (6 files)
+   - Client Projects (8 files)
+   - SaaS Accounts (6 files)
+   - Financial Institutions (6 files)
+   - Access Resources (5 files)
+   - Error Logs (2 files)
+   - Project Types (3 files)
+   - Caches (3 files)
+   - Medications (4 files)
+   - Accounts (3 files)
+
+**Note:** Button styling already completed for 50+ files. Focus remaining work on forms, tables, breadcrumbs, and page layouts.
 
 ### Phase 2: Update Path References
 
