@@ -44,7 +44,7 @@ if (isset($_POST['business_name'], $_POST['business_email'], $_POST['first_name'
 		} else {
 		    //no errors
 		 	// Update the account
-            $stmt = $pdo->prepare('UPDATE invoice_clients SET business_name = ?, description = ?, bluesky = ?, facebook = ?, instagram = ?, x = ?, linkedin = ?, email = ?, first_name = ?, last_name = ?, phone = ?, address_street = ?, address_city = ?, address_state = ?, address_zip = ?,  address_country = ?, incomplete = ?, issue = ?, WHERE id = ?');
+            $stmt = $pdo->prepare('UPDATE invoice_clients SET business_name = ?, description = ?, bluesky = ?, facebook = ?, instagram = ?, x = ?, linkedin = ?, email = ?, first_name = ?, last_name = ?, phone = ?, address_street = ?, address_city = ?, address_state = ?, address_zip = ?,  address_country = ?, incomplete = ?, issue = ? WHERE id = ?');
 			$stmt->execute([ $_POST['business_name'], $_POST['description'], $_POST['bluesky'], $_POST['facebook'],$_POST['instagram'], $_POST['x'],$_POST['linkedin'], $_POST['business_email'], $_POST['first_name'],$_POST['last_name'], $_POST['business_phone'], $_POST['business_address_street'], $_POST['business_address_city'], $_POST['business_address_state'], $_POST['business_address_zip'], $_POST['business_address_country'], "No", "No", $business_id ]);
 				// Record updated successfully, redirect the user back to the profile page
 				header('Location: client-business-edit.php');
