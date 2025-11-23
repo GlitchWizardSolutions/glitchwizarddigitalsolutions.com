@@ -1,5 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
 // Connect to the login accounts Database using the PDO interface
 try {
 	$login_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name . ';charset=' . db_charset, db_user, db_pass);
@@ -71,14 +72,19 @@ if (isset($_GET['success_msg'])) {
 // Determine the URL
 $url = 'dev-projects.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' . $_GET['page_id'] : '');
 ?>
-<?=template_admin_header('Warranties', 'resources', 'warranty')?>
+<?=template_admin_header('Warranties', 'resources', 'warranties')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Warranties']
+])?>
 
 <div class="content-title">
     <div class="title">
-     <i class="fa-solid fa-user-secret"></i>
+        <i class="fa-solid fa-shield-halved"></i>
         <div class="txt">
             <h2>Warranties</h2>
-       
+            <p>Manage product warranties and support contracts</p>
         </div>
     </div>
 </div>

@@ -36,14 +36,20 @@ if (!$record) {
     exit('Warranty record not found!');
 }
 ?>
-<?=template_admin_header('View Warranty', 'resources', 'warranty')?>
+<?=template_admin_header('View Warranty', 'resources', 'warranties')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Warranties', 'url' => 'warranties.php'],
+    ['label' => 'View Warranty']
+])?>
 
 <div class="content-title">
     <div class="title">
         <i class="fa-solid fa-shield-halved"></i>
         <div class="txt">
             <h2><?=htmlspecialchars($record['title'], ENT_QUOTES)?></h2>
-            <p>Warranty Details</p>
+            <p>Complete warranty details and documentation</p>
         </div>
     </div>
 </div>

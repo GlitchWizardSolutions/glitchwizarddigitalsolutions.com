@@ -163,14 +163,20 @@ if (isset($_GET['id'])) {
             }
 }
 ?>
-<?=template_admin_header($page . 'Warranties', 'resources', 'warranty')?>
+<?=template_admin_header($page . ' Warranty', 'resources', 'warranties')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Warranties', 'url' => 'warranties.php'],
+    ['label' => $page . ' Warranty']
+])?>
+
 <div class="content-title">
     <div class="title">
-      <i class="fa-solid fa-shield-halved"></i>
+        <i class="fa-solid fa-shield-halved"></i>
         <div class="txt">
-             <h2 class="responsive-width-100"><?=$page?>&nbsp;<?=htmlspecialchars($record['title'] ?? '', ENT_QUOTES)?></h2>
-             <p>Warranty Record</p>
-            
+            <h2 class="responsive-width-100"><?=$page?> Warranty <?=$page == 'Edit' ? '- ' . htmlspecialchars($record['title'] ?? '', ENT_QUOTES) : ''?></h2>
+            <p><?=$page == 'Edit' ? 'Update' : 'Create new'?> warranty record</p>
         </div>
     </div>
 </div>

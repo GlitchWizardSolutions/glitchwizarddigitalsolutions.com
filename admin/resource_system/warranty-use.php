@@ -49,14 +49,20 @@ if ($record['warranty_expiration_date']) {
     $warranty_expired = $days_remaining <= 0;
 }
 ?>
-<?=template_admin_header('Warranty Usage', 'resources', 'warranty')?>
+<?=template_admin_header('Warranty Usage', 'resources', 'warranties')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Warranties', 'url' => 'warranties.php'],
+    ['label' => 'Quick Reference']
+])?>
 
 <div class="content-title">
     <div class="title">
         <i class="fa-solid fa-file-shield"></i>
         <div class="txt">
             <h2>Warranty Information</h2>
-            <p>Quick Reference for <?=htmlspecialchars($record['title'], ENT_QUOTES)?></p>
+            <p>Quick reference for <?=htmlspecialchars($record['title'], ENT_QUOTES)?></p>
         </div>
     </div>
 </div>

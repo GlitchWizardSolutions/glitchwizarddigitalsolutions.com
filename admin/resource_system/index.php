@@ -33,28 +33,25 @@ try {
 }
 
 try {
-	$invoice_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name5 . ';charset=' . db_charset, db_user, db_pass);
-	$invoice_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$error_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name9 . ';charset=' . db_charset, db_user, db_pass);
+	$error_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $exception) {
-	exit('Failed to connect to invoice database! ' . $exception->getMessage());
+	exit('Failed to connect to error handling database! ' . $exception->getMessage());
 }
 
 // Get resource counts with error handling
 try {
 	// Login DB (db_name)
 	$domains_total = $login_db->query('SELECT COUNT(*) FROM domains')->fetchColumn();
-	$domains_expiring = $login_db->query('SELECT COUNT(*) FROM domains WHERE domain_exp_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 30 DAY)')->fetchColumn();
+	$domains_expiring = $login_db->query('SELECT COUNT(*) FROM domains WHERE due_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 30 DAY)')->fetchColumn();
 	
 	$client_projects_total = $login_db->query('SELECT COUNT(*) FROM client_projects')->fetchColumn();
-	$client_projects_active = $login_db->query('SELECT COUNT(*) FROM client_projects WHERE status = "active"')->fetchColumn();
+	$client_projects_active = $login_db->query('SELECT COUNT(*) FROM client_projects WHERE project_status = "active"')->fetchColumn();
 	
 	$project_types_total = $login_db->query('SELECT COUNT(*) FROM project_types')->fetchColumn();
 
 	// OnTheGo DB (db_name2)
-	$dev_projects_total = $onthego_db->query('SELECT COUNT(*) FROM dev_projects')->fetchColumn();
-	$dev_projects_active = $onthego_db->query('SELECT COUNT(*) FROM dev_projects WHERE status = "active"')->fetchColumn();
-
-	$sass_accounts_total = $onthego_db->query('SELECT COUNT(*) FROM sass_accounts')->fetchColumn();
+	$sass_accounts_total = $onthego_db->query('SELECT COUNT(*) FROM sass_account')->fetchColumn();
 
 	$financial_accounts_total = $onthego_db->query('SELECT COUNT(*) FROM financial_accounts')->fetchColumn();
 
@@ -62,13 +59,11 @@ try {
 	$warranties_active = $onthego_db->query('SELECT COUNT(*) FROM warranty_tickets WHERE ticket_status = "active"')->fetchColumn();
 	$warranties_expiring = $onthego_db->query('SELECT COUNT(*) FROM warranty_tickets WHERE warranty_expiration_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 30 DAY) AND ticket_status = "active"')->fetchColumn();
 
-	$error_logs_total = $onthego_db->query('SELECT COUNT(*) FROM error_logs')->fetchColumn();
-	$error_logs_24h = $onthego_db->query('SELECT COUNT(*) FROM error_logs WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)')->fetchColumn();
-
 	$caches_total = $onthego_db->query('SELECT COUNT(*) FROM cache')->fetchColumn();
 	
-	// Invoice DB (db_name5)
-	$access_resources_total = $invoice_db->query('SELECT COUNT(*) FROM access_resources')->fetchColumn();
+	// Error Handling DB (db_name9)
+	$error_logs_total = $error_db->query('SELECT COUNT(*) FROM error_handling')->fetchColumn();
+	$error_logs_24h = $error_db->query('SELECT COUNT(*) FROM error_handling WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)')->fetchColumn();
 } catch (PDOException $exception) {
 	exit('Database query error: ' . $exception->getMessage());
 }
@@ -101,19 +96,6 @@ try {
             </div>
             <?php endif; ?>
             <a href="domains.php" style="display: inline-block; margin-top: 15px; color: white; text-decoration: none; opacity: 0.9;">View All →</a>
-        </div>
-
-        <!-- Dev Projects Card -->
-        <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0; font-size: 18px;">Dev Projects</h3>
-                <i class="fa-solid fa-code fa-2x" style="opacity: 0.8;"></i>
-            </div>
-            <div style="font-size: 36px; font-weight: bold; margin-bottom: 10px;"><?=$dev_projects_total?></div>
-            <div style="background: rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 5px; font-size: 14px;">
-                <?=$dev_projects_active?> active
-            </div>
-            <a href="dev-projects.php" style="display: inline-block; margin-top: 15px; color: white; text-decoration: none; opacity: 0.9;">View All →</a>
         </div>
 
         <!-- Client Projects Card -->
@@ -171,19 +153,6 @@ try {
             </div>
             <?php endif; ?>
             <a href="warranties.php" style="display: inline-block; margin-top: 15px; color: white; text-decoration: none; opacity: 0.9;">View All →</a>
-        </div>
-
-        <!-- Access Resources Card -->
-        <div class="stat-card" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0; font-size: 18px;">Access Resources</h3>
-                <i class="fa-solid fa-key fa-2x" style="opacity: 0.6;"></i>
-            </div>
-            <div style="font-size: 36px; font-weight: bold; margin-bottom: 10px;"><?=$access_resources_total?></div>
-            <div style="background: rgba(0,0,0,0.1); padding: 8px 12px; border-radius: 5px; font-size: 14px;">
-                Credentials stored
-            </div>
-            <a href="access-resources.php" style="display: inline-block; margin-top: 15px; color: #333; text-decoration: none; opacity: 0.8;">View All →</a>
         </div>
 
         <!-- Error Logs Card -->
