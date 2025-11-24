@@ -41,10 +41,22 @@ if (isset($_GET['id'])) {
     $page = 'Edit';
     if (isset($_POST['submit'])) {
         // Update the client
-    
         
-        $stmt = $pdo->prepare('UPDATE invoice_clients SET acc_id = ?, project_id = ?, business_name = ?, description = ?,  facebook = ?, instagram = ?, bluesky = ?, x = ?, linkedin = ?, first_name = ?, last_name = ?,  email = ?, phone = ?, address_street = ?, address_city = ?, address_state = ?, address_zip = ?, address_country = ?, created = ? WHERE id = ?');
-        $stmt->execute([ $_POST['acc_id'], $_POST['project_id'], $_POST['business_name'], $_POST['description'],  $_POST['facebook'], $_POST['instagram'], $_POST['bluesky'], $_POST['x'], $_POST['linkedin'], $_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['phone'], $_POST['address_street'], $_POST['address_city'], $_POST['address_state'], $_POST['address_zip'], $_POST['address_country'], $_POST['created'], $_GET['id'] ]);
+        // Validate if profile is incomplete (missing required contact info)
+        $incomplete = "No";
+        $issue = "No";
+        
+        if (empty($_POST['email']) || empty($_POST['phone']) || empty($_POST['address_street']) || empty($_POST['address_city']) || empty($_POST['address_state']) || empty($_POST['address_zip'])) {
+            $incomplete = "Yes";
+        }
+        
+        // Validate email format if provided
+        if (!empty($_POST['email']) && !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+            $issue = "Yes";
+        }
+        
+        $stmt = $pdo->prepare('UPDATE invoice_clients SET acc_id = ?, project_id = ?, business_name = ?, description = ?,  facebook = ?, instagram = ?, bluesky = ?, x = ?, linkedin = ?, first_name = ?, last_name = ?,  email = ?, phone = ?, address_street = ?, address_city = ?, address_state = ?, address_zip = ?, address_country = ?, incomplete = ?, issue = ?, created = ? WHERE id = ?');
+        $stmt->execute([ $_POST['acc_id'], $_POST['project_id'], $_POST['business_name'], $_POST['description'],  $_POST['facebook'], $_POST['instagram'], $_POST['bluesky'], $_POST['x'], $_POST['linkedin'], $_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['phone'], $_POST['address_street'], $_POST['address_city'], $_POST['address_state'], $_POST['address_zip'], $_POST['address_country'], $incomplete, $issue, $_POST['created'], $_GET['id'] ]);
         header('Location: clients.php?success_msg=2');
         exit;
     }
@@ -58,8 +70,21 @@ if (isset($_GET['id'])) {
     $page = 'Create';
     if (isset($_POST['submit'])) {
         
-        $stmt = $pdo->prepare('INSERT INTO invoice_clients (acc_id, project_id, business_name, description,  facebook, instagram, bluesky, x, linkedin, first_name,last_name,email,phone,address_street,address_city,address_state,address_zip,address_country,created) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-        $stmt->execute([ $_POST['acc_id'], $_POST['project_id'], $_POST['business_name'], $_POST['description'],  $_POST['facebook'], $_POST['instagram'], $_POST['bluesky'], $_POST['x'], $_POST['linkedin'], $_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['phone'], $_POST['address_street'], $_POST['address_city'], $_POST['address_state'], $_POST['address_zip'], $_POST['address_country'], $_POST['created'] ]);
+        // Validate if profile is incomplete (missing required contact info)
+        $incomplete = "No";
+        $issue = "No";
+        
+        if (empty($_POST['email']) || empty($_POST['phone']) || empty($_POST['address_street']) || empty($_POST['address_city']) || empty($_POST['address_state']) || empty($_POST['address_zip'])) {
+            $incomplete = "Yes";
+        }
+        
+        // Validate email format if provided
+        if (!empty($_POST['email']) && !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+            $issue = "Yes";
+        }
+        
+        $stmt = $pdo->prepare('INSERT INTO invoice_clients (acc_id, project_id, business_name, description,  facebook, instagram, bluesky, x, linkedin, first_name,last_name,email,phone,address_street,address_city,address_state,address_zip,address_country,incomplete,issue,created) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+        $stmt->execute([ $_POST['acc_id'], $_POST['project_id'], $_POST['business_name'], $_POST['description'],  $_POST['facebook'], $_POST['instagram'], $_POST['bluesky'], $_POST['x'], $_POST['linkedin'], $_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['phone'], $_POST['address_street'], $_POST['address_city'], $_POST['address_state'], $_POST['address_zip'], $_POST['address_country'], $incomplete, $issue, $_POST['created'] ]);
         header('Location: clients.php?success_msg=1');
         exit;
     }
@@ -115,11 +140,11 @@ if (isset($_GET['id'])) {
                 <?php endforeach; ?>
             </select>
  
-            <label for="email"><span class="required">*</span> Email</label>
-            <input id="email" type="email" name="email" placeholder="Email" value="<?=htmlspecialchars($client['email'], ENT_QUOTES)?>" required>
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" placeholder="Email" value="<?=htmlspecialchars($client['email'], ENT_QUOTES)?>">
 
-            <label for="first_name"><span class="required">*</span> First Name</label>
-            <input id="first_name" type="text" name="first_name" placeholder="First Name" value="<?=htmlspecialchars($client['first_name'], ENT_QUOTES)?>" required>
+            <label for="first_name">First Name</label>
+            <input id="first_name" type="text" name="first_name" placeholder="First Name" value="<?=htmlspecialchars($client['first_name'], ENT_QUOTES)?>">
 
             <label for="last_name">Last Name</label>
             <input id="last_name" type="text" name="last_name" placeholder="Last Name" value="<?=htmlspecialchars($client['last_name'], ENT_QUOTES)?>">
@@ -127,28 +152,28 @@ if (isset($_GET['id'])) {
             <label for="phone">Phone</label>
             <input id="phone" type="text" name="phone" placeholder="Phone" value="<?=htmlspecialchars($client['phone'], ENT_QUOTES)?>">
 
-            <label for="project_id"><span class="required">*</span> Project ID</label>
-            <input id="project_id" type="text" name="project_id" placeholder="Project ID" value="<?=htmlspecialchars($client['project_id'], ENT_QUOTES)?>" required>
+            <label for="project_id">Project ID</label>
+            <input id="project_id" type="text" name="project_id" placeholder="Project ID" value="<?=htmlspecialchars($client['project_id'], ENT_QUOTES)?>">
             
             <label for="business_name"><span class="required">*</span> Business Name</label>
             <input id="business_name" type="text" name="business_name" placeholder="Business Name" value="<?=htmlspecialchars($client['business_name'], ENT_QUOTES)?>" required>
             
-            <label for="description"><span class="required">*</span> description</label>
-            <input id="description" type="text" name="description" placeholder="Description" value="<?=htmlspecialchars($client['description'], ENT_QUOTES)?>" required>
+            <label for="description">Description</label>
+            <input id="description" type="text" name="description" placeholder="Description" value="<?=htmlspecialchars($client['description'], ENT_QUOTES)?>">
             
-            <label for="facebook"><span class="required">*</span> Facebook</label>
-            <input id="facebook" type="text" name="facebook" placeholder="Facebook" value="<?=htmlspecialchars($client['facebook'], ENT_QUOTES)?>" required>
+            <label for="facebook">Facebook</label>
+            <input id="facebook" type="text" name="facebook" placeholder="Facebook" value="<?=htmlspecialchars($client['facebook'], ENT_QUOTES)?>">
             
-            <label for="instagram"><span class="required">*</span> Instagram</label>
-            <input id="instagram" type="text" name="instagram" placeholder="Instagram" value="<?=htmlspecialchars($client['instagram'], ENT_QUOTES)?>" required>
+            <label for="instagram">Instagram</label>
+            <input id="instagram" type="text" name="instagram" placeholder="Instagram" value="<?=htmlspecialchars($client['instagram'], ENT_QUOTES)?>">
             
-            <label for="bluesky"><span class="required">*</span> Bluesky</label>
-            <input id="bluesky" type="text" name="bluesky" placeholder="Bluesky" value="<?=htmlspecialchars($client['bluesky'], ENT_QUOTES)?>" required>
-             <label for="x"><span class="required">*</span>X</label>
-            <input id="x" type="text" name="x" placeholder="X" value="<?=htmlspecialchars($client['x'], ENT_QUOTES)?>" required>
+            <label for="bluesky">Bluesky</label>
+            <input id="bluesky" type="text" name="bluesky" placeholder="Bluesky" value="<?=htmlspecialchars($client['bluesky'], ENT_QUOTES)?>">
+             <label for="x">X</label>
+            <input id="x" type="text" name="x" placeholder="X" value="<?=htmlspecialchars($client['x'], ENT_QUOTES)?>">
             
-            <label for="linkedin"><span class="required">*</span> Linkedin</label>
-            <input id="linkedin" type="text" name="linkedin" placeholder="Linkedin" value="<?=htmlspecialchars($client['linkedin'], ENT_QUOTES)?>" required>
+            <label for="linkedin">Linkedin</label>
+            <input id="linkedin" type="text" name="linkedin" placeholder="Linkedin" value="<?=htmlspecialchars($client['linkedin'], ENT_QUOTES)?>">
 
             <label for="address_street">Address</label>
             <input id="address_street" type="text" name="address_street" placeholder="Street" value="<?=htmlspecialchars($client['address_street'], ENT_QUOTES)?>">

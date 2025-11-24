@@ -13,11 +13,15 @@ $account = $stmt->fetch(PDO::FETCH_ASSOC);
 // FORM SUBMITTED
 if (isset($_POST['business_name'], $_POST['business_email'], $_POST['first_name'], $_POST['last_name'])) {
 	// Make sure the submitted values are not empty.
-	if (empty($_POST['business_name']) || empty($_POST['business_email']) || empty($_POST['first_name']) || empty($_POST['last_name']) || empty($_POST['last_name']) || empty($_POST['last_name']) || empty($_POST['last_name'])) {
-		$msg = 'The input fields must not be empty!';
+	if (empty($_POST['business_name']) || empty($_POST['business_email']) || empty($_POST['first_name']) || empty($_POST['last_name'])) {
+		$msg = 'Business name, email, first name, and last name are required!';
+	} else if (empty($_POST['business_phone'])) {
+		$msg = 'Business phone is required!';
+	} else if (empty($_POST['business_address_street']) || empty($_POST['business_address_city']) || empty($_POST['business_address_state']) || empty($_POST['business_address_zip'])) {
+		$msg = 'Complete address (street, city, state, zip) is required!';
 	} else if (!filter_var($_POST['business_email'], FILTER_VALIDATE_EMAIL)) {
 		$msg = 'Please provide a valid email address!';
-	}else if (!preg_match('/^[a-zA-Z0-9 ]+$/', $_POST['first_name'])) {
+	} else if (!preg_match('/^[a-zA-Z0-9 ]+$/', $_POST['first_name'])) {
 	    $msg = 'Name must not have special characters';
 	} 
 		// Check if business already exists in the database
