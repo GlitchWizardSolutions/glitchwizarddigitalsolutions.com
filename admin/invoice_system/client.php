@@ -8,7 +8,6 @@ check_loggedin($pdo, '../../index.php');
 // Default client values
 $client = [
     'acc_id' => 0,
-    'project_id' => 0,
     'business_name' => 'none',
     'description' => 'none',
     'facebook' => 'https://facebook.com/#',
@@ -55,8 +54,8 @@ if (isset($_GET['id'])) {
             $issue = "Yes";
         }
         
-        $stmt = $pdo->prepare('UPDATE invoice_clients SET acc_id = ?, project_id = ?, business_name = ?, description = ?,  facebook = ?, instagram = ?, bluesky = ?, x = ?, linkedin = ?, first_name = ?, last_name = ?,  email = ?, phone = ?, address_street = ?, address_city = ?, address_state = ?, address_zip = ?, address_country = ?, incomplete = ?, issue = ?, created = ? WHERE id = ?');
-        $stmt->execute([ $_POST['acc_id'], $_POST['project_id'], $_POST['business_name'], $_POST['description'],  $_POST['facebook'], $_POST['instagram'], $_POST['bluesky'], $_POST['x'], $_POST['linkedin'], $_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['phone'], $_POST['address_street'], $_POST['address_city'], $_POST['address_state'], $_POST['address_zip'], $_POST['address_country'], $incomplete, $issue, $_POST['created'], $_GET['id'] ]);
+        $stmt = $pdo->prepare('UPDATE invoice_clients SET acc_id = ?, business_name = ?, description = ?,  facebook = ?, instagram = ?, bluesky = ?, x = ?, linkedin = ?, first_name = ?, last_name = ?,  email = ?, phone = ?, address_street = ?, address_city = ?, address_state = ?, address_zip = ?, address_country = ?, incomplete = ?, issue = ?, created = ? WHERE id = ?');
+        $stmt->execute([ $_POST['acc_id'], $_POST['business_name'], $_POST['description'],  $_POST['facebook'], $_POST['instagram'], $_POST['bluesky'], $_POST['x'], $_POST['linkedin'], $_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['phone'], $_POST['address_street'], $_POST['address_city'], $_POST['address_state'], $_POST['address_zip'], $_POST['address_country'], $incomplete, $issue, $_POST['created'], $_GET['id'] ]);
         header('Location: clients.php?success_msg=2');
         exit;
     }
@@ -83,8 +82,8 @@ if (isset($_GET['id'])) {
             $issue = "Yes";
         }
         
-        $stmt = $pdo->prepare('INSERT INTO invoice_clients (acc_id, project_id, business_name, description,  facebook, instagram, bluesky, x, linkedin, first_name,last_name,email,phone,address_street,address_city,address_state,address_zip,address_country,incomplete,issue,created) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-        $stmt->execute([ $_POST['acc_id'], $_POST['project_id'], $_POST['business_name'], $_POST['description'],  $_POST['facebook'], $_POST['instagram'], $_POST['bluesky'], $_POST['x'], $_POST['linkedin'], $_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['phone'], $_POST['address_street'], $_POST['address_city'], $_POST['address_state'], $_POST['address_zip'], $_POST['address_country'], $incomplete, $issue, $_POST['created'] ]);
+        $stmt = $pdo->prepare('INSERT INTO invoice_clients (acc_id, business_name, description,  facebook, instagram, bluesky, x, linkedin, first_name,last_name,email,phone,address_street,address_city,address_state,address_zip,address_country,incomplete,issue,created) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+        $stmt->execute([ $_POST['acc_id'], $_POST['business_name'], $_POST['description'],  $_POST['facebook'], $_POST['instagram'], $_POST['bluesky'], $_POST['x'], $_POST['linkedin'], $_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['phone'], $_POST['address_street'], $_POST['address_city'], $_POST['address_state'], $_POST['address_zip'], $_POST['address_country'], $incomplete, $issue, $_POST['created'] ]);
         header('Location: clients.php?success_msg=1');
         exit;
     }
@@ -151,9 +150,6 @@ if (isset($_GET['id'])) {
 
             <label for="phone">Phone</label>
             <input id="phone" type="text" name="phone" placeholder="Phone" value="<?=htmlspecialchars($client['phone'], ENT_QUOTES)?>">
-
-            <label for="project_id">Project ID</label>
-            <input id="project_id" type="text" name="project_id" placeholder="Project ID" value="<?=htmlspecialchars($client['project_id'], ENT_QUOTES)?>">
             
             <label for="business_name"><span class="required">*</span> Business Name</label>
             <input id="business_name" type="text" name="business_name" placeholder="Business Name" value="<?=htmlspecialchars($client['business_name'], ENT_QUOTES)?>" required>
