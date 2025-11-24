@@ -30,7 +30,7 @@ $search = isset($_GET['search']) ? $_GET['search'] : '';
 // Filters
 $status = isset($_GET['status']) ? $_GET['status'] : '';
 // Order by column
-$order = isset($_GET['order']) && $_GET['order'] == 'DESC' ? 'DESC' : 'ASC';
+$order = isset($_GET['order']) && $_GET['order'] == 'ASC' ? 'ASC' : 'DESC';
 // Add/remove columns to the whitelist array
 $order_by_whitelist = ['id','application','pagename','path','section','error_type','severity','error_code','thrown','inputs','outputs','noted','status','timestamp'];
 $order_by = isset($_GET['order_by']) && in_array($_GET['order_by'], $order_by_whitelist) ? $_GET['order_by'] : 'timestamp';

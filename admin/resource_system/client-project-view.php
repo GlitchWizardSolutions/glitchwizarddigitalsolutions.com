@@ -71,6 +71,7 @@ $copy="";
     <div class="btns">
         <a href="client-projects.php" class="btn btn-secondary">Return</a>
         <a href="client-project.php?id=<?=$record['id']?>" class="btn btn-primary">Edit</a>
+        <a href="client-project-log.php?project_id=<?=$record['id']?>" class="btn btn-success">Add Log Entry</a>
         <a href="client-projects.php?delete=<?=$record['id']?>" onclick="return confirm('Are you sure you want to delete this record?')" class="btn btn-danger">Delete</a>
     </div>
 </div>
