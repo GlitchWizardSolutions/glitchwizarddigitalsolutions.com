@@ -14,7 +14,7 @@ $stmt = $pdo->prepare('SELECT i.*, ii.* FROM invoices i JOIN invoice_items ii ON
 $stmt->execute([ $_GET['id'] ]);
 $invoice_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Retrieve invoice details
-$stmt = $pdo->prepare('SELECT c.id AS c_id, i.*, c.* FROM invoices i LEFT JOIN invoice_items ii ON ii.invoice_number = i.invoice_number LEFT JOIN invoice_clients c ON c.id = i.client_id WHERE i.id = ?');
+$stmt = $pdo->prepare('SELECT c.id AS c_id, i.*, c.*, d.domain, d.due_date AS domain_due_date, d.amount AS domain_amount, d.host_url, pt.name AS project_type_name, pt.description AS project_type_description FROM invoices i LEFT JOIN invoice_items ii ON ii.invoice_number = i.invoice_number LEFT JOIN invoice_clients c ON c.id = i.client_id LEFT JOIN domains d ON d.id = i.domain_id LEFT JOIN project_types pt ON pt.id = i.project_type_id WHERE i.id = ?');
 $stmt->execute([ $_GET['id'] ]);
 $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
 // address
@@ -80,8 +80,31 @@ if (!$invoice) {
         </div>
         <div class="invoice-detail">
             <h3>Invoice Number</h3>
-            <p><?=$invoice['invoice_number']?></p>
+            <p><?=$invoice['invoice_number']?><?php if ($invoice['is_recurring']): ?> <span class="badge" style="background:#9b59b6;color:white;padding:3px 8px;border-radius:4px;font-size:11px;margin-left:6px;" title="Recurring: <?=ucfirst($invoice['recurrence_frequency'])?>"><i class="fa-solid fa-rotate"></i> Recurring</span><?php endif; ?></p>
         </div>
+        <?php if ($invoice['domain']): ?>
+        <div class="invoice-detail">
+            <h3><i class="fa-solid fa-globe"></i> Domain</h3>
+            <p><?=htmlspecialchars($invoice['domain'], ENT_QUOTES)?></p>
+        </div>
+        <?php endif; ?>
+        <?php if ($invoice['project_type_name']): ?>
+        <div class="invoice-detail">
+            <h3><i class="fa-solid fa-layer-group"></i> Service Category</h3>
+            <p style="font-weight:500;"><?=htmlspecialchars($invoice['project_type_name'], ENT_QUOTES)?></p>
+        </div>
+        <?php if ($invoice['project_type_description']): ?>
+        <div class="invoice-detail" style="grid-column: 1 / -1;">
+            <p style="font-size:13px;color:#666;line-height:1.5;font-style:italic;"><?=htmlspecialchars($invoice['project_type_description'], ENT_QUOTES)?></p>
+        </div>
+        <?php endif; ?>
+        <?php endif; ?>
+        <?php if ($invoice['is_recurring']): ?>
+        <div class="invoice-detail">
+            <h3><i class="fa-solid fa-rotate"></i> Recurring Schedule</h3>
+            <p><span class="badge" style="background:#9b59b6;color:white;padding:4px 10px;border-radius:4px;font-size:12px;"><?=ucfirst($invoice['recurrence_frequency'])?></span></p>
+        </div>
+        <?php endif; ?>
         <div class="invoice-detail">
             <h3>Payment Method(s)</h3>
             <p>
