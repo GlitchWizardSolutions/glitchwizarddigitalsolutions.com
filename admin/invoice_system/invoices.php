@@ -95,7 +95,7 @@ if ($client_id) $stmt->bindParam('client_id', $client_id, PDO::PARAM_INT);
 $stmt->execute();
 $total_invoices = $stmt->fetchColumn();
 // Prepare invoices query
-$stmt = $pdo->prepare('SELECT i.*, c.first_name, c.last_name, c.email, (SELECT COUNT(*) FROM invoice_items ii WHERE ii.invoice_number = i.invoice_number) AS total_items FROM invoices i LEFT JOIN invoice_clients c ON c.id = i.client_id ' . $where . ' ORDER BY ' . $order_by . ' ' . $order . ' LIMIT :start_results,:num_results');
+$stmt = $pdo->prepare('SELECT i.*, c.first_name, c.last_name, c.email, d.domain, pt.name AS project_type_name, (SELECT COUNT(*) FROM invoice_items ii WHERE ii.invoice_number = i.invoice_number) AS total_items FROM invoices i LEFT JOIN invoice_clients c ON c.id = i.client_id LEFT JOIN domains d ON d.id = i.domain_id LEFT JOIN project_types pt ON pt.id = i.project_type_id ' . $where . ' ORDER BY ' . $order_by . ' ' . $order . ' LIMIT :start_results,:num_results');
 $stmt->bindParam('start_results', $param1, PDO::PARAM_INT);
 $stmt->bindParam('num_results', $param2, PDO::PARAM_INT);
 if ($search) $stmt->bindParam('search', $param3, PDO::PARAM_STR);
@@ -286,9 +286,11 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                     <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=id'?>">#<?=$order_by=='id' ? $table_icons[strtolower($order)] : ''?></td>
                     <td colspan="2"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=first_name'?>">Client<?=$order_by=='first_name' ? $table_icons[strtolower($order)] : ''?></td>
                     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=invoice_number'?>">Invoice #<?=$order_by=='invoice_number' ? $table_icons[strtolower($order)] : ''?></td>
-                    <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=total_items'?>">Items<?=$order_by=='total_items' ? $table_icons[strtolower($order)] : ''?></td>
-               <?php /*     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_methods'?>">Method(s)<?=$order_by=='payment_methods' ? $table_icons[strtolower($order)] : ''?></td> */ ?>
-                    <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_amount'?>">Amount<?=$order_by=='payment_amount' ? $table_icons[strtolower($order)] : ''?></td>
+                    <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=total_items'?>">Items<?=$order_by=='total_items' ? $table_icons[strtolower($order)] : ''?></a></td>
+                    <td class="responsive-hidden">Domain</td>
+                    <td class="responsive-hidden">Category</td>
+               <?php /*     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_methods'?>">Method(s)<?=$order_by=='payment_methods' ? $table_icons[strtolower($order)] : ''?></a></td> */ ?>
+                    <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_amount'?>">Amount<?=$order_by=='payment_amount' ? $table_icons[strtolower($order)] : ''?></a></td>
                     <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_status'?>">Status<?=$order_by=='payment_status' ? $table_icons[strtolower($order)] : ''?></td>
                     <td>Seen</td>
                     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=due_date'?>">Due Date<?=$order_by=='due_date' ? $table_icons[strtolower($order)] : ''?></td>
@@ -310,8 +312,10 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                         </div>
                     </td>
                     <td><?=htmlspecialchars($invoice['first_name'] . ' ' . $invoice['last_name'], ENT_QUOTES)?></td>
-                    <td class="alt responsive-hidden"><?=htmlspecialchars($invoice['invoice_number'], ENT_QUOTES)?></td>
+                    <td class="alt responsive-hidden"><?=htmlspecialchars($invoice['invoice_number'], ENT_QUOTES)?><?php if ($invoice['is_recurring']): ?> <span class="badge" style="background:#9b59b6;color:white;padding:2px 6px;border-radius:3px;font-size:10px;margin-left:4px;" title="Recurring: <?=ucfirst($invoice['recurrence_frequency'])?>"><i class="fa-solid fa-rotate"></i></span><?php endif; ?></td>
                     <td class="alt responsive-hidden"><span class="grey small"><?=number_format($invoice['total_items'])?></span></td>
+                    <td class="alt responsive-hidden"><?=$invoice['domain'] ? '<span class="grey" style="font-size:11px;"><i class="fa-solid fa-globe"></i> ' . htmlspecialchars($invoice['domain'], ENT_QUOTES) . '</span>' : '<span class="grey" style="font-size:11px;">—</span>'?></td>
+                    <td class="alt responsive-hidden"><?=$invoice['project_type_name'] ? '<span class="grey" style="font-size:11px;">' . htmlspecialchars($invoice['project_type_name'], ENT_QUOTES) . '</span>' : '<span class="grey" style="font-size:11px;">—</span>'?></td>
                   <?php /*  <td class="alt responsive-hidden">
                         <?php if ($invoice['payment_methods']): ?>
                         <?php foreach (explode(',', $invoice['payment_methods']) as $method): ?>
