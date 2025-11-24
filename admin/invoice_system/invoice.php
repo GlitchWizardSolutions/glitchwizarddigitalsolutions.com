@@ -25,13 +25,21 @@ $invoice = [
     'recurrence_period_type' => 'year',
     'payment_ref' => '',
     'paid_with' => '',
-    'paid_total' => 0
+    'paid_total' => 0,
+    'domain_id' => null,
+    'project_type_id' => null,
+    'is_recurring' => 0,
+    'recurrence_frequency' => 'none'
 ];
 
 // Get template names in templates folder, only display folders
 $templates = array_filter(glob(base_path . 'templates/*'), 'is_dir');
 // Retrieve accounts
 $invoice_clients = $pdo->query('SELECT * FROM invoice_clients ORDER BY first_name ASC')->fetchAll();
+// Retrieve active domains for dropdown
+$domains = $pdo->query('SELECT * FROM domains WHERE status = "Active" ORDER BY domain ASC')->fetchAll();
+// Retrieve project types for dropdown
+$project_types = $pdo->query('SELECT * FROM project_types ORDER BY name ASC')->fetchAll();
 // Invoice items
 $invoice_items = [];
 // Calculate payment amount
@@ -69,8 +77,8 @@ if (isset($_GET['id'])) {
         $payment_methods = isset($_POST['payment_methods']) ? implode(', ', $_POST['payment_methods']) : '';
         // Update the invoice
         error_log("Update invoices: " . $_POST['client_id'] . "," . $_POST['invoice_number']);
-        $stmt = $pdo->prepare('UPDATE invoices SET client_id = ?, invoice_number = ?, payment_amount = ?, payment_status = ?, payment_methods = ?, notes = ?, due_date = ?, created = ?, tax = ?, tax_total = ?, invoice_template = ?, recurrence = ?, recurrence_period = ?, recurrence_period_type = ?, paid_total = ? WHERE id = ?');
-        $stmt->execute([ $_POST['client_id'], $_POST['invoice_number'], $payment_amount, $_POST['payment_status'], $payment_methods, $_POST['notes'], $_POST['due_date'], $_POST['created'], $tax, $tax_total, $_POST['invoice_template'], $_POST['recurrence'], $_POST['recurrence_period'], $_POST['recurrence_period_type'], $_POST['paid_total'], $_GET['id'] ]);
+        $stmt = $pdo->prepare('UPDATE invoices SET client_id = ?, invoice_number = ?, payment_amount = ?, payment_status = ?, payment_methods = ?, notes = ?, due_date = ?, created = ?, tax = ?, tax_total = ?, invoice_template = ?, recurrence = ?, recurrence_period = ?, recurrence_period_type = ?, paid_total = ?, domain_id = ?, project_type_id = ?, is_recurring = ?, recurrence_frequency = ? WHERE id = ?');
+        $stmt->execute([ $_POST['client_id'], $_POST['invoice_number'], $payment_amount, $_POST['payment_status'], $payment_methods, $_POST['notes'], $_POST['due_date'], $_POST['created'], $tax, $tax_total, $_POST['invoice_template'], $_POST['recurrence'], $_POST['recurrence_period'], $_POST['recurrence_period_type'], $_POST['paid_total'], $_POST['domain_id'] ?: null, $_POST['project_type_id'] ?: null, isset($_POST['is_recurring']) ? 1 : 0, $_POST['recurrence_frequency'], $_GET['id'] ]);
         // add items
         addItems($pdo, $_POST['invoice_number']);
         // Create PDF
@@ -122,8 +130,8 @@ if (isset($_GET['id'])) {
         $inv= str_replace(' ', '', $inv); 
         $inv= date('ymdh:ia') . $inv; 
         // Insert the invoice
-        $stmt = $pdo->prepare('INSERT INTO invoices (client_id, invoice_number, payment_amount, payment_status, payment_methods, notes, viewed, due_date, created, tax, tax_total, invoice_template, recurrence, recurrence_period, recurrence_period_type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-        $stmt->execute([ $_POST['client_id'], $inv, $payment_amount, $_POST['payment_status'], $payment_methods, $_POST['notes'], 0, $_POST['due_date'], $_POST['created'], $tax, $tax_total, $_POST['invoice_template'], $_POST['recurrence'], $_POST['recurrence_period'], $_POST['recurrence_period_type'] ]);
+        $stmt = $pdo->prepare('INSERT INTO invoices (client_id, invoice_number, payment_amount, payment_status, payment_methods, notes, viewed, due_date, created, tax, tax_total, invoice_template, recurrence, recurrence_period, recurrence_period_type, domain_id, project_type_id, is_recurring, recurrence_frequency) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+        $stmt->execute([ $_POST['client_id'], $inv, $payment_amount, $_POST['payment_status'], $payment_methods, $_POST['notes'], 0, $_POST['due_date'], $_POST['created'], $tax, $tax_total, $_POST['invoice_template'], $_POST['recurrence'], $_POST['recurrence_period'], $_POST['recurrence_period_type'], $_POST['domain_id'] ?: null, $_POST['project_type_id'] ?: null, isset($_POST['is_recurring']) ? 1 : 0, $_POST['recurrence_frequency'] ]);
         // add items
         addItems($pdo, $inv);
         // Create PDF
@@ -223,6 +231,47 @@ if (isset($_GET['id'])) {
                 <?php endforeach; ?>
             </select>
             <a href="client.php" class="btn btn-primary" style="margin-top: 10px; display: inline-block;">Add New Client</a>
+            
+            <label for="domain_id"><i class="fa-solid fa-globe"></i> Domain (Optional)</label>
+            <select id="domain_id" name="domain_id" style="margin-bottom:10px">
+                <option value="">-- Select Domain (Optional) --</option>
+                <?php foreach ($domains as $domain): ?>
+                <option value="<?=$domain['id']?>" 
+                        data-amount="<?=$domain['amount']?>" 
+                        data-due-date="<?=$domain['due_date']?>"
+                        <?=isset($invoice['domain_id']) && $invoice['domain_id']==$domain['id']?' selected':''?>>
+                    <?=$domain['domain']?> - $<?=number_format($domain['amount'], 2)?> (Due: <?=date('m/d/Y', strtotime($domain['due_date']))?>)
+                </option>
+                <?php endforeach; ?>
+            </select>
+            <small style="color: #666; display: block; margin-top: 5px;"><i class="fa-solid fa-info-circle"></i> Link this invoice to a domain renewal. Amount will auto-populate.</small>
+
+            <label for="project_type_id"><i class="fa-solid fa-layer-group"></i> Service Category (Optional)</label>
+            <select id="project_type_id" name="project_type_id" style="margin-bottom:10px">
+                <option value="">-- Select Service Category (Optional) --</option>
+                <?php foreach ($project_types as $type): ?>
+                <option value="<?=$type['id']?>" <?=isset($invoice['project_type_id']) && $invoice['project_type_id']==$type['id']?' selected':''?>>
+                    <?=$type['name']?>
+                </option>
+                <?php endforeach; ?>
+            </select>
+            <small style="color: #666; display: block; margin-top: 5px;"><i class="fa-solid fa-info-circle"></i> Categorize this invoice by service type for reporting</small>
+
+            <label for="is_recurring" class="checkbox pad-bot-5" style="margin-top: 15px;">
+                <input id="is_recurring" type="checkbox" name="is_recurring" value="1" <?=isset($invoice['is_recurring']) && $invoice['is_recurring'] ? 'checked' : ''?>>
+                <i class="fa-solid fa-rotate"></i> Recurring Invoice
+            </label>
+
+            <div id="recurrence_options" style="<?=isset($invoice['is_recurring']) && $invoice['is_recurring'] ? '' : 'display:none;'?> margin-left: 25px; padding: 10px; background: #f5f5f5; border-left: 3px solid #6b46c1; margin-bottom: 15px;">
+                <label for="recurrence_frequency">Recurrence Frequency</label>
+                <select id="recurrence_frequency" name="recurrence_frequency">
+                    <option value="none" <?=isset($invoice['recurrence_frequency']) && $invoice['recurrence_frequency']=='none'?' selected':''?>>None</option>
+                    <option value="monthly" <?=isset($invoice['recurrence_frequency']) && $invoice['recurrence_frequency']=='monthly'?' selected':''?>>Monthly</option>
+                    <option value="quarterly" <?=isset($invoice['recurrence_frequency']) && $invoice['recurrence_frequency']=='quarterly'?' selected':''?>>Quarterly</option>
+                    <option value="annually" <?=isset($invoice['recurrence_frequency']) && $invoice['recurrence_frequency']=='annually'?' selected':''?>>Annually</option>
+                </select>
+                <small style="color: #666; display: block; margin-top: 5px;"><i class="fa-solid fa-info-circle"></i> How often this invoice should be automatically generated</small>
+            </div>
             
             <?php if ($page == 'Create'): ?>
             <label for="send_email_checkbox" class="checkbox pad-bot-5" style="margin-top: 15px;">
@@ -609,6 +658,71 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Please add at least one invoice item before submitting.');
                 document.querySelector('.invoice-items-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
                 return false;
+            }
+        });
+    }
+});
+
+// Domain selection auto-populate
+document.addEventListener('DOMContentLoaded', function() {
+    const domainSelect = document.getElementById('domain_id');
+    if (domainSelect) {
+        domainSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                const amount = selectedOption.getAttribute('data-amount');
+                const dueDate = selectedOption.getAttribute('data-due-date');
+                
+                // Auto-populate first item if no items exist
+                const firstItemPrice = document.querySelector('input[name="item_price[]"]');
+                const firstItemName = document.querySelector('input[name="item_name[]"]');
+                
+                if (firstItemPrice && !firstItemPrice.value && amount) {
+                    firstItemPrice.value = amount;
+                }
+                
+                if (firstItemName && !firstItemName.value) {
+                    const domainName = selectedOption.textContent.split(' - ')[0];
+                    firstItemName.value = 'Domain Renewal: ' + domainName;
+                }
+                
+                // Update due date if it matches the default 7-day value
+                const dueDateInput = document.getElementById('due_date');
+                if (dueDateInput && dueDate) {
+                    dueDateInput.value = dueDate.replace(' ', 'T').substring(0, 16);
+                }
+                
+                // Check the recurring checkbox and set to annually
+                const recurringCheckbox = document.getElementById('is_recurring');
+                const recurrenceFrequency = document.getElementById('recurrence_frequency');
+                if (recurringCheckbox && !recurringCheckbox.checked) {
+                    recurringCheckbox.checked = true;
+                    recurringCheckbox.dispatchEvent(new Event('change'));
+                }
+                if (recurrenceFrequency) {
+                    recurrenceFrequency.value = 'annually';
+                }
+                
+                if (typeof calculateInvoiceTotals === 'function') {
+                    calculateInvoiceTotals();
+                }
+            }
+        });
+    }
+    
+    // Recurring checkbox toggle
+    const recurringCheckbox = document.getElementById('is_recurring');
+    const recurrenceOptions = document.getElementById('recurrence_options');
+    if (recurringCheckbox && recurrenceOptions) {
+        recurringCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                recurrenceOptions.style.display = 'block';
+                const freqSelect = document.getElementById('recurrence_frequency');
+                if (freqSelect && freqSelect.value === 'none') {
+                    freqSelect.value = 'annually';
+                }
+            } else {
+                recurrenceOptions.style.display = 'none';
             }
         });
     }
