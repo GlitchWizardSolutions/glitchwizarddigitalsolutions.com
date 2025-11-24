@@ -53,11 +53,11 @@ $search = isset($_GET['search']) ? $_GET['search'] : '';
 // Filters
 $status = isset($_GET['status']) ? $_GET['status'] : '';
  
-// Order by column
-$order = isset($_GET['order']) && $_GET['order'] == 'DESC' ? 'DESC' : 'ASC';
+// Order by column - default to DESC for last_update, custom order for ticket_status
+$order = isset($_GET['order']) && $_GET['order'] == 'ASC' ? 'ASC' : 'DESC';
 // Add/remove columns to the whitelist array
 $order_by_whitelist = ['last_comment', 'ticket_status', 'created','priority','category_id','title','msg','private'];
-$order_by = isset($_GET['order_by']) && in_array($_GET['order_by'], $order_by_whitelist) ? $_GET['order_by'] : 'last_update';
+$order_by = isset($_GET['order_by']) && in_array($_GET['order_by'], $order_by_whitelist) ? $_GET['order_by'] : 'ticket_status';
 // Number of results per pagination page
 $results_per_page = 15;
 // Declare query param variables
@@ -82,8 +82,17 @@ if (isset($_GET['acc_id'])) $stmt->bindParam('acc_id', $_GET['acc_id'], PDO::PAR
 if ($status) $stmt->bindParam('status', $status, PDO::PARAM_STR);
 $stmt->execute();
 $tickets_total = $stmt->fetchColumn();
+
+// Build ORDER BY clause - custom sorting for ticket_status to put 'open' first
+$order_clause = '';
+if ($order_by == 'ticket_status') {
+    $order_clause = 'ORDER BY CASE t.ticket_status WHEN "open" THEN 1 WHEN "resolved" THEN 2 WHEN "closed" THEN 3 END ' . $order . ', t.last_update DESC';
+} else {
+    $order_clause = 'ORDER BY ' . $order_by . ' ' . $order;
+}
+
 // SQL query to get all tickets from the "tickets" table
-$stmt = $pdo->prepare('SELECT t.*, (SELECT COUNT(tc.id) FROM tickets_comments tc WHERE tc.ticket_id = t.id) AS num_comments, (SELECT GROUP_CONCAT(tu.filepath) FROM tickets_uploads tu WHERE tu.ticket_id = t.id) AS imgs, c.title AS category, a.username AS p_full_name, a.email AS a_email FROM tickets t LEFT JOIN categories c ON c.id = t.category_id LEFT JOIN accounts a ON t.acc_id = a.id ' . $where . ' ORDER BY ' . $order_by . ' ' . $order . ' LIMIT :start_results,:num_results');
+$stmt = $pdo->prepare('SELECT t.*, (SELECT COUNT(tc.id) FROM tickets_comments tc WHERE tc.ticket_id = t.id) AS num_comments, (SELECT GROUP_CONCAT(tu.filepath) FROM tickets_uploads tu WHERE tu.ticket_id = t.id) AS imgs, c.title AS category, a.username AS p_full_name, a.email AS a_email FROM tickets t LEFT JOIN categories c ON c.id = t.category_id LEFT JOIN accounts a ON t.acc_id = a.id ' . $where . ' ' . $order_clause . ' LIMIT :start_results,:num_results');
 // Bind params
 $stmt->bindParam('start_results', $param1, PDO::PARAM_INT);
 $stmt->bindParam('num_results', $param2, PDO::PARAM_INT);

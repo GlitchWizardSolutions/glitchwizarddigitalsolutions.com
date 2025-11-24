@@ -136,11 +136,14 @@ const initMultiselect = () => {
 };
 initMultiselect();
 document.querySelectorAll('.msg').forEach(element => {
-    element.querySelector('.close').onclick = () => {
-        element.remove();
-        history.replaceState && history.replaceState(null, '', location.pathname + location.search.replace(/[\?&]success_msg=[^&]+/, '').replace(/^&/, '?') + location.hash);
-        history.replaceState && history.replaceState(null, '', location.pathname + location.search.replace(/[\?&]error_msg=[^&]+/, '').replace(/^&/, '?') + location.hash);
-    };
+    const closeBtn = element.querySelector('.close');
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            element.remove();
+            history.replaceState && history.replaceState(null, '', location.pathname + location.search.replace(/[\?&]success_msg=[^&]+/, '').replace(/^&/, '?') + location.hash);
+            history.replaceState && history.replaceState(null, '', location.pathname + location.search.replace(/[\?&]error_msg=[^&]+/, '').replace(/^&/, '?') + location.hash);
+        };
+    }
 });
 if (location.search.includes('success_msg') || location.search.includes('error_msg')) {
     history.replaceState && history.replaceState(null, '', location.pathname + location.search.replace(/[\?&]success_msg=[^&]+/, '').replace(/^&/, '?') + location.hash);
