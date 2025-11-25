@@ -1171,7 +1171,7 @@ main .form.size-full, .create-invoice-modal.size-full {
 .table table tbody td {
   padding: 8px 0;
 }
-.table table tbody td .green, .table table tbody td .red, .table table tbody td .grey, .table table tbody td .orange, .table table tbody td .blue {
+.table table tbody td .green, .table table tbody td .red, .table table tbody td .grey, .table table tbody td .orange, .table table tbody td .blue, .table table tbody td .purple {
   display: inline-flex;
   font-weight: 600;
   font-size: 12px;
@@ -1182,7 +1182,7 @@ main .form.size-full, .create-invoice-modal.size-full {
   background-color: #e8ebec;
   color: #8e9499;
 }
-.table table tbody td .green.small, .table table tbody td .red.small, .table table tbody td .grey.small, .table table tbody td .orange.small, .table table tbody td .blue.small {
+.table table tbody td .green.small, .table table tbody td .red.small, .table table tbody td .grey.small, .table table tbody td .orange.small, .table table tbody td .blue.small, .table table tbody td .purple.small {
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 5px;
@@ -1202,6 +1202,10 @@ main .form.size-full, .create-invoice-modal.size-full {
 .table table tbody td .orange {
   background-color: #f8eac2;
   color: #dea200;
+}
+.table table tbody td .purple {
+  background-color: #e8d5f7;
+  color: #9c27b0;
 }
 .table table tbody td .images {
   max-width: 180px;
