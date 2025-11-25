@@ -97,10 +97,11 @@ include includes_path . 'navigation.php';
               </div>
               <div class="invoice-iframe-container">
                 <iframe 
-                  src="<?php echo site_menu_base ?>client-invoices/invoice.php?id=<?= htmlspecialchars($invoice_id) ?><?= isset($_GET['notification_id']) ? '&notification_id=' . htmlspecialchars($_GET['notification_id']) : '' ?>" 
+                  src="<?php echo site_menu_base ?>client-invoices/invoice.php?id=<?= htmlspecialchars($invoice_id) ?><?= isset($_GET['notification_id']) ? '&notification_id=' . htmlspecialchars($_GET['notification_id']) : '' ?><?= isset($_GET['payment_success']) ? '&payment_success=true' : '' ?><?= isset($_GET['payment_cancelled']) ? '&payment_cancelled=true' : '' ?>" 
                   class="invoice-iframe"
                   title="Invoice #<?= htmlspecialchars($invoice_id) ?>"
-                  scrolling="yes"
+                  scrolling="no"
+                  id="invoice-iframe"
                 ></iframe>
               </div>
             </div>
@@ -113,19 +114,29 @@ include includes_path . 'navigation.php';
 
   <script>
     // Auto-resize iframe based on content
+    function resizeIframe() {
+      const iframe = document.querySelector('.invoice-iframe');
+      if (iframe) {
+        try {
+          // Try to get the height of the iframe content
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          const height = iframeDoc.documentElement.scrollHeight;
+          iframe.style.height = (height + 100) + 'px'; // Add 100px buffer for payment messages
+        } catch(e) {
+          // If we can't access iframe content (CORS), use large fixed height
+          iframe.style.height = '1500px';
+        }
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       const iframe = document.querySelector('.invoice-iframe');
       if (iframe) {
         iframe.addEventListener('load', function() {
-          try {
-            // Try to get the height of the iframe content
-            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-            const height = iframeDoc.documentElement.scrollHeight;
-            iframe.style.height = (height + 50) + 'px'; // Add 50px buffer
-          } catch(e) {
-            // If we can't access iframe content (CORS), use large fixed height
-            iframe.style.height = '1500px';
-          }
+          resizeIframe();
+          // Re-check height after a short delay (for dynamic content)
+          setTimeout(resizeIframe, 500);
+          setTimeout(resizeIframe, 1000);
         });
       }
     });
