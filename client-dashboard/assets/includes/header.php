@@ -155,7 +155,7 @@
             <li class="dropdown-footer" style="display: flex; flex-direction: column; gap: 8px; padding: 15px;">
               <a href="<?php echo $base_url; ?>/client-invoices.php" class="btn btn-sm" style="background-color: rgb(120, 13, 227); color: white; border: none; text-decoration: none; width: 100%; padding: 8px;">View All Invoices</a>
               <?php if ($invoice_notification_bell > 0): ?>
-              <a href="<?php echo $base_url; ?>/mark-invoices-read.php" class="btn btn-sm btn-success" style="text-decoration: none; color: white; width: 100%; padding: 8px;">Mark All Read</a>
+              <a href="<?php echo $base_url; ?>/mark-invoices-read.php" class="btn btn-sm btn-success" style="text-decoration: none; color: white; width: 100%; padding: 8px;" title="Outstanding balance notifications remain visible">Mark All Read</a>
               <?php endif; ?>
             </li>
            </div>
