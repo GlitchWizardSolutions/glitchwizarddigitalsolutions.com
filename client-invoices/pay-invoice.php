@@ -350,13 +350,17 @@ if (!$client) {
                     return Promise.reject('Invalid payment amount');
                 }
                 
+                // Create unique invoice ID for PayPal by appending timestamp
+                // This allows multiple partial payments on the same invoice
+                const uniqueInvoiceId = '<?=$invoice['invoice_number']?>-' + Date.now();
+                
                 return actions.order.create({
                     purchase_units: [{
                         description: 'Invoice <?=$invoice['invoice_number']?><?=($invoice['payment_status'] == 'Balance' ? ' (Partial Payment)' : '')?>',
                         amount: {
                             value: paymentAmount
                         },
-                        invoice_id: '<?=$invoice['invoice_number']?>',
+                        invoice_id: uniqueInvoiceId,
                         custom_id: '<?=$invoice['invoice_number']?>'
                     }]
                 });
