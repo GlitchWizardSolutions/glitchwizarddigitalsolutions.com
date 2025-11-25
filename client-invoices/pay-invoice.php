@@ -187,22 +187,25 @@ if (!$client) {
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            color: #666;
+            color: #333;
         }
-        .partial-payment input[type="number"] {
+        .partial-payment input[type="text"] {
             width: 100%;
-            padding: 12px 12px 12px 35px;
-            font-size: 18px;
-            border: 2px solid #ddd;
+            padding: 15px 15px 15px 35px;
+            font-size: 24px;
+            border: 2px solid #ffc107;
             border-radius: 4px;
             box-sizing: border-box;
-            font-weight: 600;
+            font-weight: 700;
+            background: #fff;
+            color: #333;
+            text-align: left;
+            cursor: default;
         }
-        .partial-payment input[type="number"]:focus {
+        .partial-payment input[type="text"]:focus {
             outline: none;
-            border-color: #3498db;
         }
         .partial-payment .hint {
             display: block;
@@ -258,46 +261,37 @@ if (!$client) {
             <h3>💰 Payment Amount</h3>
             <label for="payment-amount">
                 <?php if ($invoice['payment_status'] == 'Balance'): ?>
-                Pay Full Balance or Make Partial Payment:
+                Select payment amount below:
                 <?php else: ?>
-                Pay Full Amount or Make Partial Payment:
+                Select payment amount below:
                 <?php endif; ?>
             </label>
             <div class="amount-input-wrapper">
-                <input type="number" 
+                <input type="text" 
                        id="payment-amount" 
-                       min="0.01" 
-                       max="<?=$amount_to_charge?>" 
-                       step="0.01" 
-                       value="<?=$amount_to_charge?>"
-                       placeholder="Enter amount">
+                       value="<?=number_format($amount_to_charge, 2)?>"
+                       readonly>
             </div>
             <span class="hint">
-                Maximum: $<?=number_format($amount_to_charge, 2)?> • Minimum: $0.01
+                Maximum: $<?=number_format($amount_to_charge, 2)?>
             </span>
             
             <!-- Quick Amount Buttons -->
             <div class="quick-amounts">
-                <strong style="display: block; margin-bottom: 8px; color: #856404;">Quick Select:</strong>
+                <strong style="display: block; margin-bottom: 8px; color: #856404;">Payment Options:</strong>
                 <button type="button" onclick="setPaymentAmount(<?=$amount_to_charge?>)">
                     Full Balance ($<?=number_format($amount_to_charge, 2)?>)
                 </button>
-                <?php if ($amount_to_charge >= 100): ?>
+                <?php if ($amount_to_charge >= 2): ?>
                 <button type="button" onclick="setPaymentAmount(<?=$amount_to_charge / 2?>)">
                     Half ($<?=number_format($amount_to_charge / 2, 2)?>)
                 </button>
                 <?php endif; ?>
-                <?php if ($amount_to_charge >= 200): ?>
+                <?php if ($amount_to_charge >= 4): ?>
                 <button type="button" onclick="setPaymentAmount(<?=$amount_to_charge / 4?>)">
                     Quarter ($<?=number_format($amount_to_charge / 4, 2)?>)
                 </button>
                 <?php endif; ?>
-                <button type="button" onclick="setPaymentAmount(50)">
-                    $50
-                </button>
-                <button type="button" onclick="setPaymentAmount(100)">
-                    $100
-                </button>
             </div>
         </div>
 
@@ -323,29 +317,25 @@ if (!$client) {
         // Helper function to set payment amount
         function setPaymentAmount(amount) {
             const maxAmount = <?=$amount_to_charge?>;
-            const validAmount = Math.min(Math.max(0.01, parseFloat(amount)), maxAmount);
+            const validAmount = Math.min(parseFloat(amount), maxAmount);
+            // Update the display field with formatted amount
             document.getElementById('payment-amount').value = validAmount.toFixed(2);
         }
         
-        // Get the payment amount from the input field
+        // Get the payment amount from the display field
         function getPaymentAmount() {
             const input = document.getElementById('payment-amount');
-            const amount = parseFloat(input.value);
+            const amount = parseFloat(input.value.replace(/,/g, ''));
             const maxAmount = <?=$amount_to_charge?>;
             
             // Validate amount
             if (isNaN(amount) || amount <= 0) {
-                alert('Please enter a valid payment amount.');
+                alert('Please select a payment amount.');
                 return null;
             }
             
             if (amount > maxAmount) {
                 alert('Payment amount cannot exceed the balance due of $' + maxAmount.toFixed(2));
-                return null;
-            }
-            
-            if (amount < 0.01) {
-                alert('Payment amount must be at least $0.01');
                 return null;
             }
             
