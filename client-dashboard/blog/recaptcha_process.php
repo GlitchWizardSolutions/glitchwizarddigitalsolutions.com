@@ -76,7 +76,6 @@ if ($verification['success'] && $verification['score'] >= 0.5) {
                  header("Location: post?name=$slug&error=$error_encoded#comments");
                  exit;
             }
-    echo "✅ Comment accepted! Author: " . htmlspecialchars($author) . "<br>Comment: " . htmlspecialchars($comment);
 } else {
     // ❌ Low score or invalid
                  $slug = urlencode($row['slug']);
