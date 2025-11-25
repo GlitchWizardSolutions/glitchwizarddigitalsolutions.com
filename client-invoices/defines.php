@@ -40,16 +40,9 @@ if(!defined('notification_email')) define('notification_email','accounting@glitc
 // Send mail from which address ON THIS SERVER?
 if(!defined('mail_from')) define('mail_from','no_reply@GlitchwizardDigitalSolutions.com');
 if(!defined('mail_name')) define('mail_name','GlitchWizard Solutions');
+// SMTP settings - loaded from private/config.php (no credentials stored here for security)
 if(!defined('SMTP')) define('SMTP',true);
-if(!defined('smtp_host')) define('smtp_host','mail.glitchwizarddigitalsolutions.com');
-if(!defined('smtp_port')) define('smtp_port',465);
-if(!defined('smtp_user')) define('smtp_user','no_reply@glitchwizarddigitalsolutions.com');
-// SMTP password loaded from private/config.php
-// The SMTP Secure connection type (ssl, tls).
-if(!defined('smtp_secure'))define('smtp_secure','ssl');
-// Reply-To address (where recipients should reply)
-if(!defined('reply_to_email')) define('reply_to_email','barbara@glitchwizardsolutions.com');
-if(!defined('reply_to_name')) define('reply_to_name','Barbara Moore');
+// All SMTP credentials (host, port, user, password, secure) are defined in private/config.php
 /* Chron */
 if(!defined('cron_mails_per_request')) define('cron_mails_per_request',1);
 // Cron sleep per request in seconds
