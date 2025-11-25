@@ -15,11 +15,13 @@ if (!$account || $account['role'] !== 'Admin') {
 
 echo "<h2>Update Notification Messages</h2>";
 
-// Get all notifications with old format
+// Get all notifications with old format (including recently created ones that need line break updates)
 $stmt = $pdo->query("
     SELECT * FROM client_notifications 
     WHERE message LIKE 'New invoice%created%' 
     OR message LIKE 'Payment of%received for Invoice%'
+    OR message LIKE 'PAID - %received. Fully paid.'
+    OR message LIKE 'PARTIAL - %received. Balance:%'
     ORDER BY id DESC
 ");
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -45,14 +47,27 @@ if ($notifications) {
         elseif (preg_match('/Payment of \$([^\s]+) received for Invoice #([^\.]+)\. Invoice is now fully paid\./', $old_message, $matches)) {
             $amount = $matches[1];
             $invoice_num = $matches[2];
-            $new_message = "PAID - Invoice #{$invoice_num} - Payment of $$amount received. Fully paid.";
+            $new_message = "PAID - Invoice #{$invoice_num}\nReceived: $$amount";
         }
         // Update "Payment of $XXX received for Invoice #YYY. Remaining balance: $ZZZ"
         elseif (preg_match('/Payment of \$([^\s]+) received for Invoice #([^\.]+)\. Remaining balance: \$(.+)/', $old_message, $matches)) {
             $amount = $matches[1];
             $invoice_num = $matches[2];
             $balance = $matches[3];
-            $new_message = "PARTIAL - Invoice #{$invoice_num} - Payment of $$amount received. Balance: $$balance";
+            $new_message = "PARTIAL - Invoice #{$invoice_num}\nReceived: $$amount\nBalance: $$balance";
+        }
+        // Update newer PAID format to add line breaks
+        elseif (preg_match('/PAID - Invoice #([^\s]+) - Payment of \$([^\s]+) received\. Fully paid\./', $old_message, $matches)) {
+            $invoice_num = $matches[1];
+            $amount = $matches[2];
+            $new_message = "PAID - Invoice #{$invoice_num}\nReceived: $$amount";
+        }
+        // Update newer PARTIAL format to add line breaks
+        elseif (preg_match('/PARTIAL - Invoice #([^\s]+) - Payment of \$([^\s]+) received\. Balance: \$(.+)/', $old_message, $matches)) {
+            $invoice_num = $matches[1];
+            $amount = $matches[2];
+            $balance = $matches[3];
+            $new_message = "PARTIAL - Invoice #{$invoice_num}\nReceived: $$amount\nBalance: $$balance";
         }
         
         if ($new_message !== $old_message) {
