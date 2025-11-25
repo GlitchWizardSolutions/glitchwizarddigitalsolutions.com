@@ -37,7 +37,6 @@ if (!$data || !isset($data['orderID']) || !isset($data['invoice_number'])) {
 
 $order_id = $data['orderID'];
 $invoice_number = $data['invoice_number'];
-$details = $data['details'];
 
 // Verify the payment with PayPal API
 try {
@@ -61,30 +60,42 @@ try {
     }
     
     $access_token = $token_data['access_token'];
+    error_log("PayPal Capture: Got access token");
     
-    // Verify the order details with PayPal
-    curl_setopt($ch, CURLOPT_URL, paypal_base_url . '/v2/checkout/orders/' . $order_id);
-    curl_setopt($ch, CURLOPT_POST, false);
+    // Capture the order (this is where the actual payment happens)
+    curl_setopt($ch, CURLOPT_URL, paypal_base_url . '/v2/checkout/orders/' . $order_id . '/capture');
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, '{}');
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json',
         'Authorization: Bearer ' . $access_token
     ]);
     
-    $order_response = curl_exec($ch);
-    $order_data = json_decode($order_response, true);
+    $capture_response = curl_exec($ch);
+    $capture_data = json_decode($capture_response, true);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
     
-    // Verify payment was completed
-    if (!isset($order_data['status']) || $order_data['status'] !== 'COMPLETED') {
-        throw new Exception('Payment not completed');
+    error_log("PayPal Capture: Capture response (HTTP $http_code): " . print_r($capture_data, true));
+    
+    // Check if capture was successful
+    if ($http_code !== 201 && $http_code !== 200) {
+        $error_msg = isset($capture_data['details'][0]['description']) 
+            ? $capture_data['details'][0]['description'] 
+            : (isset($capture_data['message']) ? $capture_data['message'] : 'Unknown error');
+        throw new Exception('PayPal capture failed: ' . $error_msg);
+    }
+    
+    if (!isset($capture_data['status']) || $capture_data['status'] !== 'COMPLETED') {
+        throw new Exception('Payment capture not completed. Status: ' . ($capture_data['status'] ?? 'unknown'));
     }
     
     // Get payment amount and details
-    $capture = $order_data['purchase_units'][0]['payments']['captures'][0];
-    $payment_amount = floatval($capture['amount']['value']);
-    $transaction_id = $capture['id'];
-    $payer_email = $order_data['payer']['email_address'] ?? '';
-    $payer_name = ($order_data['payer']['name']['given_name'] ?? '') . ' ' . ($order_data['payer']['name']['surname'] ?? '');
+    $capture_details = $capture_data['purchase_units'][0]['payments']['captures'][0];
+    $payment_amount = floatval($capture_details['amount']['value']);
+    $transaction_id = $capture_details['id'];
+    $payer_email = $capture_data['payer']['email_address'] ?? '';
+    $payer_name = ($capture_data['payer']['name']['given_name'] ?? '') . ' ' . ($capture_data['payer']['name']['surname'] ?? '');
     
     // Get the invoice
     $stmt = $pdo->prepare('SELECT * FROM invoices WHERE invoice_number = ?');
