@@ -43,6 +43,11 @@ $stmt = $pdo->prepare('SELECT * FROM invoice_clients WHERE id = ?');
 $stmt->execute([ $invoice['client_id'] ]);
 $client = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Get payment history
+$stmt = $pdo->prepare('SELECT * FROM payment_history WHERE invoice_number = ? ORDER BY payment_date DESC');
+$stmt->execute([ $invoice['invoice_number'] ]);
+$payment_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Client address
 $client_address = [
     $client['address_street'],

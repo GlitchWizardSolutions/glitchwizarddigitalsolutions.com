@@ -242,6 +242,52 @@ body, html {
   padding: 0;
   line-height: 1.6;
 }
+.invoice .invoice-form .payment-history {
+  margin: 30px 0;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #e9ecef;
+}
+.invoice .invoice-form .payment-history h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3644;
+  margin: 0 0 15px 0;
+}
+.invoice .invoice-form .payment-history table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.invoice .invoice-form .payment-history table th {
+  background: #e9ecef;
+  color: #495057;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px;
+  text-align: left;
+  border-bottom: 2px solid #dee2e6;
+}
+.invoice .invoice-form .payment-history table td {
+  padding: 12px 10px;
+  font-size: 14px;
+  color: #5d6779;
+  border-bottom: 1px solid #e9ecef;
+}
+.invoice .invoice-form .payment-history table tr:last-child td {
+  border-bottom: none;
+}
+.invoice .invoice-form .payment-history table td.amount {
+  font-weight: 600;
+  color: #2ecc71;
+  text-align: right;
+}
+.invoice .invoice-form .payment-history .no-payments {
+  text-align: center;
+  color: #9fa4b1;
+  font-size: 14px;
+  padding: 20px;
+}
 .invoice .invoice-form .btns {
   display: flex;
   justify-content: flex-end;
@@ -436,6 +482,31 @@ body, html {
                         </tbody>
                     </table>
                 </div>
+                <?php if (!empty($payment_history)): ?>
+                <div class="payment-history">
+                    <h3>💳 Payment History</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Transaction ID</th>
+                                <th>Method</th>
+                                <th style="text-align:right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($payment_history as $payment): ?>
+                            <tr>
+                                <td><?=date('M j, Y g:i A', strtotime($payment['payment_date']))?></td>
+                                <td style="font-family:monospace;font-size:12px;"><?=htmlspecialchars($payment['transaction_id'])?></td>
+                                <td><?=htmlspecialchars($payment['payment_method'])?></td>
+                                <td class="amount"><?=currency_code?><?=number_format($payment['amount_paid'], 2)?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php endif; ?>
                 <?php if ($invoice['payment_status'] == 'Unpaid' || $invoice['payment_status'] == 'Balance'): ?>
                 <div class="payment-methods">
                     <h3>Secure Payment</h3>
