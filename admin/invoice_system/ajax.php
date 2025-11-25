@@ -81,6 +81,17 @@ if (isset($_GET['action']) && $_GET['action'] == 'create_invoice') {
      error_log('Generating the pdf = create_invoice in ajax.php');
     create_invoice_pdf($invoice, $invoice_items, $client);
      error_log('Generated the pdf = create_invoice in ajax.php');
+    
+    // Create notification for unpaid invoices only
+    if ($_POST['payment_status'] != 'Paid') {
+        $invoice_total = $payment_amount + $tax_total;
+        $notification_message = "New invoice #{$_POST['invoice_number']} created - Amount due: $" . number_format($invoice_total, 2);
+        
+        $stmt = $pdo->prepare('INSERT INTO client_notifications (client_id, invoice_id, message, is_read, created_at) VALUES (?, ?, ?, 0, NOW())');
+        $stmt->execute([$_POST['client_id'], $invoice['id'], $notification_message]);
+        error_log('Created notification for invoice #' . $_POST['invoice_number']);
+    }
+    
     // Send email
     if (isset($_POST['send_email'])) {
          error_log('SENDING EMAIL = create_invoice in ajax.php');

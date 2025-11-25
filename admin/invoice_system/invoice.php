@@ -148,6 +148,16 @@ if (isset($_GET['id'])) {
         $client = $stmt->fetch(PDO::FETCH_ASSOC);
         // Generate pdf
         create_invoice_pdf($invoice, $invoice_items, $client);
+        
+        // Create notification for unpaid invoices only
+        if ($_POST['payment_status'] != 'Paid') {
+            $invoice_total = $payment_amount + $tax_total;
+            $notification_message = "New invoice #{$inv} created - Amount due: $" . number_format($invoice_total, 2);
+            
+            $stmt = $pdo->prepare('INSERT INTO client_notifications (client_id, invoice_id, message, is_read, created_at) VALUES (?, ?, ?, 0, NOW())');
+            $stmt->execute([$_POST['client_id'], $invoice['id'], $notification_message]);
+        }
+        
         // Send email
         if (isset($_POST['send_email'])) {
             send_client_invoice_email($invoice, $client);
