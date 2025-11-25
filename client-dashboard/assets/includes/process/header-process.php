@@ -71,14 +71,19 @@ if (!empty($client_ids)) {
     $stmt->execute($client_ids);
     $invoice_notification_bell = $stmt->fetchColumn();
 
-    // Retrieve 3 most recent unread invoice notifications with invoice_number
+    // Retrieve invoice notifications: unread NEW/PAID, or PARTIAL/PAST DUE (always show these)
     $stmt = $pdo->prepare("
         SELECT cn.*, i.invoice_number 
         FROM client_notifications cn
         JOIN invoices i ON cn.invoice_id = i.id
-        WHERE cn.client_id IN ($placeholders) AND cn.is_read = 0 
+        WHERE cn.client_id IN ($placeholders) 
+        AND (
+            cn.is_read = 0 
+            OR cn.message LIKE 'PARTIAL -%'
+            OR cn.message LIKE 'PAST DUE -%'
+        )
         ORDER BY cn.created_at DESC 
-        LIMIT 3
+        LIMIT 10
     ");
     $stmt->execute($client_ids);
     $invoice_notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);

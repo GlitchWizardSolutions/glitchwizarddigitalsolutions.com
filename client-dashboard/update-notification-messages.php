@@ -6,10 +6,10 @@ $pdo = pdo_connect_mysql();
 
 // Get account info (must be admin to run this)
 $stmt = $pdo->prepare('SELECT * FROM accounts WHERE id = ?');
-$stmt->execute([ $_SESSION['id'] ]);
+$stmt->execute([ $_SESSION['id'] ?? 0 ]);
 $account = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($account['role'] !== 'Admin') {
+if (!$account || $account['role'] !== 'Admin') {
     die('This script can only be run by Admin users.');
 }
 

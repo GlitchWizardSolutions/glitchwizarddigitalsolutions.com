@@ -150,8 +150,11 @@
        <?php endif; ?>
                      <hr class="dropdown-divider">
             </li>
-            <li class="dropdown-footer">
+            <li class="dropdown-footer" style="display: flex; justify-content: space-between; align-items: center;">
               <a href="<?php echo $base_url; ?>/client-invoices.php">View All Invoices</a>
+              <?php if ($invoice_notification_bell > 0): ?>
+              <a href="<?php echo $base_url; ?>/mark-invoices-read.php" class="btn btn-sm btn-outline-secondary" style="font-size: 0.75rem;">Mark All Read</a>
+              <?php endif; ?>
             </li>
            </div>
      </div>  

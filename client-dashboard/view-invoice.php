@@ -13,19 +13,12 @@ if (!isset($_GET['id'])) {
 
 $invoice_id = $_GET['id'];
 
-// Debug logging
-error_log("View Invoice: invoice_id = " . $invoice_id);
-error_log("View Invoice: session_id = " . $_SESSION['id']);
-
 // Verify this invoice belongs to one of the user's business profiles
 $stmt = $pdo->prepare('SELECT id FROM invoice_clients WHERE acc_id = ?');
 $stmt->execute([ $_SESSION['id'] ]);
 $user_business_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-error_log("View Invoice: user_business_ids = " . print_r($user_business_ids, true));
-
 if (empty($user_business_ids)) {
-    error_log("View Invoice: No business profiles found for account");
     header('Location: client-invoices.php');
     exit;
 }
@@ -36,10 +29,7 @@ $stmt = $pdo->prepare("SELECT invoice_number FROM invoices WHERE invoice_number 
 $stmt->execute(array_merge([$invoice_id], $user_business_ids));
 $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
 
-error_log("View Invoice: invoice found = " . ($invoice ? 'yes' : 'no'));
-
 if (!$invoice) {
-    error_log("View Invoice: Invoice not found or doesn't belong to user");
     header('Location: client-invoices.php');
     exit;
 }
