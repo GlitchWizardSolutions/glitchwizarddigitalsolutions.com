@@ -27,9 +27,7 @@ $invoice = [
     'paid_with' => '',
     'paid_total' => 0,
     'domain_id' => null,
-    'project_type_id' => null,
-    'is_recurring' => 0,
-    'recurrence_frequency' => 'none'
+    'project_type_id' => null
 ];
 
 // Get template names in templates folder, only display folders
@@ -75,16 +73,18 @@ if (isset($_GET['id'])) {
     if (isset($_POST['submit']) || isset($_POST['send_email']) || isset($_POST['send_receipt'])) {
         // Get the payment methods as a comma separated string
         $payment_methods = isset($_POST['payment_methods']) ? implode(', ', $_POST['payment_methods']) : '';
+        // Use existing invoice number from the fetched invoice record
+        $invoice_number = $invoice['invoice_number'];
         // Update the invoice
-        error_log("Update invoices: " . $_POST['client_id'] . "," . $_POST['invoice_number']);
-        $stmt = $pdo->prepare('UPDATE invoices SET client_id = ?, invoice_number = ?, payment_amount = ?, payment_status = ?, payment_methods = ?, notes = ?, due_date = ?, created = ?, tax = ?, tax_total = ?, invoice_template = ?, recurrence = ?, recurrence_period = ?, recurrence_period_type = ?, paid_total = ?, domain_id = ?, project_type_id = ?, is_recurring = ?, recurrence_frequency = ? WHERE id = ?');
-        $stmt->execute([ $_POST['client_id'], $_POST['invoice_number'], $payment_amount, $_POST['payment_status'], $payment_methods, $_POST['notes'], $_POST['due_date'], $_POST['created'], $tax, $tax_total, $_POST['invoice_template'], $_POST['recurrence'], $_POST['recurrence_period'], $_POST['recurrence_period_type'], $_POST['paid_total'], $_POST['domain_id'] ?: null, $_POST['project_type_id'] ?: null, isset($_POST['is_recurring']) ? 1 : 0, $_POST['recurrence_frequency'], $_GET['id'] ]);
+        error_log("Update invoices: " . $_POST['client_id'] . "," . $invoice_number);
+        $stmt = $pdo->prepare('UPDATE invoices SET client_id = ?, invoice_number = ?, payment_amount = ?, payment_status = ?, payment_methods = ?, notes = ?, due_date = ?, created = ?, tax = ?, tax_total = ?, invoice_template = ?, recurrence = ?, recurrence_period = ?, recurrence_period_type = ?, domain_id = ?, project_type_id = ? WHERE id = ?');
+        $stmt->execute([ $_POST['client_id'], $invoice_number, $payment_amount, $_POST['payment_status'], $payment_methods, $_POST['notes'], $_POST['due_date'], $_POST['created'], $tax, $tax_total, $_POST['invoice_template'], $_POST['recurrence'], $_POST['recurrence_period'], $_POST['recurrence_period_type'], $_POST['domain_id'] ?: null, $_POST['project_type_id'] ?: null, $_GET['id'] ]);
         // add items
-        addItems($pdo, $_POST['invoice_number']);
+        addItems($pdo, $invoice_number);
         // Create PDF
-        error_log("Create PDF: " .$_POST['invoice_number'] . "," . $_POST['invoice_number']);
+        error_log("Create PDF: " . $invoice_number);
         $stmt = $pdo->prepare('SELECT * FROM invoices WHERE invoice_number = ?');
-        $stmt->execute([ $_POST['invoice_number'] ]);
+        $stmt->execute([ $invoice_number ]);
         $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
         // Get invoice items
         $stmt = $pdo->prepare('SELECT * FROM invoice_items WHERE invoice_number = ?');
@@ -126,12 +126,12 @@ if (isset($_GET['id'])) {
         $stmt = $pdo->prepare('SELECT business_name FROM invoice_clients WHERE id = ?');
         $stmt->execute([ $_POST['client_id'] ]);
         $business_name = $stmt->fetch(PDO::FETCH_ASSOC);
-        $inv= substr($business_name['business_name'],0,7);
+        $inv= substr($business_name['business_name'],0,6);
         $inv= str_replace(' ', '', $inv); 
-        $inv= date('ymdh:ia') . $inv; 
+        $inv= date('ymdH:i') . $inv; 
         // Insert the invoice
-        $stmt = $pdo->prepare('INSERT INTO invoices (client_id, invoice_number, payment_amount, payment_status, payment_methods, notes, viewed, due_date, created, tax, tax_total, invoice_template, recurrence, recurrence_period, recurrence_period_type, domain_id, project_type_id, is_recurring, recurrence_frequency) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-        $stmt->execute([ $_POST['client_id'], $inv, $payment_amount, $_POST['payment_status'], $payment_methods, $_POST['notes'], 0, $_POST['due_date'], $_POST['created'], $tax, $tax_total, $_POST['invoice_template'], $_POST['recurrence'], $_POST['recurrence_period'], $_POST['recurrence_period_type'], $_POST['domain_id'] ?: null, $_POST['project_type_id'] ?: null, isset($_POST['is_recurring']) ? 1 : 0, $_POST['recurrence_frequency'] ]);
+        $stmt = $pdo->prepare('INSERT INTO invoices (client_id, invoice_number, payment_amount, payment_status, payment_methods, notes, viewed, due_date, created, tax, tax_total, invoice_template, recurrence, recurrence_period, recurrence_period_type, domain_id, project_type_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+        $stmt->execute([ $_POST['client_id'], $inv, $payment_amount, $_POST['payment_status'], $payment_methods, $_POST['notes'], 0, $_POST['due_date'], $_POST['created'], $tax, $tax_total, $_POST['invoice_template'], $_POST['recurrence'], $_POST['recurrence_period'], $_POST['recurrence_period_type'], $_POST['domain_id'] ?: null, $_POST['project_type_id'] ?: null ]);
         // add items
         addItems($pdo, $inv);
         // Create PDF
@@ -175,7 +175,7 @@ if (isset($_GET['id'])) {
     </div>
 </div>
 
-<div class="content-title responsive-flex-wrap responsive-pad-bot-3">
+<div class="content-title responsive-flex-wrap responsive-pad-bot-3 mb-3">
     <a href="invoices.php" class="btn btn-primary">
         View Invoices
     </a>&nbsp;&nbsp;
@@ -195,9 +195,219 @@ if (isset($_GET['id'])) {
 </div>
 <?php endif; ?>
 
+<style>
+.form-professional {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.form-professional .form {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+.form-professional label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+}
+
+.form-professional label i {
+    color: #6b46c1;
+    margin-right: 6px;
+}
+
+.form-professional input[type="text"],
+.form-professional input[type="number"],
+.form-professional input[type="datetime-local"],
+.form-professional input[type="email"],
+.form-professional select,
+.form-professional textarea,
+.form-professional .multiselect {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #6b46c1;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.form-professional input[type="text"]:focus,
+.form-professional input[type="number"]:focus,
+.form-professional input[type="datetime-local"]:focus,
+.form-professional input[type="email"]:focus,
+.form-professional select:focus,
+.form-professional textarea:focus {
+    outline: none;
+    border-color: #8e44ad;
+    box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.15);
+    background: #ffffff;
+}
+
+.form-professional select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b46c1' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.form-professional textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+    line-height: 1.6;
+}
+
+.form-professional small {
+    display: block;
+    margin-top: -15px;
+    margin-bottom: 15px;
+    color: #7f8c8d;
+    font-size: 13px;
+    padding-left: 4px;
+}
+
+.form-professional small i {
+    color: #3498db;
+    margin-right: 4px;
+}
+
+.form-professional .required {
+    color: #e74c3c;
+    font-weight: bold;
+    margin-right: 4px;
+}
+
+.form-professional .btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.form-professional .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.section-title {
+    background: linear-gradient(135deg, #6b46c1 0%, #8e44ad 100%);
+    box-shadow: 0 2px 8px rgba(107, 70, 193, 0.2);
+}
+
+.content-block {
+    border: 2px solid #6b46c1;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(107, 70, 193, 0.1);
+}
+
+.form-professional .checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-professional .checkbox:hover {
+    background: #e9ecef;
+}
+
+.form-professional .checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.recurrence-options {
+    background: #f8f4ff;
+    border-left: 4px solid #6b46c1;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 0 8px 8px 0;
+}
+
+/* Grid Layout System */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 0;
+}
+
+.form-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-row .form-group,
+.form-row-3 .form-group {
+    margin-bottom: 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    margin-bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group small {
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+.form-row .btn {
+    align-self: end;
+    height: fit-content;
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .form-row,
+    .form-row-3 {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Stack templates vertically on mobile */
+    #invoice_template_grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+
 <form action="" method="post" class="form-professional">
 
-    <div class="form-actions" style="position: sticky; top: 0; background: white; z-index: 100; padding: 15px 0; border-bottom: 2px solid #e0e0e0; margin-bottom: 20px;">
+    <div class="form-actions" style="top: 0; z-index: 100; padding: 15px 0;  margin-bottom: 20px;">
         <a href="invoices.php" class="btn btn-secondary">Cancel</a>
         <?php if ($page == 'Edit'): ?>
         <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this invoice?')">
@@ -221,79 +431,122 @@ if (isset($_GET['id'])) {
             </div>
 
             <div class="form responsive-width-100" style="padding: 20px;">
-
-            <label for="client_id"><span class="required">*</span> Client</label>
-    
-            <select id="client_id" name="client_id" class="client_id" style="margin-bottom:10px" required>
-                <option value="">Select Invoice Client</option>
-                <?php foreach ($invoice_clients as $invoice_client): ?>
-                <option value="<?=$invoice_client['id']?>"<?=$invoice['client_id']==$invoice_client['id']?' selected':''?>><?=$invoice_client['business_name'] ?>&nbsp;[<?=$invoice_client['first_name']?>&nbsp;<?=$invoice_client['last_name']?>]</option>
-                <?php endforeach; ?>
-            </select>
-            <a href="client.php" class="btn btn-primary" style="margin-top: 10px; display: inline-block;">Add New Client</a>
-            
-            <label for="domain_id"><i class="fa-solid fa-globe"></i> Domain (Optional)</label>
-            <select id="domain_id" name="domain_id" style="margin-bottom:10px">
-                <option value="">-- Select Domain (Optional) --</option>
-                <?php foreach ($domains as $domain): ?>
-                <option value="<?=$domain['id']?>" 
-                        data-amount="<?=$domain['amount']?>" 
-                        data-due-date="<?=$domain['due_date']?>"
-                        <?=isset($invoice['domain_id']) && $invoice['domain_id']==$domain['id']?' selected':''?>>
-                    <?=$domain['domain']?> - $<?=number_format($domain['amount'], 2)?> (Due: <?=date('m/d/Y', strtotime($domain['due_date']))?>)
-                </option>
-                <?php endforeach; ?>
-            </select>
-            <small style="color: #666; display: block; margin-top: 5px;"><i class="fa-solid fa-info-circle"></i> Link this invoice to a domain renewal. Amount will auto-populate.</small>
-
-            <label for="project_type_id"><i class="fa-solid fa-layer-group"></i> Service Category (Optional)</label>
-            <select id="project_type_id" name="project_type_id" style="margin-bottom:10px">
-                <option value="">-- Select Service Category (Optional) --</option>
-                <?php foreach ($project_types as $type): ?>
-                <option value="<?=$type['id']?>" <?=isset($invoice['project_type_id']) && $invoice['project_type_id']==$type['id']?' selected':''?>>
-                    <?=$type['name']?>
-                </option>
-                <?php endforeach; ?>
-            </select>
-            <small style="color: #666; display: block; margin-top: 5px;"><i class="fa-solid fa-info-circle"></i> Categorize this invoice by service type for reporting</small>
-
-            <label for="is_recurring" class="checkbox pad-bot-5" style="margin-top: 15px;">
-                <input id="is_recurring" type="checkbox" name="is_recurring" value="1" <?=isset($invoice['is_recurring']) && $invoice['is_recurring'] ? 'checked' : ''?>>
-                <i class="fa-solid fa-rotate"></i> Recurring Invoice
-            </label>
-
-            <div id="recurrence_options" style="<?=isset($invoice['is_recurring']) && $invoice['is_recurring'] ? '' : 'display:none;'?> margin-left: 25px; padding: 10px; background: #f5f5f5; border-left: 3px solid #6b46c1; margin-bottom: 15px;">
-                <label for="recurrence_frequency">Recurrence Frequency</label>
-                <select id="recurrence_frequency" name="recurrence_frequency">
-                    <option value="none" <?=isset($invoice['recurrence_frequency']) && $invoice['recurrence_frequency']=='none'?' selected':''?>>None</option>
-                    <option value="monthly" <?=isset($invoice['recurrence_frequency']) && $invoice['recurrence_frequency']=='monthly'?' selected':''?>>Monthly</option>
-                    <option value="quarterly" <?=isset($invoice['recurrence_frequency']) && $invoice['recurrence_frequency']=='quarterly'?' selected':''?>>Quarterly</option>
-                    <option value="annually" <?=isset($invoice['recurrence_frequency']) && $invoice['recurrence_frequency']=='annually'?' selected':''?>>Annually</option>
-                </select>
-                <small style="color: #666; display: block; margin-top: 5px;"><i class="fa-solid fa-info-circle"></i> How often this invoice should be automatically generated</small>
+            <a href="client.php" class="btn btn-primary">Add New Client</a>
+            <!-- Client and Add New Client Button on same line -->
+            <div class="form-row mt-3">
+                
+                <div class="form-group">
+                    <label for="client_id"><span class="required">*</span> Client</label>
+                    <select id="client_id" name="client_id" class="client_id" required>
+                        <option value="">Select Invoice Client</option>
+                        <?php foreach ($invoice_clients as $invoice_client): ?>
+                        <option value="<?=$invoice_client['id']?>"<?=$invoice['client_id']==$invoice_client['id']?' selected':''?>><?=$invoice_client['business_name'] ?>&nbsp;[<?=$invoice_client['first_name']?>&nbsp;<?=$invoice_client['last_name']?>]</option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
             </div>
             
-            <?php if ($page == 'Create'): ?>
-            <label for="send_email_checkbox" class="checkbox pad-bot-5" style="margin-top: 15px;">
-                <input id="send_email_checkbox" type="checkbox" name="send_email" value="1" checked>
-                Send email to client
-            </label>
-            <?php endif; ?>
-  
-             <label for ="invoice_number"><span class="required">*</span> Invoice Number</label>
+            <!-- Domain and Service Category on same line -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="domain_id"><i class="fa-solid fa-globe"></i> Domain</label>
+                    <select id="domain_id" name="domain_id">
+                        <option value="">-- Select Domain --</option>
+                        <?php foreach ($domains as $domain): ?>
+                        <option value="<?=$domain['id']?>" <?=isset($invoice['domain_id']) && $invoice['domain_id']==$domain['id']?' selected':''?>>
+                            <?=$domain['domain']?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                     
+                </div>
+                
+                <div class="form-group">
+                    <label for="project_type_id"><i class="fa-solid fa-layer-group"></i> Service Category</label>
+                    <select id="project_type_id" name="project_type_id">
+                        <option value="">-- Select Service Category --</option>
+                        <?php foreach ($project_types as $type): ?>
+                        <option value="<?=$type['id']?>" <?=isset($invoice['project_type_id']) && $invoice['project_type_id']==$type['id']?' selected':''?>>
+                            <?=$type['name']?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    
+                </div>
+            </div>
             
-            <input id="invoice_number" type="text" name="invoice_number" placeholder="Invoice Number" value="<?=htmlspecialchars($invoice['invoice_number']?? '', ENT_QUOTES)?>" required>
-           
-            <label for="payment_status">Payment Status</label>
-            <select id="payment_status" name="payment_status">
-                <option value="Unpaid"<?=$invoice['payment_status']=='Unpaid'?' selected':''?>>Unpaid</option>
-                <option value="Paid"<?=$invoice['payment_status']=='Paid'?' selected':''?>>Paid</option>
-                <option value="Pending"<?=$invoice['payment_status']=='Pending'?' selected':''?>>Pending</option>
-                <option value="Cancelled"<?=$invoice['payment_status']=='Cancelled'?' selected':''?>>Cancelled</option>
-            </select>
+            <!-- Invoice Number and Payment Status on same line -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for ="invoice_number"><span class="required">*</span> Invoice Number</label>
+                    <input id="invoice_number" type="text" name="invoice_number" placeholder="Automatically Generated" value="<?=htmlspecialchars($invoice['invoice_number']?? '', ENT_QUOTES)?>" disabled style="background-color: #f5f5f5; cursor: not-allowed;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="payment_status">Payment Status</label>
+                    <select id="payment_status" name="payment_status">
+                        <option value="Unpaid"<?=$invoice['payment_status']=='Unpaid'?' selected':''?>>Unpaid</option>
+                        <option value="Balance"<?=$invoice['payment_status']=='Balance'?' selected':''?>>Balance</option>
+                        <option value="Pending"<?=$invoice['payment_status']=='Pending'?' selected':''?>>Pending</option>
+                        <option value="Paid"<?=$invoice['payment_status']=='Paid'?' selected':''?>>Paid</option>
+                        <option value="Gift"<?=$invoice['payment_status']=='Gift'?' selected':''?>>Gift</option>
+                        <option value="Favor"<?=$invoice['payment_status']=='Favor'?' selected':''?>>Favor</option>
+                        <option value="Cancelled"<?=$invoice['payment_status']=='Cancelled'?' selected':''?>>Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            
+            <?php if ($page == 'Edit' && isset($invoice['id'])): ?>
+            <?php 
+            // Calculate payment totals
+            $invoice_total = $invoice['payment_amount'] + $invoice['tax_total'];
+            $paid_total = $invoice['paid_total'];
+            $balance_due = $invoice_total - $paid_total;
+            ?>
+            <!-- Payment Summary Box (only show when editing existing invoice) -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <h3 style="margin: 0 0 15px 0; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-money-bill-wave"></i> Payment Summary
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                    <div>
+                        <div style="font-size: 12px; opacity: 0.9;">Invoice Total</div>
+                        <div style="font-size: 20px; font-weight: bold;"><?=currency_code . number_format($invoice_total, 2)?></div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; opacity: 0.9;">Total Paid</div>
+                        <div style="font-size: 20px; font-weight: bold;"><?=currency_code . number_format($paid_total, 2)?></div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; opacity: 0.9;">Balance Due</div>
+                        <div style="font-size: 20px; font-weight: bold;"><?=currency_code . number_format($balance_due, 2)?></div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <?php if ($balance_due > 0): ?>
+                    <a href="record_payment.php?invoice_id=<?=$invoice['id']?>" class="btn" style="background: white; color: #667eea; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-plus-circle"></i> Record Payment
+                    </a>
+                    <?php endif; ?>
+                    <a href="payment_history.php?invoice_id=<?=$invoice['id']?>" class="btn" style="background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-history"></i> Payment History
+                    </a>
+                </div>
+            </div>
+            <?php endif; ?>
+            
+            <!-- Paid Total (manual override - only for special cases) -->
+            <div class="form-group" style="<?=$page == 'Edit' ? 'display:none;' : ''?>">
+                <label for="paid_total">Paid Total (Manual Override)</label>
+                <input type="number" id="paid_total" name="paid_total" step="0.01" value="<?=$invoice['paid_total']?>" placeholder="0.00">
+                <small style="color: #6c757d; font-size: 12px;">⚠️ Use "Record Payment" button above instead of manual entry.</small>
+            </div>
 
-            <label for="payment_methods">Payment Methods</label>
-            <div class="multiselect" data-name="payment_methods[]">
+            <!-- Payment Methods (full width) -->
+            <div class="form-group">
+                <label for="payment_methods">Payment Methods</label>
+                <div class="multiselect" data-name="payment_methods[]">
                 <?php foreach (array_filter(explode(', ', $invoice['payment_methods'])) as $m): ?>
                 <span class="item" data-value="<?=$m?>">
                     <i class="remove">&times;</i><?=$m?>
@@ -305,17 +558,10 @@ if (isset($_GET['id'])) {
                     <span data-value="PayPal">PayPal</span>
                     <span data-value="Cash">Cash</span>
                     <span data-value="Check">Check</span>
-                    <span data-value="Bank Transfer">Bank Transfer</span>
-                    <span data-value="Credit Card">Credit Card</span>
                 </div>
             </div>
-            <small style="color: #666; display: block; margin-top: 5px;"><i class="fa-solid fa-info-circle"></i> PayPal is recommended for online payments</small>
-
-            <label for="due_date"><span class="required">*</span> Due Date</label>
-            <input id="due_date" type="datetime-local" name="due_date" value="<?=date('Y-m-d\TH:i', strtotime($invoice['due_date']))?>" required>
-
-            <label for="created"><span class="required">*</span> Created Date</label>
-            <input id="created" type="datetime-local" name="created" value="<?=date('Y-m-d\TH:i', strtotime($invoice['created']))?>" required>
+             
+        </div>
 
         </div>
         </div>
@@ -332,10 +578,10 @@ if (isset($_GET['id'])) {
 
             <div style="padding: 20px; background: #fff8e1;">
                 <p style="margin: 0 0 15px 0; color: #e65100; font-weight: 500;">
-                    <i class="fa-solid fa-exclamation-triangle"></i> <strong>Important:</strong> Add at least one item to this invoice. Items define what the client is being charged for.
+                    <i class="fa-solid fa-exclamation-triangle"></i> <strong>Important:</strong> Add at least one item to this invoice.
                 </p>
 
-                <div class="table manage-invoice-table">
+                <div class="table manage-invoice-table" style="padding: 15px; background: white; border-radius: 8px;">
                     <table style="width: 100%;">
                         <thead>
                             <tr>
@@ -371,7 +617,7 @@ if (isset($_GET['id'])) {
                     </table>
                     <div style="margin-top: 15px; display: flex; gap: 10px;">
                         <a href="#" class="add-item btn btn-primary" style="flex: 1;">
-                            <i class="fa-solid fa-plus"></i> Add Item
+                            <i class="fa-solid fa-plus"></i>&nbsp; Add Item
                         </a>
                         <div style="flex: 1; text-align: right; font-size: 18px; font-weight: bold; padding: 10px 15px; background: #e3f2fd; border-radius: 6px; color: #1976d2;">
                             Subtotal: <span class="invoice-subtotal">$0.00</span>
@@ -402,20 +648,20 @@ if (isset($_GET['id'])) {
 
             <label for="tax">Tax</label>
             <input id="tax" type="text" name="tax" placeholder="% or fixed amount (e.g., 10% or 25.00)" value="<?=$invoice['tax'] == 'fixed' ? $invoice['tax_total'] : $invoice['tax']?>" step="0.01">
-            <small style="color: #666; display: block; margin-top: 5px; margin-bottom: 15px;">Enter as percentage (10%) or fixed amount (25.00)</small>
+            <small><i class="fa-solid fa-info-circle"></i> Enter as percentage (10%) or fixed amount (25.00)</small>
 
             <label for="invoice_template">Invoice Template</label>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+            <div id="invoice_template_grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
                 <?php foreach ($templates as $template): 
                     $template_name = basename($template);
                     $template_preview = file_exists($template . '/preview.png') ? $template . '/preview.png' : '';
                 ?>
-                <label class="template-card" style="cursor: pointer; border: 3px solid #e0e0e0; border-radius: 8px; padding: 10px; transition: all 0.3s; display: block; text-align: center; background: white;">
+                <label class="template-card" style="cursor: pointer; border: 3px solid #6b46c1; border-radius: 8px; padding: 10px; transition: all 0.3s; display: block; text-align: center; background: white;">
                     <input type="radio" name="invoice_template" value="<?=$template_name?>" <?=$invoice['invoice_template']==$template_name?' checked':''?> style="margin-bottom: 10px;">
                     <?php if ($template_preview): ?>
                     <img src="<?=str_replace(base_path, '../../client-invoices/', $template_preview)?>" alt="<?=$template_name?>" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 8px; border: 1px solid #ddd;">
                     <?php else: ?>
-                    <div style="width: 100%; height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 4px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">
+                    <div style="width: 100%; height: 150px; background: linear-gradient(135deg, #6b46c1 0%, #8e44ad 100%); border-radius: 4px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">
                         <i class="fa-solid fa-file-invoice"></i>
                     </div>
                     <?php endif; ?>
@@ -424,14 +670,33 @@ if (isset($_GET['id'])) {
                 <?php endforeach; ?>
             </div>
 
-            <label for="notes">Invoice Notes</label>
-            <textarea id="notes" name="notes" placeholder="Thank you for your business!" rows="4"><?=htmlspecialchars($invoice['notes'], ENT_QUOTES)?></textarea>
+            <!-- Invoice Notes (full width) -->
+            <div class="form-group">
+                <label for="notes">Invoice Notes</label>
+                <textarea id="notes" name="notes" placeholder="Thank you for your business!" rows="4"><?=htmlspecialchars($invoice['notes'], ENT_QUOTES)?></textarea>
+            </div>
 
-            <label for="recurrence">Recurring Invoice</label>
-            <select id="recurrence" name="recurrence">
-                <option value="0"<?=$invoice['recurrence']==0?' selected':''?>>No - One-time invoice</option>
-                <option value="1"<?=$invoice['recurrence']==1?' selected':''?>>Yes - Recurring invoice</option>
-            </select>
+            <!-- Send Email and Recurring Invoice on same row -->
+            <div class="form-row">
+                <?php if ($page == 'Create'): ?>
+                <div class="form-group">
+                    <label for="send_email_checkbox" class="checkbox">
+                        <input id="send_email_checkbox" type="checkbox" name="send_email" value="1" checked>
+                        <span>Send email to client</span>
+                    </label>
+                </div>
+                <?php else: ?>
+                <div></div>
+                <?php endif; ?>
+                
+                <div class="form-group">
+                    <label for="recurrence">Recurring Invoice</label>
+                    <select id="recurrence" name="recurrence">
+                        <option value="0"<?=$invoice['recurrence']==0?' selected':''?>>No - One-time invoice</option>
+                        <option value="1"<?=$invoice['recurrence']==1?' selected':''?>>Yes - Recurring invoice</option>
+                    </select>
+                </div>
+            </div>
 
             <div class="recurrence-options"<?=$invoice['recurrence']==0 ? ' style="display:none"' : ''?>>
                 <label for="recurrence_period">Recurrence Period</label>
@@ -444,25 +709,27 @@ if (isset($_GET['id'])) {
                     <option value="month"<?=$invoice['recurrence_period_type']=='month'?' selected':''?>>Month(s)</option>
                     <option value="year"<?=$invoice['recurrence_period_type']=='year'?' selected':''?>>Year(s)</option>
                 </select>
-                <small style="color: #666; display: block; margin-top: 5px;">Client will be automatically invoiced every period</small>
+                <small><i class="fa-solid fa-info-circle"></i> Client will be automatically invoiced every period</small>
             </div>
 
-            <?php if ($page == 'Edit'): ?>
-            <label for="paid_total">Amount Paid</label>
-            <input id="paid_total" type="number" name="paid_total" placeholder="0.00" value="<?=$invoice['paid_total']?>" step="0.01">
-            <?php endif; ?>
-
-            <label for="due_date"><span class="required">*</span> Due Date</label>
-            <input id="due_date" type="datetime-local" name="due_date" value="<?=date('Y-m-d\TH:i', strtotime($invoice['due_date']))?>" required>
-
-            <label for="created"><span class="required">*</span> Created Date</label>
-            <input id="created" type="datetime-local" name="created" value="<?=date('Y-m-d\TH:i', strtotime($invoice['created']))?>" required>
+            <!-- Created and Due Date on same row at the bottom -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="created"><span class="required">*</span> Created Date</label>
+                    <input id="created" type="datetime-local" name="created" value="<?=date('Y-m-d\TH:i', strtotime($invoice['created']))?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="due_date"><span class="required">*</span> Due Date</label>
+                    <input id="due_date" type="datetime-local" name="due_date" value="<?=date('Y-m-d\TH:i', strtotime($invoice['due_date']))?>" required>
+                </div>
+            </div>
 
         </div>
        </div>
     </div>
 
-    <div class="form-actions" style="position: sticky; bottom: 0; background: white; z-index: 100; padding: 15px 0; border-top: 2px solid #e0e0e0; margin-top: 20px;">
+    <div class="form-actions" style="bottom: 0; z-index: 100; padding: 15px 0; margin-top: 20px;">
         <a href="invoices.php" class="btn btn-secondary">Cancel</a>
         <?php if ($page == 'Edit'): ?>
         <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this invoice?')">
@@ -480,8 +747,30 @@ if (isset($_GET['id'])) {
 </form>
 
 <script>
-// Auto-preselect PayPal if no payment methods selected
+// Scroll to top and focus client dropdown on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Scroll to top of page
+    window.scrollTo(0, 0);
+    
+    // Blur any auto-focused elements
+    if (document.activeElement) {
+        document.activeElement.blur();
+    }
+    
+    // Focus on client dropdown instead of payment methods
+    const clientDropdown = document.getElementById('client_id');
+    if (clientDropdown) {
+        setTimeout(function() {
+            // Close any open multiselect dropdowns
+            document.querySelectorAll('.multiselect .list').forEach(list => {
+                list.style.display = 'none';
+            });
+            // Focus client dropdown
+            clientDropdown.focus();
+        }, 150);
+    }
+    
+    // Auto-preselect PayPal if no payment methods selected
     const multiselect = document.querySelector('.multiselect[data-name="payment_methods[]"]');
     if (multiselect) {
         const existingItems = multiselect.querySelectorAll('.item');
@@ -658,71 +947,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Please add at least one invoice item before submitting.');
                 document.querySelector('.invoice-items-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
                 return false;
-            }
-        });
-    }
-});
-
-// Domain selection auto-populate
-document.addEventListener('DOMContentLoaded', function() {
-    const domainSelect = document.getElementById('domain_id');
-    if (domainSelect) {
-        domainSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            if (selectedOption.value) {
-                const amount = selectedOption.getAttribute('data-amount');
-                const dueDate = selectedOption.getAttribute('data-due-date');
-                
-                // Auto-populate first item if no items exist
-                const firstItemPrice = document.querySelector('input[name="item_price[]"]');
-                const firstItemName = document.querySelector('input[name="item_name[]"]');
-                
-                if (firstItemPrice && !firstItemPrice.value && amount) {
-                    firstItemPrice.value = amount;
-                }
-                
-                if (firstItemName && !firstItemName.value) {
-                    const domainName = selectedOption.textContent.split(' - ')[0];
-                    firstItemName.value = 'Domain Renewal: ' + domainName;
-                }
-                
-                // Update due date if it matches the default 7-day value
-                const dueDateInput = document.getElementById('due_date');
-                if (dueDateInput && dueDate) {
-                    dueDateInput.value = dueDate.replace(' ', 'T').substring(0, 16);
-                }
-                
-                // Check the recurring checkbox and set to annually
-                const recurringCheckbox = document.getElementById('is_recurring');
-                const recurrenceFrequency = document.getElementById('recurrence_frequency');
-                if (recurringCheckbox && !recurringCheckbox.checked) {
-                    recurringCheckbox.checked = true;
-                    recurringCheckbox.dispatchEvent(new Event('change'));
-                }
-                if (recurrenceFrequency) {
-                    recurrenceFrequency.value = 'annually';
-                }
-                
-                if (typeof calculateInvoiceTotals === 'function') {
-                    calculateInvoiceTotals();
-                }
-            }
-        });
-    }
-    
-    // Recurring checkbox toggle
-    const recurringCheckbox = document.getElementById('is_recurring');
-    const recurrenceOptions = document.getElementById('recurrence_options');
-    if (recurringCheckbox && recurrenceOptions) {
-        recurringCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                recurrenceOptions.style.display = 'block';
-                const freqSelect = document.getElementById('recurrence_frequency');
-                if (freqSelect && freqSelect.value === 'none') {
-                    freqSelect.value = 'annually';
-                }
-            } else {
-                recurrenceOptions.style.display = 'none';
             }
         });
     }

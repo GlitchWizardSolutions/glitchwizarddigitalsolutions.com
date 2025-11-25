@@ -68,10 +68,16 @@ if ($status) {
         $where .= ($where ? 'AND ' : 'WHERE ') . 'i.payment_status = "Paid" ';
     } elseif ($status == 'unpaid') {
         $where .= ($where ? 'AND ' : 'WHERE ') . 'i.payment_status = "Unpaid" ';
+    } elseif ($status == 'balance') {
+        $where .= ($where ? 'AND ' : 'WHERE ') . 'i.payment_status = "Balance" ';
     } elseif ($status == 'pending') {
         $where .= ($where ? 'AND ' : 'WHERE ') . 'i.payment_status = "Pending" ';
+    } elseif ($status == 'gift') {
+        $where .= ($where ? 'AND ' : 'WHERE ') . 'i.payment_status = "Gift" ';
+    } elseif ($status == 'favor') {
+        $where .= ($where ? 'AND ' : 'WHERE ') . 'i.payment_status = "Favor" ';
     } elseif ($status == 'overdue') {
-        $where .= ($where ? 'AND ' : 'WHERE ') . 'i.due_date < :current_date AND i.payment_status = "Unpaid" ';
+        $where .= ($where ? 'AND ' : 'WHERE ') . 'i.due_date < :current_date AND (i.payment_status = "Unpaid" OR i.payment_status = "Balance") ';
     } elseif ($status == 'cancelled') {
         $where .= ($where ? 'AND ' : 'WHERE ') . 'i.payment_status = "Cancelled" ';
     }
@@ -213,9 +219,12 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                 <label for="status">Status</label>
                 <select name="status" id="status">
                     <option value=""<?=$status==''?' selected':''?>>All</option>
-                    <option value="paid"<?=$status=='paid'?' selected':''?>>Paid</option>
                     <option value="unpaid"<?=$status=='unpaid'?' selected':''?>>Unpaid</option>
+                    <option value="balance"<?=$status=='balance'?' selected':''?>>Balance Due</option>
                     <option value="pending"<?=$status=='pending'?' selected':''?>>Pending</option>
+                    <option value="paid"<?=$status=='paid'?' selected':''?>>Paid</option>
+                    <option value="gift"<?=$status=='gift'?' selected':''?>>Gift</option>
+                    <option value="favor"<?=$status=='favor'?' selected':''?>>Favor</option>
                     <option value="overdue"<?=$status=='overdue'?' selected':''?>>Overdue</option>
                     <option value="cancelled"<?=$status=='cancelled'?' selected':''?>>Cancelled</option>
                 </select>
@@ -278,7 +287,7 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
     <?php endif; ?>   
 </div>
 
-<div class="content-block">
+<div class="content-block"></div>
     <div class="table">
         <table>
             <thead>
@@ -312,7 +321,7 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                         </div>
                     </td>
                     <td><?=htmlspecialchars($invoice['first_name'] . ' ' . $invoice['last_name'], ENT_QUOTES)?></td>
-                    <td class="alt responsive-hidden"><?=htmlspecialchars($invoice['invoice_number'], ENT_QUOTES)?><?php if ($invoice['is_recurring']): ?> <span class="badge" style="background:#9b59b6;color:white;padding:2px 6px;border-radius:3px;font-size:10px;margin-left:4px;" title="Recurring: <?=ucfirst($invoice['recurrence_frequency'])?>"><i class="fa-solid fa-rotate"></i></span><?php endif; ?></td>
+                    <td class="alt responsive-hidden"><?=htmlspecialchars($invoice['invoice_number'], ENT_QUOTES)?><?php if ($invoice['recurrence']): ?> <span class="badge" style="background:#9b59b6;color:white;padding:2px 6px;border-radius:3px;font-size:10px;margin-left:4px;" title="Recurring: Every <?=$invoice['recurrence_period']?> <?=$invoice['recurrence_period_type']?>(s)"><i class="fa-solid fa-rotate"></i></span><?php endif; ?></td>
                     <td class="alt responsive-hidden"><span class="grey small"><?=number_format($invoice['total_items'])?></span></td>
                     <td class="alt responsive-hidden"><?=$invoice['domain'] ? '<span class="grey" style="font-size:11px;"><i class="fa-solid fa-globe"></i> ' . htmlspecialchars($invoice['domain'], ENT_QUOTES) . '</span>' : '<span class="grey" style="font-size:11px;">—</span>'?></td>
                     <td class="alt responsive-hidden"><?=$invoice['project_type_name'] ? '<span class="grey" style="font-size:11px;">' . htmlspecialchars($invoice['project_type_name'], ENT_QUOTES) . '</span>' : '<span class="grey" style="font-size:11px;">—</span>'?></td>
@@ -323,16 +332,34 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                         <?php endforeach; ?>
                         <?php endif; ?>
                     </td> */ ?>
-                    <td class="responsive-hidden"><?=currency_code . number_format($invoice['payment_amount']+$invoice['tax_total'], 2)?></td>
+                    <td class="responsive-hidden">
+                        <?php if ($invoice['payment_status'] == 'Balance' || $invoice['payment_status'] == 'Pending'): ?>
+                        <?php 
+                        $balance_amt = ($invoice['payment_amount']+$invoice['tax_total']) - $invoice['paid_total'];
+                        $status_color = $invoice['payment_status'] == 'Pending' ? '#3498db' : '#ff9800';
+                        ?>
+                        <span style="color: <?=$status_color?>; font-weight: bold;" title="<?=$invoice['payment_status']?>: Total <?=currency_code . number_format($invoice['payment_amount']+$invoice['tax_total'], 2)?> - Paid <?=currency_code . number_format($invoice['paid_total'], 2)?>">
+                            <?=currency_code . number_format($balance_amt, 2)?>
+                        </span>
+                        <?php else: ?>
+                        <?=currency_code . number_format($invoice['payment_amount']+$invoice['tax_total'], 2)?>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <div class="invoice-detail">
                             <?php if ($invoice['payment_status'] == 'Paid'): ?>
-                            <span class="green">Paid in Full</span>
+                            <span class="green">Paid</span>
+                            <?php elseif ($invoice['payment_status'] == 'Balance'): ?>
+                            <span class="orange">Balance Due</span>
+                            <?php elseif ($invoice['payment_status'] == 'Pending'): ?>
+                            <span class="blue">Pending</span>
+                            <?php elseif ($invoice['payment_status'] == 'Gift'): ?>
+                            <span style="color: #9c27b0;">Gift</span>
+                            <?php elseif ($invoice['payment_status'] == 'Favor'): ?>
+                            <span style="color: #ff9800;">Favor</span>
                             <?php elseif ($invoice['payment_status'] == 'Cancelled'): ?>
                             <span class="grey">Cancelled</span>
-                            <?php elseif ($invoice['payment_status'] == 'Pending'): ?>
-                            <span class="orange">Pending</span>
-                            <?php elseif ($invoice['due_date'] < $current_date): ?>
+                            <?php elseif (($invoice['payment_status'] == 'Unpaid' || $invoice['payment_status'] == 'Balance') && $invoice['due_date'] < $current_date): ?>
                             <span class="red">OVERDUE</span>
                             <?php else: ?>
                             <span class="blue">Unpaid</span>
@@ -375,13 +402,25 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                                     </span>
                                     Edit
                                 </a>
-                                <a class="red" href="invoices.php?delete=<?=$invoice['id']?>" onclick="return confirm('Are you sure you want to delete this invoice?')">
+                                <?php if ($invoice['payment_status'] != 'Paid' && $invoice['payment_status'] != 'Cancelled'): ?>
+                                <a href="record_payment.php?invoice_id=<?=$invoice['id']?>" style="color: #6b46c1;">
                                     <span class="icon">
-                                        <svg width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg>
-                                    </span>    
-                                    Delete
+                                        <svg width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3,6H21V18H3V6M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M7,8A2,2 0 0,1 5,10V14A2,2 0 0,1 7,16H17A2,2 0 0,1 19,14V10A2,2 0 0,1 17,8H7Z" /></svg>
+                                    </span>
+                                    Payment
                                 </a>
-                                <?php if ($invoice['payment_status'] == 'Unpaid' && mail_enabled): ?>
+                                <?php endif; ?>
+                                <a href="payment_history.php?invoice_id=<?=$invoice['id']?>">
+                                    <span class="icon">
+                                        <svg width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3" /></svg>
+                                    </span>
+                                    History
+                                </a>
+                                <?php 
+                                // Show Send Reminder for Unpaid, Balance, or Pending with balance remaining
+                                $has_balance = (($invoice['payment_amount'] + $invoice['tax_total']) - $invoice['paid_total']) > 0;
+                                if ((($invoice['payment_status'] == 'Unpaid' || $invoice['payment_status'] == 'Balance') || ($invoice['payment_status'] == 'Pending' && $has_balance)) && mail_enabled): 
+                                ?>
                                 <a href="invoices.php?reminder=<?=$invoice['id']?>">
                                     <span class="icon">
                                         <svg width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>
@@ -394,7 +433,7 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                                     <span class="icon">
                                         <svg width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" /></svg>
                                     </span>
-                                    Mark as Paid
+                                    Mark Paid
                                 </a>
                                 <?php endif; ?>
                                 <?php if ($invoice['payment_status'] != 'Pending'): ?>
@@ -402,9 +441,15 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                                     <span class="icon">
                                         <svg width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" /></svg>
                                     </span>
-                                    Mark as Pending
+                                    Mark Pending
                                 </a>
-                                <?php endif; ?>                          
+                                <?php endif; ?>
+                                <a class="red" href="invoices.php?delete=<?=$invoice['id']?>" onclick="return confirm('Are you sure you want to delete this invoice?')">
+                                    <span class="icon">
+                                        <svg width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg>
+                                    </span>    
+                                    Delete
+                                </a>                          
                             </div>
                         </div>
                     </td>

@@ -256,12 +256,26 @@ body, html {
 	</head>
 	<body>
         <div class="invoice">
+            <?php if (isset($_GET['payment_submitted']) && $_GET['payment_submitted'] == 'true'): ?>
+            <div style="background:#d4edda;border:1px solid #c3e6cb;color:#155724;padding:15px;margin:0 auto 20px;max-width:500px;border-radius:5px;text-align:center;">
+                <strong>✓ Payment Submitted!</strong><br>
+                <span style="font-size:14px;">Your payment has been received and is pending verification. You will be notified once confirmed.</span>
+            </div>
+            <?php endif; ?>
             <form action="pay-invoice.php?id=<?=$invoice['invoice_number']?>" method="post" class="invoice-form">
                 <div class="invoice-header">
                     <?php if (company_name): ?>
                     <p class="invoice-from">Invoice from <?=nl2br(company_name)?></p>
                     <?php endif; ?>
-                    <h1 class="invoice-title"><?=currency_code?><?=number_format($invoice['payment_amount']+$invoice['tax_total'], 2)?><?=$invoice['payment_status'] != 'Unpaid' ? ' <strong class="' . strtolower($invoice['payment_status']) . '">' . $invoice['payment_status'] . '</span>' : ''?></h1>
+                    <?php 
+                    $invoice_total = $invoice['payment_amount'] + $invoice['tax_total'];
+                    $balance_due = isset($invoice['balance_due']) ? $invoice['balance_due'] : ($invoice_total - $invoice['paid_total']);
+                    $display_amount = ($invoice['payment_status'] == 'Balance' && $balance_due > 0) ? $balance_due : $invoice_total;
+                    ?>
+                    <h1 class="invoice-title"><?=currency_code?><?=number_format($display_amount, 2)?><?=$invoice['payment_status'] != 'Unpaid' ? ' <strong class="' . strtolower($invoice['payment_status']) . '">' . $invoice['payment_status'] . '</strong>' : ''?></h1>
+                    <?php if ($invoice['payment_status'] == 'Balance' && $balance_due > 0): ?>
+                    <p class="due-date" style="color:#ff9800;font-weight:600;">Balance Due (Total: <?=currency_code?><?=number_format($invoice_total, 2)?> - Paid: <?=currency_code?><?=number_format($invoice['paid_total'], 2)?>)</p>
+                    <?php endif; ?>
                     <p class="due-date">Due <?=date('F d, Y h:ia', strtotime($invoice['due_date']))?></p>
                     <?php if (company_logo): ?>
                     <img src="<?=company_logo?>" class="company-logo" alt="<?=company_name?>">
@@ -321,10 +335,28 @@ body, html {
                                 <td colspan="1" class="total">Total</td>
                                 <td class="num"><?=currency_code?><?=number_format($invoice['payment_amount']+$invoice['tax_total'], 2)?></td>
                             </tr>
+                            <?php if ($invoice['paid_total'] > 0): ?>
+                            <tr class="alt">
+                                <td colspan="1" class="total" style="color:#2ecc71;">Total Paid</td>
+                                <td class="num" style="color:#2ecc71;font-weight:600;"><?=currency_code?><?=number_format($invoice['paid_total'], 2)?></td>
+                            </tr>
+                            <?php endif; ?>
+                            <?php if ($invoice['payment_status'] == 'Pending' && $balance_due > 0): ?>
+                            <tr class="alt">
+                                <td colspan="1" class="total" style="color:#f39c12;">Pending Verification</td>
+                                <td class="num" style="color:#f39c12;font-weight:600;"><?=currency_code?><?=number_format($balance_due, 2)?></td>
+                            </tr>
+                            <?php endif; ?>
+                            <?php if ($invoice['payment_status'] == 'Balance' && $balance_due > 0): ?>
+                            <tr class="alt">
+                                <td colspan="1" class="total" style="color:#ff9800;font-weight:600;">Balance Due</td>
+                                <td class="num" style="color:#ff9800;font-weight:700;font-size:16px;"><?=currency_code?><?=number_format($balance_due, 2)?></td>
+                            </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
-                <?php if ($invoice['payment_status'] == 'Unpaid' && !empty($payment_methods)): ?>
+                <?php if (($invoice['payment_status'] == 'Unpaid' || $invoice['payment_status'] == 'Balance') && !empty($payment_methods)): ?>
                 <div class="payment-methods">
                     <h3>Payment Methods</h3>
 

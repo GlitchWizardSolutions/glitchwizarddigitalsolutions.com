@@ -39,10 +39,15 @@ if ($invoice['payment_status'] == 'Paid') {
     header('Location: invoice.php?id=' . $invoice['invoice_number']);
     exit;
 }
-// Check if not unpaid
-if ($invoice['payment_status'] != 'Unpaid') {
+// Check if invoice can be paid (must be Unpaid or Balance)
+if ($invoice['payment_status'] != 'Unpaid' && $invoice['payment_status'] != 'Balance') {
     exit('You cannot pay for this invoice!');
 }
+// Calculate the amount to charge (balance_due for Balance status, full amount for Unpaid)
+$invoice_total = $invoice['payment_amount'] + $invoice['tax_total'];
+$balance_due = isset($invoice['balance_due']) ? $invoice['balance_due'] : ($invoice_total - $invoice['paid_total']);
+$amount_to_charge = ($invoice['payment_status'] == 'Balance' && $balance_due > 0) ? $balance_due : $invoice_total;
+
 // Get the client
 $stmt = $pdo->prepare('SELECT * FROM invoice_clients WHERE id = ?');
 $stmt->execute([ $invoice['client_id'] ]);
@@ -70,9 +75,9 @@ if (isset($_POST['method']) && $_POST['method'] == 'paypal' && paypal_enabled &&
         'business' => paypal_email,
         'notify_url' => paypal_ipn_url,
         'currency_code'	=> paypal_currency,
-        'item_name' => 'Invoice ' . $invoice['invoice_number'],
+        'item_name' => 'Invoice ' . $invoice['invoice_number'] . ($invoice['payment_status'] == 'Balance' ? ' (Balance Due)' : ''),
         'item_number' => $invoice['invoice_number'],
-        'amount' => $invoice['payment_amount']+$invoice['tax_total'],
+        'amount' => $amount_to_charge,
         'no_shipping' => 1,
         'no_note' => 1,
         'return' => invoice_base_url . 'invoice.php?id=' . $invoice['invoice_number'] . '&success=true',
@@ -121,10 +126,10 @@ if (isset($_POST['method']) && $_POST['method'] == 'stripe' && stripe_enabled &&
                 'price_data' => [
                     'currency' => stripe_currency,
                     'product_data' => [
-                        'name' => 'Invoice #' . $invoice['invoice_number'],
+                        'name' => 'Invoice #' . $invoice['invoice_number'] . ($invoice['payment_status'] == 'Balance' ? ' (Balance Due)' : ''),
                         'description' => 'Payment for invoice #' . $invoice['invoice_number'],
                     ],
-                    'unit_amount' => ($invoice['payment_amount']+$invoice['tax_total']) * 100,
+                    'unit_amount' => $amount_to_charge * 100,
                 ]
             ]
         ],
@@ -144,10 +149,10 @@ if (isset($_POST['method']) && $_POST['method'] == 'coinbase' && coinbase_enable
     $coinbase = \CoinbaseCommerce\ApiClient::init(coinbase_key);  
     // Create a charge
     $chargeData = [
-        'name' => 'Invoice #' . $invoice['invoice_number'],
+        'name' => 'Invoice #' . $invoice['invoice_number'] . ($invoice['payment_status'] == 'Balance' ? ' (Balance Due)' : ''),
         'description' => 'Payment for invoice #' . $invoice['invoice_number'],
         'local_price' => [
-            'amount' => $invoice['payment_amount']+$invoice['tax_total'],
+            'amount' => $amount_to_charge,
             'currency' => coinbase_currency
         ],
         'pricing_type' => 'fixed_price',
@@ -168,11 +173,56 @@ if (isset($_POST['method']) && ($_POST['method'] == 'banktransfer' || $_POST['me
     $paid_with = $_POST['method'] == 'banktransfer' ? 'Bank Transfer' : 'Cash';
     // Generate unique transaction id
     $transaction_id = 'TXN' . time();
-    // Update the invoice
-    $stmt = $pdo->prepare('UPDATE invoices SET payment_status = ?, paid_with = ?, payment_ref = ? WHERE invoice_number = ?');
-    $stmt->execute([ 'Pending', $paid_with, $transaction_id, $_GET['id'] ]);
+    
+    // Start transaction
+    $pdo->beginTransaction();
+    
+    try {
+        // Insert payment record
+        $stmt = $pdo->prepare('INSERT INTO payment_history (invoice_id, amount_paid, payment_method, payment_date, reference_number, notes) VALUES (?, ?, ?, NOW(), ?, ?)');
+        $stmt->execute([
+            $invoice['id'],
+            $amount_to_charge,
+            $paid_with,
+            $transaction_id,
+            'Client submitted ' . strtolower($paid_with) . ' payment (pending verification)'
+        ]);
+        
+        // Update invoice paid_total
+        $new_paid_total = $invoice['paid_total'] + $amount_to_charge;
+        $stmt = $pdo->prepare('UPDATE invoices SET paid_total = ? WHERE invoice_number = ?');
+        $stmt->execute([$new_paid_total, $_GET['id']]);
+        
+        // Determine new payment status
+        if ($new_paid_total >= $invoice_total) {
+            // Full payment received - mark as Pending (awaiting verification)
+            $new_status = 'Pending';
+        } else {
+            // Partial payment - keep as Balance
+            $new_status = 'Balance';
+        }
+        
+        // Update payment status
+        $stmt = $pdo->prepare('UPDATE invoices SET payment_status = ? WHERE invoice_number = ?');
+        $stmt->execute([$new_status, $_GET['id']]);
+        
+        // Create client notification
+        $stmt = $pdo->prepare('INSERT INTO client_notifications (invoice_id, notification_type, message, created_at) VALUES (?, ?, ?, NOW())');
+        $stmt->execute([
+            $invoice['id'],
+            'payment_received',
+            'Payment of $' . number_format($amount_to_charge, 2) . ' received via ' . $paid_with . ' (pending verification)'
+        ]);
+        
+        $pdo->commit();
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        error_log('Cash/Bank Transfer payment error: ' . $e->getMessage());
+        exit('Payment processing failed. Please contact support.');
+    }
+    
     // Redirect to the invoice
-    header('Location: invoice.php?id=' . $_GET['id']);
+    header('Location: invoice.php?id=' . $_GET['id'] . '&payment_submitted=true');
     exit;
 }
 ?>
@@ -209,7 +259,13 @@ if (isset($_POST['method']) && ($_POST['method'] == 'banktransfer' || $_POST['me
         <div class="invoice-info">
             <p><strong>Invoice Number:</strong> <?=$invoice['invoice_number']?></p>
             <p><strong>Client:</strong> <?=$client['first_name']?> <?=$client['last_name']?></p>
-            <p><strong>Amount Due:</strong> <span class="amount">$<?=number_format($invoice['payment_amount']+$invoice['tax_total'], 2)?></span></p>
+            <?php if ($invoice['payment_status'] == 'Balance'): ?>
+            <p><strong>Invoice Total:</strong> $<?=number_format($invoice_total, 2)?></p>
+            <p><strong>Total Paid:</strong> <span style="color:#2ecc71;">$<?=number_format($invoice['paid_total'], 2)?></span></p>
+            <p><strong>Balance Due:</strong> <span class="amount">$<?=number_format($amount_to_charge, 2)?></span></p>
+            <?php else: ?>
+            <p><strong>Amount Due:</strong> <span class="amount">$<?=number_format($amount_to_charge, 2)?></span></p>
+            <?php endif; ?>
             <p><strong>Due Date:</strong> <?=date('F d, Y', strtotime($invoice['due_date']))?></p>
         </div>
 

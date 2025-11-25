@@ -46,14 +46,20 @@ if (!$invoice) {
             <p>Status: 
                 <?php if ($invoice['payment_status'] == 'Paid'): ?>
                 <span class="green">Paid</span>
-                <?php elseif ($invoice['payment_status'] == 'Cancelled'): ?>
-                <span class="red">Cancelled</span>
+                <?php elseif ($invoice['payment_status'] == 'Balance'): ?>
+                <span class="orange">Balance Due</span>
                 <?php elseif ($invoice['payment_status'] == 'Pending'): ?>
-                <span class="orange">Pending</span>
-                <?php elseif ($invoice['due_date'] < $date): ?>
-                <span class="red">Overdue</span>
+                <span class="blue">Pending</span>
+                <?php elseif ($invoice['payment_status'] == 'Gift'): ?>
+                <span style="color: #9c27b0;">Gift</span>
+                <?php elseif ($invoice['payment_status'] == 'Favor'): ?>
+                <span style="color: #ff9800;">Favor</span>
+                <?php elseif ($invoice['payment_status'] == 'Cancelled'): ?>
+                <span class="grey">Cancelled</span>
+                <?php elseif (($invoice['payment_status'] == 'Unpaid' || $invoice['payment_status'] == 'Balance') && $invoice['due_date'] < $date): ?>
+                <span class="red">OVERDUE</span>
                 <?php else: ?>
-                <span class="red">Unpaid</span>
+                <span class="blue">Unpaid</span>
                 <?php endif; ?>
             </p>
         </div>
@@ -80,7 +86,7 @@ if (!$invoice) {
         </div>
         <div class="invoice-detail">
             <h3>Invoice Number</h3>
-            <p><?=$invoice['invoice_number']?><?php if ($invoice['is_recurring']): ?> <span class="badge" style="background:#9b59b6;color:white;padding:3px 8px;border-radius:4px;font-size:11px;margin-left:6px;" title="Recurring: <?=ucfirst($invoice['recurrence_frequency'])?>"><i class="fa-solid fa-rotate"></i> Recurring</span><?php endif; ?></p>
+            <p><?=$invoice['invoice_number']?><?php if ($invoice['recurrence']): ?> <span class="badge" style="background:#9b59b6;color:white;padding:3px 8px;border-radius:4px;font-size:11px;margin-left:6px;" title="Recurring: Every <?=$invoice['recurrence_period']?> <?=$invoice['recurrence_period_type']?>(s)"><i class="fa-solid fa-rotate"></i> Recurring</span><?php endif; ?></p>
         </div>
         <?php if ($invoice['domain']): ?>
         <div class="invoice-detail">
@@ -99,10 +105,10 @@ if (!$invoice) {
         </div>
         <?php endif; ?>
         <?php endif; ?>
-        <?php if ($invoice['is_recurring']): ?>
+        <?php if ($invoice['recurrence']): ?>
         <div class="invoice-detail">
             <h3><i class="fa-solid fa-rotate"></i> Recurring Schedule</h3>
-            <p><span class="badge" style="background:#9b59b6;color:white;padding:4px 10px;border-radius:4px;font-size:12px;"><?=ucfirst($invoice['recurrence_frequency'])?></span></p>
+            <p><span class="badge" style="background:#9b59b6;color:white;padding:4px 10px;border-radius:4px;font-size:12px;">Every <?=$invoice['recurrence_period']?> <?=$invoice['recurrence_period_type']?>(s)</span></p>
         </div>
         <?php endif; ?>
         <div class="invoice-detail">
@@ -120,14 +126,20 @@ if (!$invoice) {
             <p>
                 <?php if ($invoice['payment_status'] == 'Paid'): ?>
                 <span class="green">Paid</span>
-                <?php elseif ($invoice['payment_status'] == 'Cancelled'): ?>
-                <span class="red">Cancelled</span>
+                <?php elseif ($invoice['payment_status'] == 'Balance'): ?>
+                <span class="orange">Balance Due</span>
                 <?php elseif ($invoice['payment_status'] == 'Pending'): ?>
-                <span class="orange">Pending</span>
-                <?php elseif ($invoice['due_date'] < $date): ?>
-                <span class="red">Overdue</span>
+                <span class="blue">Pending</span>
+                <?php elseif ($invoice['payment_status'] == 'Gift'): ?>
+                <span style="color: #9c27b0;">Gift</span>
+                <?php elseif ($invoice['payment_status'] == 'Favor'): ?>
+                <span style="color: #ff9800;">Favor</span>
+                <?php elseif ($invoice['payment_status'] == 'Cancelled'): ?>
+                <span class="grey">Cancelled</span>
+                <?php elseif (($invoice['payment_status'] == 'Unpaid' || $invoice['payment_status'] == 'Balance') && $invoice['due_date'] < $date): ?>
+                <span class="red">OVERDUE</span>
                 <?php else: ?>
-                <span class="red">Unpaid</span>
+                <span class="blue">Unpaid</span>
                 <?php endif; ?>
             </p>
         </div>
@@ -143,10 +155,20 @@ if (!$invoice) {
             <p><?=$invoice['payment_ref']?></p>
         </div>
         <?php endif; ?>       
-        <?php if ($invoice['paid_total']): ?>
+        <?php if ($invoice['paid_total'] > 0): ?>
         <div class="invoice-detail">
             <h3>Total Paid</h3>
             <p style="font-weight:500"><?=currency_code?><?=number_format($invoice['paid_total'], 2)?></p>
+        </div>
+        <?php endif; ?>
+        <?php 
+        $invoice_total = $invoice['payment_amount'] + $invoice['tax_total'];
+        $balance_due = isset($invoice['balance_due']) ? $invoice['balance_due'] : ($invoice_total - $invoice['paid_total']);
+        if (($invoice['payment_status'] == 'Balance' || $invoice['payment_status'] == 'Pending') && $balance_due > 0): 
+        ?>
+        <div class="invoice-detail">
+            <h3><?=$invoice['payment_status'] == 'Pending' ? 'Pending Payment' : 'Balance Due'?></h3>
+            <p style="font-weight:700;color:<?=$invoice['payment_status'] == 'Pending' ? '#3498db' : '#ff9800'?>;"><?=currency_code?><?=number_format($balance_due, 2)?></p>
         </div>
         <?php endif; ?>
         <div class="invoice-detail">
@@ -193,6 +215,57 @@ if (!$invoice) {
         <p>The invoice is not associated with a client.</p>
         <?php endif; ?>
     </div>
+
+    <?php if ($invoice['paid_total'] > 0): ?>
+    <?php
+    // Retrieve payment history
+    $stmt = $pdo->prepare('SELECT ph.*, a.first_name AS recorded_by_first, a.last_name AS recorded_by_last 
+                           FROM payment_history ph 
+                           LEFT JOIN accounts a ON a.id = ph.recorded_by 
+                           WHERE ph.invoice_id = ? 
+                           ORDER BY ph.payment_date DESC');
+    $stmt->execute([$_GET['id']]);
+    $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    ?>
+    <div class="content-block">
+        <div class="block-header">
+            <div class="icon">
+                <svg width="15" height="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3,6H21V18H3V6M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M7,8A2,2 0 0,1 5,10V14A2,2 0 0,1 7,16H17A2,2 0 0,1 19,14V10A2,2 0 0,1 17,8H7Z" /></svg>
+            </div>
+            Payment History (<?=count($payments)?> Payment<?=count($payments) != 1 ? 's' : ''?>)
+        </div>
+        <div class="table">
+            <table>
+                <thead>
+                    <tr>
+                        <td>Date</td>
+                        <td>Amount</td>
+                        <td>Method</td>
+                        <td class="responsive-hidden">Reference</td>
+                        <td class="responsive-hidden">Recorded By</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($payments)): ?>
+                    <tr>
+                        <td colspan="5" class="no-results">No payment records found.</td>
+                    </tr>
+                    <?php else: ?>
+                    <?php foreach ($payments as $payment): ?>
+                    <tr>
+                        <td><?=date('M j, Y g:ia', strtotime($payment['payment_date']))?></td>
+                        <td style="font-weight:600;color:#2ecc71;"><?=currency_code?><?=number_format($payment['amount_paid'], 2)?></td>
+                        <td><?=htmlspecialchars($payment['payment_method'], ENT_QUOTES)?></td>
+                        <td class="responsive-hidden"><?=!empty($payment['reference_number']) ? htmlspecialchars($payment['reference_number'], ENT_QUOTES) : '<span style="color:#999;">—</span>'?></td>
+                        <td class="responsive-hidden"><?=!empty($payment['recorded_by_first']) ? htmlspecialchars($payment['recorded_by_first'] . ' ' . $payment['recorded_by_last'], ENT_QUOTES) : '<span style="color:#999;">System</span>'?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php endif; ?>
   </div>
 <div class="content-block-wrapper">
     <div class="content-block invoice-details">

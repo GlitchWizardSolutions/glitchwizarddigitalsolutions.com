@@ -354,15 +354,28 @@ function send_client_invoice_email($invoice, $client, $subject = '') {
         $mail->CharSet = 'UTF-8';
         $mail->Subject = empty($subject) ? 'Invoice #' . $invoice['invoice_number'] . ' from ' . company_name : $subject;
         
+        // Determine message type and amount based on payment status
+        $invoice_total = $invoice['payment_amount'] + $invoice['tax_total'];
+        $balance_due = isset($invoice['balance_due']) ? $invoice['balance_due'] : ($invoice_total - $invoice['paid_total']);
+        
+        if ($invoice['payment_status'] == 'Balance' && $balance_due > 0) {
+            $message_type = 'a balance due of';
+            $display_amount = number_format($balance_due, 2);
+        } else {
+            $message_type = 'an invoice of';
+            $display_amount = number_format($invoice_total, 2);
+        }
+        
         // Read template and replace placeholders
         $email_template = str_replace(
-            ['%invoice_number%', '%first_name%', '%amount%', '%due_date%', '%link%'],
+            ['%invoice_number%', '%first_name%', '%amount%', '%due_date%', '%link%', '%message_type%'],
             [
                 $invoice['invoice_number'], 
                 $client['first_name'], 
-                number_format($invoice['payment_amount'] + $invoice['tax_total'], 2), 
+                $display_amount, 
                 date('m/d/y', strtotime($invoice['due_date'])), 
-                BASE_URL . 'client-invoices/invoice.php?id=' . $invoice['invoice_number']
+                BASE_URL . 'client-invoices/invoice.php?id=' . $invoice['invoice_number'],
+                $message_type
             ],
             file_get_contents(public_path . 'client-invoices/templates/client-email-template.html')
         );
