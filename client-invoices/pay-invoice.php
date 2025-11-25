@@ -62,7 +62,6 @@ if (!$client) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Pay Invoice #<?=$invoice['invoice_number']?></title>
-    <link href="<?=invoice_base_url?>style.css" rel="stylesheet" type="text/css">
     <style>
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
