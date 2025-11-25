@@ -98,7 +98,7 @@
 
         <?php foreach ($invoice_notifications as $notification): ?>
           <?php
-            $message = htmlspecialchars($notification['message'] ?? '', ENT_QUOTES);
+            $message = $notification['message'] ?? '';
             $badge_class = 'bg-secondary';
             $badge_text = '';
             
@@ -120,6 +120,9 @@
                 $badge_text = 'PARTIAL';
                 $message = substr($message, 10); // Remove "PARTIAL - " from message
             }
+            
+            // Sanitize but allow specific HTML for formatting
+            $message = strip_tags($message, '<span><br>');
           ?>
           <li><hr class="dropdown-divider"></li>
             <li class="notification-item">
