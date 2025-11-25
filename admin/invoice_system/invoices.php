@@ -9,28 +9,43 @@ include '../../client-invoices/defines.php';
 if (isset($_POST['bulk_delete']) && isset($_POST['invoice_ids']) && is_array($_POST['invoice_ids'])) {
     $deleted_count = 0;
     $pdf_deleted_count = 0;
+    $errors = [];
     
     foreach ($_POST['invoice_ids'] as $invoice_id) {
         if (is_numeric($invoice_id)) {
-            // Get invoice details first
-            $stmt = $pdo->prepare('SELECT * FROM invoices WHERE id = ?');
-            $stmt->execute([$invoice_id]);
-            $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($invoice) {
-                // Delete the invoice and invoice_items
-                $stmt = $pdo->prepare('DELETE i, ii FROM invoices i LEFT JOIN invoice_items ii ON ii.invoice_number = i.invoice_number WHERE i.id = ?');
+            try {
+                // Get invoice details first
+                $stmt = $pdo->prepare('SELECT * FROM invoices WHERE id = ?');
                 $stmt->execute([$invoice_id]);
-                $deleted_count++;
+                $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
                 
-                // Delete PDF if exists
-                $pdf_path = '../../client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf';
-                if (file_exists($pdf_path)) {
-                    unlink($pdf_path);
-                    $pdf_deleted_count++;
+                if ($invoice) {
+                    // Delete the invoice and invoice_items
+                    $stmt = $pdo->prepare('DELETE i, ii FROM invoices i LEFT JOIN invoice_items ii ON ii.invoice_number = i.invoice_number WHERE i.id = ?');
+                    $stmt->execute([$invoice_id]);
+                    $deleted_count++;
+                    
+                    // Delete PDF if exists
+                    $pdf_path = '../../client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf';
+                    if (file_exists($pdf_path)) {
+                        if (unlink($pdf_path)) {
+                            $pdf_deleted_count++;
+                        } else {
+                            $errors[] = "Failed to delete PDF for invoice " . $invoice['invoice_number'];
+                        }
+                    }
+                } else {
+                    $errors[] = "Invoice ID $invoice_id not found";
                 }
+            } catch (Exception $e) {
+                $errors[] = "Error deleting invoice ID $invoice_id: " . $e->getMessage();
+                error_log("Bulk delete error for invoice $invoice_id: " . $e->getMessage());
             }
         }
+    }
+    
+    if (!empty($errors)) {
+        error_log("Bulk delete errors: " . implode("; ", $errors));
     }
     
     header('Location: invoices.php?success_msg=8&deleted=' . $deleted_count . '&pdfs_deleted=' . $pdf_deleted_count);
@@ -545,7 +560,14 @@ function confirmBulkDelete() {
     }
     
     if (confirm(`Are you sure you want to delete ${count} invoice(s)?\n\nThis will also delete:\n- All invoice items\n- Payment history\n- Client notifications\n- PDF files\n\nThis action cannot be undone!`)) {
-        document.getElementById('bulkDeleteForm').submit();
+        // Add hidden input to trigger bulk delete
+        const form = document.getElementById('bulkDeleteForm');
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'bulk_delete';
+        input.value = '1';
+        form.appendChild(input);
+        form.submit();
     }
 }
 </script>
