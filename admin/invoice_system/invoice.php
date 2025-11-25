@@ -128,7 +128,7 @@ if (isset($_GET['id'])) {
         $business_name = $stmt->fetch(PDO::FETCH_ASSOC);
         $inv= substr($business_name['business_name'],0,6);
         $inv= str_replace(' ', '', $inv); 
-        $inv= date('ymdH:i') . $inv; 
+        $inv= date('ymdH:i:s') . $inv; 
         // Insert the invoice
         $stmt = $pdo->prepare('INSERT INTO invoices (client_id, invoice_number, payment_amount, payment_status, payment_methods, notes, viewed, due_date, created, tax, tax_total, invoice_template, recurrence, recurrence_period, recurrence_period_type, domain_id, project_type_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
         $stmt->execute([ $_POST['client_id'], $inv, $payment_amount, $_POST['payment_status'], $payment_methods, $_POST['notes'], 0, $_POST['due_date'], $_POST['created'], $tax, $tax_total, $_POST['invoice_template'], $_POST['recurrence'], $_POST['recurrence_period'], $_POST['recurrence_period_type'], $_POST['domain_id'] ?: null, $_POST['project_type_id'] ?: null ]);
