@@ -115,7 +115,7 @@ try {
         INSERT INTO payment_history (
             invoice_id, 
             payment_date, 
-            payment_amount, 
+            amount, 
             payment_method, 
             reference_number, 
             notes,
@@ -155,7 +155,7 @@ try {
     
     // Create client notification
     $stmt = $pdo->prepare('
-        INSERT INTO client_notifications (client_id, invoice_id, message, created_at) 
+        INSERT INTO client_notifications (client_id, invoice_id, message, date_created) 
         VALUES (?, ?, ?, NOW())
     ');
     
