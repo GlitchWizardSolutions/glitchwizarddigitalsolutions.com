@@ -179,7 +179,7 @@ include includes_path . 'page-setup.php';
                           <?php if (!empty($account['avatar'])): ?>
                             <img src="<?=htmlspecialchars($account['avatar'])?>" alt="Avatar" class="rounded-circle" width="100" height="100" style="object-fit: cover;">
                           <?php else: ?>
-                            <img src="/public_html/assets/img/avatar.png" alt="Default Avatar" class="rounded-circle" width="100" height="100" style="object-fit: cover;">
+                            <img src="<?php echo $outside_url; ?>assets/img/avatar.png" alt="Default Avatar" class="rounded-circle" width="100" height="100" style="object-fit: cover;">
                           <?php endif; ?>
                         </div>
                         <input name="avatar" type="file" class="form-control" id="avatar" accept="image/jpeg,image/png,image/gif,image/webp">
