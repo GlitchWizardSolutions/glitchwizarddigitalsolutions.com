@@ -71,8 +71,15 @@ if (!empty($client_ids)) {
     $stmt->execute($client_ids);
     $invoice_notification_bell = $stmt->fetchColumn();
 
-    // Retrieve 3 most recent unread invoice notifications
-    $stmt = $pdo->prepare("SELECT * FROM client_notifications WHERE client_id IN ($placeholders) AND is_read = 0 ORDER BY created_at DESC LIMIT 3");
+    // Retrieve 3 most recent unread invoice notifications with invoice_number
+    $stmt = $pdo->prepare("
+        SELECT cn.*, i.invoice_number 
+        FROM client_notifications cn
+        JOIN invoices i ON cn.invoice_id = i.id
+        WHERE cn.client_id IN ($placeholders) AND cn.is_read = 0 
+        ORDER BY cn.created_at DESC 
+        LIMIT 3
+    ");
     $stmt->execute($client_ids);
     $invoice_notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {

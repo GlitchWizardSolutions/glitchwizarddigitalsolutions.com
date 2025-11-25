@@ -128,7 +128,7 @@
                   <?php endif; ?>
                      <span style='font-size: .85em; display: block;'><?=$message?></span> 
                       
-                        <input name="id" type="hidden" value="<?=htmlspecialchars($notification['invoice_id']?? '', ENT_QUOTES)?>">
+                        <input name="id" type="hidden" value="<?=htmlspecialchars($notification['invoice_number']?? '', ENT_QUOTES)?>">
                         <input name="notification_id" type="hidden" value="<?=htmlspecialchars($notification['id']?? '', ENT_QUOTES)?>">
                 </div> 
                  <div class="row mx-auto" style="text-align:center">
