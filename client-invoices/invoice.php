@@ -3,6 +3,22 @@
 // refreshed   6/14/25 VERIFIED
 // re-deployed 6/15/25
 include 'main.php';
+
+// Check for payment success/error messages
+$payment_message = '';
+$payment_message_type = '';
+
+if (isset($_GET['payment_success']) && $_GET['payment_success'] == 'true') {
+    $payment_message = 'Payment successful! Thank you for your payment.';
+    $payment_message_type = 'success';
+} elseif (isset($_GET['payment_cancelled'])) {
+    $payment_message = 'Payment was cancelled. No charges were made.';
+    $payment_message_type = 'info';
+} elseif (isset($_GET['payment_error'])) {
+    $payment_message = 'There was an error processing your payment. Please try again or contact support.';
+    $payment_message_type = 'error';
+}
+
 // Check if invoice ID param exists
 if (!isset($_GET['id'])) {
     exit('Invoice ID not specified!');

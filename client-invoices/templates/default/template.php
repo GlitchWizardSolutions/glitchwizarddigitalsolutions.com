@@ -292,10 +292,10 @@ body, html {
 	</head>
 	<body>
         <div class="invoice">
-            <?php if (isset($_GET['payment_success']) && $_GET['payment_success'] == 'true'): ?>
-            <div style="background:#d4edda;border:1px solid #c3e6cb;color:#155724;padding:15px;margin:0 auto 20px;max-width:750px;border-radius:5px;text-align:center;">
-                <strong>✓ Payment Successful!</strong><br>
-                <span style="font-size:14px;">Your payment has been processed successfully. Thank you!</span>
+            <?php if (!empty($payment_message)): ?>
+            <div style="background:<?=$payment_message_type=='success'?'#d4edda':($payment_message_type=='error'?'#f8d7da':'#d1ecf1')?>;border:1px solid <?=$payment_message_type=='success'?'#c3e6cb':($payment_message_type=='error'?'#f5c6cb':'#bee5eb')?>;color:<?=$payment_message_type=='success'?'#155724':($payment_message_type=='error'?'#721c24':'#0c5460')?>;padding:15px;margin:0 auto 20px;max-width:750px;border-radius:5px;text-align:center;">
+                <strong><?=$payment_message_type=='success'?'✓ Payment Successful!':($payment_message_type=='error'?'⚠ Payment Error':'ℹ Information')?></strong><br>
+                <span style="font-size:14px;"><?=$payment_message?></span>
             </div>
             <?php endif; ?>
             <?php if (isset($_GET['payment_cancelled']) && $_GET['payment_cancelled'] == 'true'): ?>
