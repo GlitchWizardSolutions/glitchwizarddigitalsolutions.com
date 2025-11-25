@@ -39,51 +39,28 @@ if (isset($_GET['notification_id'])) {
     $stmt = $pdo->prepare('UPDATE client_notifications SET is_read = 1 WHERE id = ? AND client_id IN (' . $placeholders . ')');
     $stmt->execute(array_merge([$_GET['notification_id']], $user_business_ids));
 }
+
+include includes_path . 'page-setup.php';
+include includes_path . 'navigation.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Invoice #<?= htmlspecialchars($invoice_id) ?> - Client Dashboard</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
-  <!-- Favicons -->
-  <link href="<?php echo $outside_url; ?>assets/imgs/favicon.png" rel="icon">
-  <link href="<?php echo $outside_url; ?>assets/imgs/apple-touch-icon.png" rel="apple-touch-icon">
-  <!-- Google Fonts -->
-  <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-  <!-- Vendor CSS Files -->
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
-  <!-- Main CSS File -->
-  <link href="assets/css/style.css" rel="stylesheet">
-  <style>
-    .invoice-iframe-container {
-      width: 100%;
-      min-height: calc(100vh - 200px);
-      border: none;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .invoice-iframe {
-      width: 100%;
-      height: calc(100vh - 200px);
-      border: none;
-    }
-    .back-button {
-      margin-bottom: 20px;
-    }
-  </style>
-</head>
-<body>
-  <?php include 'assets/includes/header.php'; ?>
-  <?php include 'assets/includes/navigation.php'; ?>
+<style>
+  .invoice-iframe-container {
+    width: 100%;
+    min-height: calc(100vh - 200px);
+    border: none;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .invoice-iframe {
+    width: 100%;
+    height: calc(100vh - 200px);
+    border: none;
+  }
+  .back-button {
+    margin-bottom: 20px;
+  }
+</style>
 
   <main id="main" class="main">
     <div class="pagetitle">
@@ -123,30 +100,24 @@ if (isset($_GET['notification_id'])) {
 
   </main><!-- End #main -->
 
-  <?php include 'assets/includes/footer-close.php'; ?>
-
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-  <!-- Vendor JS Files -->
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <!-- Main JS File -->
-  <script src="assets/js/main.js"></script>
-  
   <script>
     // Auto-resize iframe based on content
-    const iframe = document.querySelector('.invoice-iframe');
-    iframe.addEventListener('load', function() {
-      try {
-        // Try to get the height of the iframe content
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        const height = iframeDoc.documentElement.scrollHeight;
-        iframe.style.height = Math.max(height, 800) + 'px';
-      } catch(e) {
-        // If we can't access iframe content (CORS), use fixed height
-        iframe.style.height = 'calc(100vh - 200px)';
+    document.addEventListener('DOMContentLoaded', function() {
+      const iframe = document.querySelector('.invoice-iframe');
+      if (iframe) {
+        iframe.addEventListener('load', function() {
+          try {
+            // Try to get the height of the iframe content
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            const height = iframeDoc.documentElement.scrollHeight;
+            iframe.style.height = Math.max(height, 800) + 'px';
+          } catch(e) {
+            // If we can't access iframe content (CORS), use fixed height
+            iframe.style.height = 'calc(100vh - 200px)';
+          }
+        });
       }
     });
   </script>
-</body>
-</html>
+
+  <?php include includes_path . 'footer-close.php'; ?>
