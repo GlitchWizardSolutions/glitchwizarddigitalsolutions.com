@@ -125,7 +125,7 @@
                      <hr class="dropdown-divider">
             </li>
             <li class="dropdown-footer">
-              <a href="<?php echo $outside_url; ?>client-invoices/">View All Invoices</a>
+              <a href="<?php echo $base_url; ?>/client-invoices.php">View All Invoices</a>
             </li>
            </div>
      </div>  
