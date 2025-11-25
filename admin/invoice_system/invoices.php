@@ -5,6 +5,38 @@ include_once 'assets/includes/admin_config.php';
 include_once '../assets/includes/components.php';
 include '../../client-invoices/defines.php';
 
+// Handle bulk delete
+if (isset($_POST['bulk_delete']) && isset($_POST['invoice_ids']) && is_array($_POST['invoice_ids'])) {
+    $deleted_count = 0;
+    $pdf_deleted_count = 0;
+    
+    foreach ($_POST['invoice_ids'] as $invoice_id) {
+        if (is_numeric($invoice_id)) {
+            // Get invoice details first
+            $stmt = $pdo->prepare('SELECT * FROM invoices WHERE id = ?');
+            $stmt->execute([$invoice_id]);
+            $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($invoice) {
+                // Delete the invoice and invoice_items
+                $stmt = $pdo->prepare('DELETE i, ii FROM invoices i LEFT JOIN invoice_items ii ON ii.invoice_number = i.invoice_number WHERE i.id = ?');
+                $stmt->execute([$invoice_id]);
+                $deleted_count++;
+                
+                // Delete PDF if exists
+                $pdf_path = '../../client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf';
+                if (file_exists($pdf_path)) {
+                    unlink($pdf_path);
+                    $pdf_deleted_count++;
+                }
+            }
+        }
+    }
+    
+    header('Location: invoices.php?success_msg=8&deleted=' . $deleted_count . '&pdfs_deleted=' . $pdf_deleted_count);
+    exit;
+}
+
 // Handle status updates
 if (isset($_GET['mark_paid']) && is_numeric($_GET['mark_paid'])) {
     $stmt = $pdo->prepare('UPDATE invoices SET payment_status = ? WHERE id = ?');
@@ -167,6 +199,11 @@ if (isset($_GET['success_msg'])) {
     if ($_GET['success_msg'] == 7) {
         $success_msg = 'Invoice updated and receipt sent successfully!';
     }
+    if ($_GET['success_msg'] == 8) {
+        $deleted = isset($_GET['deleted']) ? intval($_GET['deleted']) : 0;
+        $pdfs_deleted = isset($_GET['pdfs_deleted']) ? intval($_GET['pdfs_deleted']) : 0;
+        $success_msg = "Successfully deleted {$deleted} invoice(s) and {$pdfs_deleted} PDF file(s).";
+    }
 }
 // Create URL
 $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&dateend=' . $dateend . '&status=' . $status . '&payment_method=' . $payment_method . '&client_id=' . $client_id;
@@ -198,6 +235,7 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
 <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
     <a href="invoice.php" class="btn btn-primary">+ Invoice</a>&nbsp;&nbsp;
     <a href="invoices_import.php" class="btn btn-primary">Import</a>&nbsp;&nbsp;
+    <button type="button" id="bulkDeleteBtn" class="btn" style="background-color: #e74c3c; color: white; display: none;" onclick="confirmBulkDelete()">Delete Selected</button>&nbsp;&nbsp;
     <a href="invoices_export.php" class="btn btn-primary">Export</a>
 </div>
     <br>
@@ -289,10 +327,12 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
 
 <div class="content-block"></div>
     <div class="table">
+        <form method="POST" id="bulkDeleteForm">
         <table>
             <thead>
                 <tr>
-                    <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=id'?>">#<?=$order_by=='id' ? $table_icons[strtolower($order)] : ''?></td>
+                    <td style="width: 30px;"><input type="checkbox" id="selectAll" title="Select All" style="cursor: pointer;"></td>
+                    <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=id'?>#<?=$order_by=='id' ? $table_icons[strtolower($order)] : ''?>
                     <td colspan="2"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=first_name'?>">Client<?=$order_by=='first_name' ? $table_icons[strtolower($order)] : ''?></td>
                     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=invoice_number'?>">Invoice #<?=$order_by=='invoice_number' ? $table_icons[strtolower($order)] : ''?></td>
                     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=total_items'?>">Items<?=$order_by=='total_items' ? $table_icons[strtolower($order)] : ''?></a></td>
@@ -314,6 +354,7 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                 <?php endif; ?>
                 <?php foreach ($invoices as $invoice): ?>
                 <tr>
+                    <td><input type="checkbox" name="invoice_ids[]" value="<?=$invoice['id']?>" class="invoice-checkbox" style="cursor: pointer;"></td>
                     <td><?=$invoice['id']?></td>
                     <td class="img">
                         <div class="profile-img">
@@ -457,7 +498,57 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                 <?php endforeach; ?>
             </tbody>
         </table>
+        </form>
     </div>
+
+<script>
+// Select All functionality
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.invoice-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+    toggleBulkDeleteButton();
+});
+
+// Show/hide bulk delete button based on selections
+document.querySelectorAll('.invoice-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        // Update select all checkbox state
+        const allCheckboxes = document.querySelectorAll('.invoice-checkbox');
+        const checkedCheckboxes = document.querySelectorAll('.invoice-checkbox:checked');
+        document.getElementById('selectAll').checked = allCheckboxes.length === checkedCheckboxes.length && allCheckboxes.length > 0;
+        
+        toggleBulkDeleteButton();
+    });
+});
+
+function toggleBulkDeleteButton() {
+    const checkedBoxes = document.querySelectorAll('.invoice-checkbox:checked');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    
+    if (checkedBoxes.length > 0) {
+        bulkDeleteBtn.style.display = 'inline-block';
+        bulkDeleteBtn.textContent = `Delete Selected (${checkedBoxes.length})`;
+    } else {
+        bulkDeleteBtn.style.display = 'none';
+    }
+}
+
+function confirmBulkDelete() {
+    const checkedBoxes = document.querySelectorAll('.invoice-checkbox:checked');
+    const count = checkedBoxes.length;
+    
+    if (count === 0) {
+        alert('Please select at least one invoice to delete.');
+        return false;
+    }
+    
+    if (confirm(`Are you sure you want to delete ${count} invoice(s)?\n\nThis will also delete:\n- All invoice items\n- Payment history\n- Client notifications\n- PDF files\n\nThis action cannot be undone!`)) {
+        document.getElementById('bulkDeleteForm').submit();
+    }
+}
+</script>
 </div>
 
 <div class="pagination">
