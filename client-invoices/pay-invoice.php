@@ -387,11 +387,23 @@ if (!$client) {
                 .then(data => {
                     console.log('Server response data:', data);
                     if (data.success) {
-                        // Redirect to invoice with success message
-                        window.location.href = 'invoice.php?id=<?=$invoice['invoice_number']?>&payment_success=true';
+                        // Check if we're in an iframe (loaded from dashboard)
+                        const inIframe = window.self !== window.top;
+                        if (inIframe) {
+                            // Redirect parent window to dashboard wrapper
+                            window.top.location.href = '../client-dashboard/view-invoice.php?id=<?=$invoice['invoice_number']?>&payment_success=true';
+                        } else {
+                            // Redirect to standalone invoice with success message
+                            window.location.href = 'invoice.php?id=<?=$invoice['invoice_number']?>&payment_success=true';
+                        }
                     } else {
                         alert('Payment recorded but there was an issue: ' + data.message);
-                        window.location.href = 'invoice.php?id=<?=$invoice['invoice_number']?>';
+                        const inIframe = window.self !== window.top;
+                        if (inIframe) {
+                            window.top.location.href = '../client-dashboard/view-invoice.php?id=<?=$invoice['invoice_number']?>';
+                        } else {
+                            window.location.href = 'invoice.php?id=<?=$invoice['invoice_number']?>';
+                        }
                     }
                 })
                 .catch(error => {
@@ -408,8 +420,15 @@ if (!$client) {
             
             // Handle cancellation
             onCancel: function(data) {
-                // Redirect back to invoice
-                window.location.href = 'invoice.php?id=<?=$invoice['invoice_number']?>&payment_cancelled=true';
+                // Check if we're in an iframe (loaded from dashboard)
+                const inIframe = window.self !== window.top;
+                if (inIframe) {
+                    // Redirect parent window to dashboard wrapper
+                    window.top.location.href = '../client-dashboard/view-invoice.php?id=<?=$invoice['invoice_number']?>&payment_cancelled=true';
+                } else {
+                    // Redirect back to standalone invoice
+                    window.location.href = 'invoice.php?id=<?=$invoice['invoice_number']?>&payment_cancelled=true';
+                }
             },
             
             // Styling
