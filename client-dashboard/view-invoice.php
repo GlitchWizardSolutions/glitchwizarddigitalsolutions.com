@@ -54,7 +54,8 @@ include includes_path . 'navigation.php';
   }
   .invoice-iframe {
     width: 100%;
-    height: calc(100vh - 200px);
+    min-height: 1200px;
+    height: auto;
     border: none;
   }
   .back-button {
@@ -110,10 +111,10 @@ include includes_path . 'navigation.php';
             // Try to get the height of the iframe content
             const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
             const height = iframeDoc.documentElement.scrollHeight;
-            iframe.style.height = Math.max(height, 800) + 'px';
+            iframe.style.height = (height + 50) + 'px'; // Add 50px buffer
           } catch(e) {
-            // If we can't access iframe content (CORS), use fixed height
-            iframe.style.height = 'calc(100vh - 200px)';
+            // If we can't access iframe content (CORS), use large fixed height
+            iframe.style.height = '1500px';
           }
         });
       }
