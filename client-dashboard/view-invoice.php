@@ -125,7 +125,7 @@ if (isset($_GET['notification_id'])) {
 
   </main><!-- End #main -->
 
-  <?php include 'assets/includes/footer.php'; ?>
+  <?php include 'assets/includes/footer-close.php'; ?>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
