@@ -122,7 +122,7 @@
             }
             
             // Sanitize but allow specific HTML for formatting
-            $message = strip_tags($message, '<span><br>');
+            $message = strip_tags($message, '<span><br><div>');
           ?>
           <li><hr class="dropdown-divider"></li>
             <li class="notification-item">

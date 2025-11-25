@@ -22,6 +22,10 @@ $stmt = $pdo->query("
     OR message LIKE 'Payment of%received for Invoice%'
     OR message LIKE 'PAID - %received. Fully paid.'
     OR message LIKE 'PARTIAL - %received. Balance:%'
+    OR message LIKE 'PAID - Invoice%Received:%'
+    OR message LIKE 'PARTIAL - Invoice%Received:%Balance:%'
+    OR (message LIKE 'PARTIAL - Invoice%' AND message NOT LIKE '%<div%')
+    OR (message LIKE 'PAID - Invoice%' AND message NOT LIKE '%<div%')
     ORDER BY id DESC
 ");
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -54,20 +58,33 @@ if ($notifications) {
             $amount = $matches[1];
             $invoice_num = $matches[2];
             $balance = $matches[3];
-            $new_message = "PARTIAL - Invoice #{$invoice_num}\n<span style='display:inline-block;width:70px'>Received:</span>$$amount\n<span style='display:inline-block;width:70px'>Balance:</span>$$balance";
+            $new_message = "PARTIAL - Invoice #{$invoice_num}<br><span style='display:inline-block;width:70px'>Received:</span>$$amount<br><span style='display:inline-block;width:70px'>Balance:</span>$$balance";
         }
         // Update newer PAID format to add line breaks
         elseif (preg_match('/PAID - Invoice #([^\s]+) - Payment of \$([^\s]+) received\. Fully paid\./', $old_message, $matches)) {
             $invoice_num = $matches[1];
             $amount = $matches[2];
-            $new_message = "PAID - Invoice #{$invoice_num}\n<span style='display:inline-block;width:70px'>Received:</span>$$amount";
+            $new_message = "PAID - Invoice #{$invoice_num}<br><div style='display:flex;justify-content:space-between;max-width:200px'><span>Received:</span><span>$$amount</span></div>";
+        }
+        // Update current PAID format with inline-block spans to flex layout
+        elseif (preg_match("/PAID - Invoice #([^<]+)<br><span[^>]*>Received:<\/span>\\$(.+)/", $old_message, $matches)) {
+            $invoice_num = $matches[1];
+            $amount = $matches[2];
+            $new_message = "PAID - Invoice #{$invoice_num}<br><div style='display:flex;justify-content:space-between;max-width:200px'><span>Received:</span><span>$$amount</span></div>";
         }
         // Update newer PARTIAL format to add line breaks
         elseif (preg_match('/PARTIAL - Invoice #([^\s]+) - Payment of \$([^\s]+) received\. Balance: \$(.+)/', $old_message, $matches)) {
             $invoice_num = $matches[1];
             $amount = $matches[2];
             $balance = $matches[3];
-            $new_message = "PARTIAL - Invoice #{$invoice_num}\n<span style='display:inline-block;width:70px'>Received:</span>$$amount\n<span style='display:inline-block;width:70px'>Balance:</span>$$balance";
+            $new_message = "PARTIAL - Invoice #{$invoice_num}<br><div style='display:flex;justify-content:space-between;max-width:200px'><span>Received:</span><span>$$amount</span></div><div style='display:flex;justify-content:space-between;max-width:200px'><span>Balance:</span><span>$$balance</span></div>";
+        }
+        // Update current PARTIAL format with inline-block spans to flex layout
+        elseif (preg_match("/PARTIAL - Invoice #([^<]+)<br><span[^>]*>Received:<\/span>\\$([^<]+)<br><span[^>]*>Balance:<\/span>\\$(.+)/", $old_message, $matches)) {
+            $invoice_num = $matches[1];
+            $amount = $matches[2];
+            $balance = $matches[3];
+            $new_message = "PARTIAL - Invoice #{$invoice_num}<br><div style='display:flex;justify-content:space-between;max-width:200px'><span>Received:</span><span>$$amount</span></div><div style='display:flex;justify-content:space-between;max-width:200px'><span>Balance:</span><span>$$balance</span></div>";
         }
         
         if ($new_message !== $old_message) {
@@ -76,7 +93,8 @@ if ($notifications) {
             echo "&nbsp;&nbsp;&nbsp;Old: <code>" . htmlspecialchars($old_message) . "</code><br>";
             echo "&nbsp;&nbsp;&nbsp;New: <code>" . htmlspecialchars($new_message) . "</code></li>";
         } else {
-            echo "<li>⚠️ Skipped notification ID {$notif['id']} - no pattern match</li>";
+            echo "<li>⚠️ Skipped notification ID {$notif['id']} - no pattern match<br>";
+            echo "&nbsp;&nbsp;&nbsp;Message: <code>" . htmlspecialchars($old_message) . "</code></li>";
         }
     }
     
