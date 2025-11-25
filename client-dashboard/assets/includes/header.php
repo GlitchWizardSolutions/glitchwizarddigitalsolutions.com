@@ -84,8 +84,10 @@
              <span id="boot-icon" class="bi bi-receipt-cutoff" style="font-size: 1rem; color: rgb(120, 13, 227);"></span>
             <?php if($invoice_notification_bell == 0) : ?>
             <span class="badge bg-transparent badge-number"><?=$invoice_notification_bell ?></span>
+           <?php elseif($invoice_badge_urgent) : ?>
+             <span class="badge bg-danger badge-number" title="Partial payments or past due invoices require attention"><?=$invoice_notification_bell ?></span>
            <?php else : ?>
-             <span class="badge bg-danger badge-number"><?=$invoice_notification_bell ?></span>
+             <span class="badge bg-warning badge-number" title="Unread invoice notifications"><?=$invoice_notification_bell ?></span>
             <?php endif; ?>
           </a>
 

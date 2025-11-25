@@ -66,10 +66,33 @@ $client_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
 if (!empty($client_ids)) {
     $placeholders = str_repeat('?,', count($client_ids) - 1) . '?';
     
-    // Count unread invoice notifications for all client profiles
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM client_notifications WHERE client_id IN ($placeholders) AND is_read = 0");
+    // Count unread invoice notifications (excluding PARTIAL/PAST DUE to avoid double counting)
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) 
+        FROM client_notifications 
+        WHERE client_id IN ($placeholders) 
+        AND is_read = 0
+        AND message NOT LIKE 'PARTIAL -%'
+        AND message NOT LIKE 'PAST DUE -%'
+    ");
     $stmt->execute($client_ids);
-    $invoice_notification_bell = $stmt->fetchColumn();
+    $unread_count = $stmt->fetchColumn();
+    
+    // Count PARTIAL/PAST DUE notifications (regardless of read status)
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) 
+        FROM client_notifications 
+        WHERE client_id IN ($placeholders) 
+        AND (message LIKE 'PARTIAL -%' OR message LIKE 'PAST DUE -%')
+    ");
+    $stmt->execute($client_ids);
+    $urgent_count = $stmt->fetchColumn();
+    
+    // Total badge count: unread (non-urgent) + urgent (never double counts)
+    $invoice_notification_bell = $unread_count + $urgent_count;
+    
+    // Badge color: red if urgent items exist, warning if only regular unread
+    $invoice_badge_urgent = ($urgent_count > 0);
 
     // Retrieve invoice notifications: unread NEW/PAID, or PARTIAL/PAST DUE (always show these)
     $stmt = $pdo->prepare("
@@ -89,6 +112,7 @@ if (!empty($client_ids)) {
     $invoice_notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
     $invoice_notification_bell = 0;
+    $invoice_badge_urgent = false;
     $invoice_notifications = [];
 }
 
