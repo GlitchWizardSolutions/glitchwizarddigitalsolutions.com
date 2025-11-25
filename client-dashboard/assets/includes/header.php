@@ -95,12 +95,38 @@
             </li>
 
         <?php foreach ($invoice_notifications as $notification): ?>
+          <?php
+            $message = htmlspecialchars($notification['message'] ?? '', ENT_QUOTES);
+            $badge_class = 'bg-secondary';
+            $badge_text = '';
+            
+            // Extract status prefix and set badge color
+            if (strpos($message, 'NEW - ') === 0) {
+                $badge_class = 'bg-warning';
+                $badge_text = 'NEW';
+                $message = substr($message, 6); // Remove "NEW - " from message
+            } elseif (strpos($message, 'PAID - ') === 0) {
+                $badge_class = 'bg-success';
+                $badge_text = 'PAID';
+                $message = substr($message, 7); // Remove "PAID - " from message
+            } elseif (strpos($message, 'PAST DUE - ') === 0) {
+                $badge_class = 'bg-danger';
+                $badge_text = 'PAST DUE';
+                $message = substr($message, 11); // Remove "PAST DUE - " from message
+            } elseif (strpos($message, 'PARTIAL - ') === 0) {
+                $badge_class = 'bg-info';
+                $badge_text = 'PARTIAL';
+                $message = substr($message, 10); // Remove "PARTIAL - " from message
+            }
+          ?>
           <li><hr class="dropdown-divider"></li>
             <li class="notification-item">
                <form action="<?php echo $base_url; ?>/view-invoice.php" style="width:100%" class='form' method="get"> 
              <div class="row mx-auto">
-                  
-                     <span style='font-size: .85em'><?=htmlspecialchars($notification['message'] ?? '', ENT_QUOTES)?></span> 
+                  <?php if ($badge_text): ?>
+                     <span class="badge <?=$badge_class?> mb-1" style="font-size: .7em; width: auto; display: inline-block;"><?=$badge_text?></span>
+                  <?php endif; ?>
+                     <span style='font-size: .85em; display: block;'><?=$message?></span> 
                       
                         <input name="id" type="hidden" value="<?=htmlspecialchars($notification['invoice_id']?? '', ENT_QUOTES)?>">
                         <input name="notification_id" type="hidden" value="<?=htmlspecialchars($notification['id']?? '', ENT_QUOTES)?>">

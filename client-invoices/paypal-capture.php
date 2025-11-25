@@ -173,8 +173,8 @@ try {
     ');
     
     $message = $new_status == 'Paid' 
-        ? "Payment of $" . number_format($payment_amount, 2) . " received for Invoice #{$invoice['invoice_number']}. Invoice is now fully paid."
-        : "Payment of $" . number_format($payment_amount, 2) . " received for Invoice #{$invoice['invoice_number']}. Remaining balance: $" . number_format($remaining_balance, 2);
+        ? "PAID - Invoice #{$invoice['invoice_number']} - Payment of $" . number_format($payment_amount, 2) . " received. Fully paid."
+        : "PARTIAL - Invoice #{$invoice['invoice_number']} - Payment of $" . number_format($payment_amount, 2) . " received. Balance: $" . number_format($remaining_balance, 2);
     
     $stmt->execute([$invoice['client_id'], $invoice['id'], $message]);
     

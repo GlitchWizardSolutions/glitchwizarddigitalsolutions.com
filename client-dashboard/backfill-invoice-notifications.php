@@ -38,7 +38,7 @@ if ($invoices) {
     
     foreach ($invoices as $invoice) {
         $total_amount = floatval($invoice['payment_amount']) + floatval($invoice['tax_total']);
-        $message = "New invoice #{$invoice['invoice_number']} created - Amount due: $" . number_format($total_amount, 2);
+        $message = "NEW - Invoice #{$invoice['invoice_number']} - Amount due: $" . number_format($total_amount, 2);
         
         $stmt_insert->execute([$invoice['client_id'], $invoice['id'], $message]);
         
