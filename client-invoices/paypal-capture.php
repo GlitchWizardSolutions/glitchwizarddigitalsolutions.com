@@ -168,7 +168,7 @@ try {
     
     // Create client notification
     $stmt = $pdo->prepare('
-        INSERT INTO client_notifications (client_id, invoice_id, message, date_created) 
+        INSERT INTO client_notifications (client_id, invoice_id, message, created_at) 
         VALUES (?, ?, ?, NOW())
     ');
     
