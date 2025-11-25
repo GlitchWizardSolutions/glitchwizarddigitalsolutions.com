@@ -55,6 +55,11 @@
         </ul>
       </li>
          
+      
+      
+      <!-- /admin-->  
+         <?php endif; ?>  
+
         <li class="nav-item" id='blog'>
         <a class="nav-link collapsed" data-bs-target="#blog-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-book"></i><span>Knowledge Base</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -73,11 +78,6 @@
         </ul>
       </li><!--/blog-->         
              
-      
-      
-      <!-- /admin-->  
-         <?php endif; ?>  
-
         
      <li class="nav-item" id='communication'>
         <a class="nav-link collapsed" data-bs-target="#communication-nav" data-bs-toggle="collapse" href="#">
