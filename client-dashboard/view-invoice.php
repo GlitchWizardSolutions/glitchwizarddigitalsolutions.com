@@ -85,7 +85,7 @@ if (isset($_GET['notification_id'])) {
 </head>
 <body>
   <?php include 'assets/includes/header.php'; ?>
-  <?php include 'assets/includes/sidebar.php'; ?>
+  <?php include 'assets/includes/navigation.php'; ?>
 
   <main id="main" class="main">
     <div class="pagetitle">
