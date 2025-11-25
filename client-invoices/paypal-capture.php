@@ -3,6 +3,12 @@
 // This file receives payment confirmation from PayPal Smart Payment Buttons
 // and records the payment in the database
 
+// Enable error logging
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+error_log("PayPal Capture: Request received at " . date('Y-m-d H:i:s'));
+
 include 'main.php';
 
 // Connect to the database
@@ -17,10 +23,13 @@ try {
 
 // Get JSON input
 $input = file_get_contents('php://input');
+error_log("PayPal Capture: Raw input: " . $input);
 $data = json_decode($input, true);
+error_log("PayPal Capture: Decoded data: " . print_r($data, true));
 
 // Validate input
 if (!$data || !isset($data['orderID']) || !isset($data['invoice_number'])) {
+    error_log("PayPal Capture: Invalid request data - " . print_r($data, true));
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Invalid request data']);
     exit;

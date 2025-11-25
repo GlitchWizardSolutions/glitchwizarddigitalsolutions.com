@@ -219,7 +219,9 @@ if (!$client) {
             
             // Handle successful payment
             onApprove: function(data, actions) {
+                console.log('PayPal onApprove triggered', data);
                 return actions.order.capture().then(function(details) {
+                    console.log('Payment captured', details);
                     // Send payment details to server for verification and recording
                     return fetch('paypal-capture.php', {
                         method: 'POST',
@@ -232,8 +234,12 @@ if (!$client) {
                             details: details
                         })
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Server response status:', response.status);
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log('Server response data:', data);
                         if (data.success) {
                             // Redirect to invoice with success message
                             window.location.href = 'invoice.php?id=<?=$invoice['invoice_number']?>&payment_success=true';
@@ -241,6 +247,10 @@ if (!$client) {
                             alert('Payment recorded but there was an issue: ' + data.message);
                             window.location.href = 'invoice.php?id=<?=$invoice['invoice_number']?>';
                         }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        alert('Error communicating with server: ' + error.message);
                     });
                 });
             },
