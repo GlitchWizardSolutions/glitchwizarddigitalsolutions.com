@@ -158,6 +158,77 @@ if (!$client) {
             vertical-align: middle;
             margin-right: 5px;
         }
+        .partial-payment {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .partial-payment h3 {
+            margin: 0 0 15px 0;
+            color: #856404;
+            font-size: 18px;
+        }
+        .partial-payment label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .amount-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .amount-input-wrapper::before {
+            content: '$';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            font-weight: bold;
+            color: #666;
+        }
+        .partial-payment input[type="number"] {
+            width: 100%;
+            padding: 12px 12px 12px 35px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-weight: 600;
+        }
+        .partial-payment input[type="number"]:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        .partial-payment .hint {
+            display: block;
+            margin-top: 8px;
+            font-size: 13px;
+            color: #856404;
+        }
+        .quick-amounts {
+            margin-top: 15px;
+        }
+        .quick-amounts button {
+            padding: 8px 16px;
+            margin: 5px 5px 5px 0;
+            background: #fff;
+            border: 2px solid #ffc107;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #856404;
+            transition: all 0.2s;
+        }
+        .quick-amounts button:hover {
+            background: #ffc107;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -182,6 +253,54 @@ if (!$client) {
             <p>Pay with PayPal, Credit Card, Debit Card, or Buy Now Pay Later</p>
         </div>
 
+        <!-- Partial Payment Option -->
+        <div class="partial-payment">
+            <h3>💰 Payment Amount</h3>
+            <label for="payment-amount">
+                <?php if ($invoice['payment_status'] == 'Balance'): ?>
+                Pay Full Balance or Make Partial Payment:
+                <?php else: ?>
+                Pay Full Amount or Make Partial Payment:
+                <?php endif; ?>
+            </label>
+            <div class="amount-input-wrapper">
+                <input type="number" 
+                       id="payment-amount" 
+                       min="0.01" 
+                       max="<?=$amount_to_charge?>" 
+                       step="0.01" 
+                       value="<?=$amount_to_charge?>"
+                       placeholder="Enter amount">
+            </div>
+            <span class="hint">
+                Maximum: $<?=number_format($amount_to_charge, 2)?> • Minimum: $0.01
+            </span>
+            
+            <!-- Quick Amount Buttons -->
+            <div class="quick-amounts">
+                <strong style="display: block; margin-bottom: 8px; color: #856404;">Quick Select:</strong>
+                <button type="button" onclick="setPaymentAmount(<?=$amount_to_charge?>)">
+                    Full Balance ($<?=number_format($amount_to_charge, 2)?>)
+                </button>
+                <?php if ($amount_to_charge >= 100): ?>
+                <button type="button" onclick="setPaymentAmount(<?=$amount_to_charge / 2?>)">
+                    Half ($<?=number_format($amount_to_charge / 2, 2)?>)
+                </button>
+                <?php endif; ?>
+                <?php if ($amount_to_charge >= 200): ?>
+                <button type="button" onclick="setPaymentAmount(<?=$amount_to_charge / 4?>)">
+                    Quarter ($<?=number_format($amount_to_charge / 4, 2)?>)
+                </button>
+                <?php endif; ?>
+                <button type="button" onclick="setPaymentAmount(50)">
+                    $50
+                </button>
+                <button type="button" onclick="setPaymentAmount(100)">
+                    $100
+                </button>
+            </div>
+        </div>
+
         <!-- PayPal Smart Payment Buttons Container -->
         <div id="paypal-button-container"></div>
         
@@ -201,14 +320,51 @@ if (!$client) {
     <script src="https://www.paypal.com/sdk/js?client-id=<?=paypal_client_id?>&currency=<?=paypal_currency?>"></script>
     
     <script>
+        // Helper function to set payment amount
+        function setPaymentAmount(amount) {
+            const maxAmount = <?=$amount_to_charge?>;
+            const validAmount = Math.min(Math.max(0.01, parseFloat(amount)), maxAmount);
+            document.getElementById('payment-amount').value = validAmount.toFixed(2);
+        }
+        
+        // Get the payment amount from the input field
+        function getPaymentAmount() {
+            const input = document.getElementById('payment-amount');
+            const amount = parseFloat(input.value);
+            const maxAmount = <?=$amount_to_charge?>;
+            
+            // Validate amount
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid payment amount.');
+                return null;
+            }
+            
+            if (amount > maxAmount) {
+                alert('Payment amount cannot exceed the balance due of $' + maxAmount.toFixed(2));
+                return null;
+            }
+            
+            if (amount < 0.01) {
+                alert('Payment amount must be at least $0.01');
+                return null;
+            }
+            
+            return amount.toFixed(2);
+        }
+        
         paypal.Buttons({
             // Set up the transaction
             createOrder: function(data, actions) {
+                const paymentAmount = getPaymentAmount();
+                if (!paymentAmount) {
+                    return Promise.reject('Invalid payment amount');
+                }
+                
                 return actions.order.create({
                     purchase_units: [{
-                        description: 'Invoice <?=$invoice['invoice_number']?><?=($invoice['payment_status'] == 'Balance' ? ' (Balance Due)' : '')?>',
+                        description: 'Invoice <?=$invoice['invoice_number']?><?=($invoice['payment_status'] == 'Balance' ? ' (Partial Payment)' : '')?>',
                         amount: {
-                            value: '<?=number_format($amount_to_charge, 2, '.', '')?>'
+                            value: paymentAmount
                         },
                         invoice_id: '<?=$invoice['invoice_number']?>',
                         custom_id: '<?=$invoice['invoice_number']?>'
