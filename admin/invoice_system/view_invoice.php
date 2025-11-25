@@ -14,7 +14,7 @@ $stmt = $pdo->prepare('SELECT i.*, ii.* FROM invoices i JOIN invoice_items ii ON
 $stmt->execute([ $_GET['id'] ]);
 $invoice_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Retrieve invoice details
-$stmt = $pdo->prepare('SELECT c.id AS c_id, i.*, c.*, d.domain, d.due_date AS domain_due_date, d.amount AS domain_amount, d.host_url, pt.name AS project_type_name, pt.description AS project_type_description FROM invoices i LEFT JOIN invoice_items ii ON ii.invoice_number = i.invoice_number LEFT JOIN invoice_clients c ON c.id = i.client_id LEFT JOIN domains d ON d.id = i.domain_id LEFT JOIN project_types pt ON pt.id = i.project_type_id WHERE i.id = ?');
+$stmt = $pdo->prepare('SELECT c.id AS c_id, i.*, c.*, i.created AS invoice_created, d.domain, d.due_date AS domain_due_date, d.amount AS domain_amount, d.host_url, pt.name AS project_type_name, pt.description AS project_type_description FROM invoices i LEFT JOIN invoice_items ii ON ii.invoice_number = i.invoice_number LEFT JOIN invoice_clients c ON c.id = i.client_id LEFT JOIN domains d ON d.id = i.domain_id LEFT JOIN project_types pt ON pt.id = i.project_type_id WHERE i.id = ?');
 $stmt->execute([ $_GET['id'] ]);
 $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
 // address
@@ -177,7 +177,7 @@ if (!$invoice) {
         </div>
         <div class="invoice-detail">
             <h3>Created</h3>
-            <p><?=date('F j, Y', strtotime($invoice['created']))?></p>
+            <p><?=date('F j, Y', strtotime($invoice['invoice_created']))?></p>
         </div>
         <?php if (file_exists(client_side_invoice . 'pdfs/' . $invoice['invoice_number'] . '.pdf')): ?>
         <div class="invoice-detail">
