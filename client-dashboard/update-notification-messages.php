@@ -54,7 +54,7 @@ if ($notifications) {
             $amount = $matches[1];
             $invoice_num = $matches[2];
             $balance = $matches[3];
-            $new_message = "PARTIAL - Invoice #{$invoice_num}\nReceived: $$amount\nBalance: $$balance";
+            $new_message = "PARTIAL - Invoice #{$invoice_num}\nReceived: $$amount\nBalance:  $$balance";
         }
         // Update newer PAID format to add line breaks
         elseif (preg_match('/PAID - Invoice #([^\s]+) - Payment of \$([^\s]+) received\. Fully paid\./', $old_message, $matches)) {
@@ -67,7 +67,7 @@ if ($notifications) {
             $invoice_num = $matches[1];
             $amount = $matches[2];
             $balance = $matches[3];
-            $new_message = "PARTIAL - Invoice #{$invoice_num}\nReceived: $$amount\nBalance: $$balance";
+            $new_message = "PARTIAL - Invoice #{$invoice_num}\nReceived: $$amount\nBalance:  $$balance";
         }
         
         if ($new_message !== $old_message) {

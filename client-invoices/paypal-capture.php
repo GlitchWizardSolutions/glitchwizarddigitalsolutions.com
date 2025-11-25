@@ -174,7 +174,7 @@ try {
     
     $message = $new_status == 'Paid' 
         ? "PAID - Invoice #{$invoice['invoice_number']}\nReceived: $" . number_format($payment_amount, 2)
-        : "PARTIAL - Invoice #{$invoice['invoice_number']}\nReceived: $" . number_format($payment_amount, 2) . "\nBalance: $" . number_format($remaining_balance, 2);
+        : "PARTIAL - Invoice #{$invoice['invoice_number']}\nReceived: $" . number_format($payment_amount, 2) . "\nBalance:  $" . number_format($remaining_balance, 2);
     
     $stmt->execute([$invoice['client_id'], $invoice['id'], $message]);
     
