@@ -19,6 +19,12 @@ if (isset($_GET['payment_success']) && $_GET['payment_success'] == 'true') {
     $payment_message_type = 'error';
 }
 
+// Mark notification as read if coming from notification
+if (isset($_GET['notification_id'])) {
+    $stmt = $pdo->prepare('UPDATE client_notifications SET is_read = 1 WHERE id = ?');
+    $stmt->execute([ $_GET['notification_id'] ]);
+}
+
 // Check if invoice ID param exists
 if (!isset($_GET['id'])) {
     exit('Invoice ID not specified!');

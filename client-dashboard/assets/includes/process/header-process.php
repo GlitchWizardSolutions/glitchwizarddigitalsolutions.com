@@ -58,6 +58,16 @@ $stmt = $pdo->prepare('SELECT * FROM tickets WHERE acc_id = ?  AND ticket_status
 $stmt->execute([$account['id'] ]);
 $actionReq = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Invoice Notifications - Count unread invoice notifications for client
+$stmt = $pdo->prepare('SELECT COUNT(*) FROM client_notifications WHERE client_id = ? AND is_read = 0');
+$stmt->execute([ $account['id'] ]);
+$invoice_notification_bell = $stmt->fetchColumn();
+
+// Retrieve 3 most recent unread invoice notifications
+$stmt = $pdo->prepare('SELECT * FROM client_notifications WHERE client_id = ? AND is_read = 0 ORDER BY created_at DESC LIMIT 3');
+$stmt->execute([ $account['id'] ]);
+$invoice_notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Retrieve 3 tickets and info with member comment tickets that have not been replied to.
 $stmt = $pdo->prepare('SELECT * FROM tickets WHERE ticket_status != "closed" AND last_comment != "Admin" ORDER BY created DESC LIMIT 3');
 $stmt->execute();

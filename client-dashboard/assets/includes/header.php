@@ -77,6 +77,62 @@
      <?php endif; ?>
   <?php endif; ?>       
         
+   <?php /*INVOICE NOTIFICATIONS - CLIENT ONLY VIEW*/ ?>     
+   <?php if ($account['role'] != 'Admin'): ?>
+        <li class="nav-item dropdown">
+          <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown" title="Invoice notifications">
+             <span id="boot-icon" class="bi bi-receipt-cutoff" style="font-size: 1rem; color: rgb(120, 13, 227);"></span>
+            <?php if($invoice_notification_bell == 0) : ?>
+            <span class="badge bg-transparent badge-number"><?=$invoice_notification_bell ?></span>
+           <?php else : ?>
+             <span class="badge bg-danger badge-number"><?=$invoice_notification_bell ?></span>
+            <?php endif; ?>
+          </a>
+
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+            <li class="dropdown-header">
+              Invoice Notifications
+            </li>
+
+        <?php foreach ($invoice_notifications as $notification): ?>
+          <li><hr class="dropdown-divider"></li>
+            <li class="notification-item">
+               <form action="<?php echo $outside_url; ?>client-invoices/invoice.php" style="width:100%" class='form' method="get"> 
+             <div class="row mx-auto">
+                  
+                     <span style='font-size: .85em'><?=htmlspecialchars($notification['message'] ?? '', ENT_QUOTES)?></span> 
+                      
+                        <input name="id" type="hidden" value="<?=htmlspecialchars($notification['invoice_id']?? '', ENT_QUOTES)?>">
+                        <input name="notification_id" type="hidden" value="<?=htmlspecialchars($notification['id']?? '', ENT_QUOTES)?>">
+                </div> 
+                 <div class="row mx-auto" style="text-align:center">
+
+			            <button style="width:75%; height:50%" class="btn btn-sm btn-warning mx-auto" type="submit">View Invoice</button>
+                   </div>
+                  </form> 
+		    </li>
+		<?php endforeach; ?>
+			
+		<?php if (!$invoice_notifications): ?>
+		  <li><hr class="dropdown-divider"></li>
+		<li class="notification-item">
+              <i class="bi bi-check-circle text-success"></i>
+              <div>
+                <p>No invoice notifications.</p>
+              </div>
+        </li>
+       <?php endif; ?>
+                     <hr class="dropdown-divider">
+            </li>
+            <li class="dropdown-footer">
+              <a href="<?php echo $outside_url; ?>client-invoices/">View All Invoices</a>
+            </li>
+           </div>
+     </div>  
+          </ul><!-- End Invoice Notification Dropdown Items -->
+        </li><!-- End Invoice Notification Nav -->
+  <?php endif; ?>       
+        
    <?php /*THIS IS ADMIN ONLY VIEW*/ ?>         
         
   <?php if ($account['role'] == 'Admin'): ?>
