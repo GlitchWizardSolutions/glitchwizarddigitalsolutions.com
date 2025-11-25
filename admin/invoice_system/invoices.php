@@ -410,9 +410,9 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                             <?php elseif ($invoice['payment_status'] == 'Pending'): ?>
                             <span class="blue">Pending</span>
                             <?php elseif ($invoice['payment_status'] == 'Gift'): ?>
-                            <span style="color: #9c27b0;">Gift</span>
+                            <span class="purple">Gift</span>
                             <?php elseif ($invoice['payment_status'] == 'Favor'): ?>
-                            <span style="color: #ff9800;">Favor</span>
+                            <span class="orange">Favor</span>
                             <?php elseif ($invoice['payment_status'] == 'Cancelled'): ?>
                             <span class="grey">Cancelled</span>
                             <?php elseif (($invoice['payment_status'] == 'Unpaid' || $invoice['payment_status'] == 'Balance') && $invoice['due_date'] < $current_date): ?>
@@ -432,6 +432,12 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                     </td>
                    <?php if ($invoice['payment_status'] == 'Paid'): ?>
                     <td class="alt responsive-hidden" style="text-align:center; color:green">Paid</td>
+                    <?php elseif ($invoice['payment_status'] == 'Gift'): ?>
+                    <td class="alt responsive-hidden" style="text-align:center; color:#9c27b0">Gift</td>
+                    <?php elseif ($invoice['payment_status'] == 'Favor'): ?>
+                    <td class="alt responsive-hidden" style="text-align:center; color:#ff9800">Favor</td>
+                    <?php elseif ($invoice['payment_status'] == 'Cancelled'): ?>
+                    <td class="alt responsive-hidden" style="text-align:center; color:#999">Cancelled</td>
                     <?php else:?>
                         <?php if($current_date > $invoice['due_date']): ?>
                           <td class="alt responsive-hidden" style="text-align:center"><span style="color:red"> <?=time_difference_string($invoice['due_date'])?></span></td>
