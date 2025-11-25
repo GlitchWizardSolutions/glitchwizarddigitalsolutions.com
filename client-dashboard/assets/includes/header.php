@@ -97,7 +97,7 @@
         <?php foreach ($invoice_notifications as $notification): ?>
           <li><hr class="dropdown-divider"></li>
             <li class="notification-item">
-               <form action="<?php echo $outside_url; ?>client-invoices/invoice.php" style="width:100%" class='form' method="get"> 
+               <form action="<?php echo $base_url; ?>/view-invoice.php" style="width:100%" class='form' method="get"> 
              <div class="row mx-auto">
                   
                      <span style='font-size: .85em'><?=htmlspecialchars($notification['message'] ?? '', ENT_QUOTES)?></span> 

@@ -211,8 +211,8 @@ include includes_path . 'page-setup.php';
                                             </span>
                                         </td>
                                         <td class="text-nowrap">
-                                            <a href="<?php echo site_menu_base ?>client-invoices/invoice.php?id=<?= $invoice['invoice_number'] ?>" 
-                                               class="btn btn-sm btn-primary" target="_blank" 
+                                            <a href="view-invoice.php?id=<?= $invoice['invoice_number'] ?>" 
+                                               class="btn btn-sm btn-primary" 
                                                style="padding: 0.25rem 0.5rem; font-size: 0.875rem;"
                                                title="View Invoice">
                                                 <i class="bi bi-eye"></i>
@@ -226,10 +226,10 @@ include includes_path . 'page-setup.php';
                                                 <i class="bi bi-credit-card"></i>
                                             </a>
                                             <?php elseif ($invoice['payment_status'] == 'Paid'): ?>
-                                            <a href="<?php echo site_menu_base ?>client-invoices/invoice.php?id=<?= $invoice['invoice_number'] ?>" 
-                                               class="btn btn-sm btn-secondary" target="_blank"
+                                            <a href="view-invoice.php?id=<?= $invoice['invoice_number'] ?>" 
+                                               class="btn btn-sm btn-secondary"
                                                style="padding: 0.25rem 0.5rem; font-size: 0.875rem;"
-                                               onclick="setTimeout(function() { var w = window.open(this.href); setTimeout(function() { w.print(); }, 500); }.bind(this), 100); return false;"
+                                               onclick="setTimeout(function() { window.open('<?php echo site_menu_base ?>client-invoices/invoice.php?id=<?= $invoice['invoice_number'] ?>').print(); }, 500); return false;"
                                                title="Print Receipt">
                                                 <i class="bi bi-printer"></i>
                                             </a>

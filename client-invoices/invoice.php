@@ -19,8 +19,8 @@ if (isset($_GET['payment_success']) && $_GET['payment_success'] == 'true') {
     $payment_message_type = 'error';
 }
 
-// Mark notification as read if coming from notification
-if (isset($_GET['notification_id'])) {
+// Mark notification as read if coming from notification (and not in iframe)
+if (isset($_GET['notification_id']) && !isset($_SERVER['HTTP_SEC_FETCH_DEST']) || (isset($_SERVER['HTTP_SEC_FETCH_DEST']) && $_SERVER['HTTP_SEC_FETCH_DEST'] !== 'iframe')) {
     $stmt = $pdo->prepare('UPDATE client_notifications SET is_read = 1 WHERE id = ?');
     $stmt->execute([ $_GET['notification_id'] ]);
 }
