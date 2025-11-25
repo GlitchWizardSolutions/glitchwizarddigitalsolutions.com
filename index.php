@@ -113,7 +113,7 @@ include includes_path . 'public-page-setup.php';
 					loginForm.querySelector('.msg').classList.add('success');
 					loginForm.querySelector('.msg').innerHTML = result.replace('Success: ', '');
 				} else if (result.toLowerCase().includes('redirect')) {
-					window.location.href = 'client-dashboard/index.php';
+					window.location.href = '<?php echo BASE_URL; ?>client-dashboard/index.php';
 				} else if (result.includes('tfa:')) {
                    // window.location.href = result.replace('tfa: ', '');
                       window.location.href = 'twofactor.php';
