@@ -125,19 +125,21 @@ try {
     $stmt = $pdo->prepare('
         INSERT INTO payment_history (
             invoice_id, 
+            invoice_number,
             payment_date, 
-            amount, 
+            amount_paid, 
             payment_method, 
-            reference_number, 
+            transaction_id, 
             notes,
             recorded_by
-        ) VALUES (?, NOW(), ?, ?, ?, ?, NULL)
+        ) VALUES (?, ?, NOW(), ?, ?, ?, ?, NULL)
     ');
     
     $notes = "PayPal Order ID: $order_id\nPayer: $payer_name ($payer_email)";
     
     $stmt->execute([
         $invoice['id'],
+        $invoice['invoice_number'],
         $payment_amount,
         'PayPal',
         $transaction_id,
