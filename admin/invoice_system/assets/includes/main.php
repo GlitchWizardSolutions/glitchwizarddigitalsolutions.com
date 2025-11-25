@@ -112,7 +112,7 @@ echo '<!DOCTYPE html>
         <meta name="viewport" content="width=device-width,minimum-scale=1">
         <title>' . $title . '</title>
         <link rel="icon" type="image/png" href="https://glitchwizarddigitalsolutions.com/assets/imgs/purple-logo-sm.png">
-        <link href="admin.css" rel="stylesheet" type="text/css">
+        <link href="admin.css?v=20251125" rel="stylesheet" type="text/css">
     </head>
     <body class="admin">
         <aside>
