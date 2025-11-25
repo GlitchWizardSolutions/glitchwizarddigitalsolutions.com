@@ -61,13 +61,11 @@ include includes_path . 'public-page-setup.php';
 			 	<h1>Member Portal</h1>
 	<form action="authenticate.php" method="post" class="form login-form">
 
-				<label class="form-label" for="username">
-					<i class="fas fa-user"></i>
-				</label>
-				
-			<input class="form-input" type="text" name="username" placeholder="Username" id="username" required>
-
-			<label class="form-label" for="password"> 
+			<label class="form-label" for="username">
+				<i class="fas fa-user"></i>
+			</label>
+			
+		<input class="form-input" type="text" name="username" placeholder="Username" id="username" autocomplete="username" required>			<label class="form-label" for="password"> 
 					<i  class="fas fa-lock"></i>
 				</label>
 			<input class="form-input" type="password" name="password" placeholder="Password" id="password" autocomplete="current-password" required>
