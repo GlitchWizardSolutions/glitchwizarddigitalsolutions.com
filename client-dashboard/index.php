@@ -44,7 +44,9 @@ include includes_path . 'page-setup.php';
                     <div class="card-body">
                       <h5 class="card-title">Getting Started <span>| Step 1</span></h5>
                       <div class="d-flex align-items-center">
-                        <!-- Content will be added based on access level -->
+                        <div class="ps-3">
+                          <p>Coming Soon - <?=htmlspecialchars($account['access_level'], ENT_QUOTES)?></p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -55,7 +57,9 @@ include includes_path . 'page-setup.php';
                     <div class="card-body">
                       <h5 class="card-title">Next Steps <span>| Step 2</span></h5>
                       <div class="d-flex align-items-center">
-                        <!-- Content will be added based on access level -->
+                        <div class="ps-3">
+                          <p>Coming Soon - <?=htmlspecialchars($account['access_level'], ENT_QUOTES)?></p>
+                        </div>
                       </div>
                     </div>
                   </div>
