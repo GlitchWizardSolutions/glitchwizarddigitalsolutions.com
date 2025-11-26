@@ -5,7 +5,7 @@ choose selected value in dropdown by what is in the database, this is not occuri
 */
 require 'assets/includes/admin_config.php';
 try {
-	$access_resource = new PDO('mysql:host=' . db_host . ';dbname=' . db_name5 . ';charset=' . db_charset, db_user, db_pass);
+	$access_resource = new PDO('mysql:host=' . db_host . ';dbname=' . db_name . ';charset=' . db_charset, db_user, db_pass);
 	$access_resource->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $exception) {
 	// If there is an error with the connection, stop the script and display the error.

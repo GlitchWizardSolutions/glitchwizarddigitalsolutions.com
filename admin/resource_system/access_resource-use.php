@@ -17,7 +17,7 @@ if ($account['role'] != 'Admin') {
 
 // Connect to the access_resource database
 try {
-    $access_resource_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name5 . ';charset=' . db_charset, db_user, db_pass);
+    $access_resource_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name . ';charset=' . db_charset, db_user, db_pass);
     $access_resource_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $exception) {
     exit('Failed to connect to the access resource database!');
