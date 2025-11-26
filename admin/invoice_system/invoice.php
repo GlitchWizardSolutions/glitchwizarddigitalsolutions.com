@@ -104,9 +104,12 @@ if (isset($_GET['id'])) {
         } elseif (isset($_POST['send_email'])) {
             // If send_email button was clicked, send the invoice email
             send_client_invoice_email($invoice, $client);
-            // Mark email as sent
-            $stmt = $pdo->prepare('UPDATE invoices SET email_sent = 1 WHERE id = ?');
-            $stmt->execute([$_GET['id']]);
+            // Mark email as sent (only if column exists)
+            $check_column = $pdo->query("SHOW COLUMNS FROM invoices LIKE 'email_sent'");
+            if ($check_column->rowCount() > 0) {
+                $stmt = $pdo->prepare('UPDATE invoices SET email_sent = 1 WHERE id = ?');
+                $stmt->execute([$_GET['id']]);
+            }
             header('Location: invoices.php?success_msg=6');
         } else {
             // Just save without email
@@ -134,9 +137,19 @@ if (isset($_GET['id'])) {
         $inv= date('ymdH:i:s') . $inv; 
         // Determine if email will be sent
         $email_sent = isset($_POST['send_email']) ? 1 : 0;
+        
+        // Check if email_sent column exists
+        $check_column = $pdo->query("SHOW COLUMNS FROM invoices LIKE 'email_sent'");
+        $has_email_sent_column = $check_column->rowCount() > 0;
+        
         // Insert the invoice
-        $stmt = $pdo->prepare('INSERT INTO invoices (client_id, invoice_number, payment_amount, payment_status, payment_methods, notes, viewed, email_sent, due_date, created, tax, tax_total, invoice_template, recurrence, recurrence_period, recurrence_period_type, domain_id, project_type_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-        $stmt->execute([ $_POST['client_id'], $inv, $payment_amount, $_POST['payment_status'], $payment_methods, $_POST['notes'], 0, $email_sent, $_POST['due_date'], $_POST['created'], $tax, $tax_total, $_POST['invoice_template'], $_POST['recurrence'], $_POST['recurrence_period'], $_POST['recurrence_period_type'], $_POST['domain_id'] ?: null, $_POST['project_type_id'] ?: null ]);
+        if ($has_email_sent_column) {
+            $stmt = $pdo->prepare('INSERT INTO invoices (client_id, invoice_number, payment_amount, payment_status, payment_methods, notes, viewed, email_sent, due_date, created, tax, tax_total, invoice_template, recurrence, recurrence_period, recurrence_period_type, domain_id, project_type_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+            $stmt->execute([ $_POST['client_id'], $inv, $payment_amount, $_POST['payment_status'], $payment_methods, $_POST['notes'], 0, $email_sent, $_POST['due_date'], $_POST['created'], $tax, $tax_total, $_POST['invoice_template'], $_POST['recurrence'], $_POST['recurrence_period'], $_POST['recurrence_period_type'], $_POST['domain_id'] ?: null, $_POST['project_type_id'] ?: null ]);
+        } else {
+            $stmt = $pdo->prepare('INSERT INTO invoices (client_id, invoice_number, payment_amount, payment_status, payment_methods, notes, viewed, due_date, created, tax, tax_total, invoice_template, recurrence, recurrence_period, recurrence_period_type, domain_id, project_type_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+            $stmt->execute([ $_POST['client_id'], $inv, $payment_amount, $_POST['payment_status'], $payment_methods, $_POST['notes'], 0, $_POST['due_date'], $_POST['created'], $tax, $tax_total, $_POST['invoice_template'], $_POST['recurrence'], $_POST['recurrence_period'], $_POST['recurrence_period_type'], $_POST['domain_id'] ?: null, $_POST['project_type_id'] ?: null ]);
+        }
         // add items
         addItems($pdo, $inv);
         // Create PDF
@@ -156,8 +169,9 @@ if (isset($_GET['id'])) {
         
         // Create notification for unpaid invoices only
         if ($_POST['payment_status'] != 'Paid') {
-        $invoice_total = $payment_amount + $tax_total;
-        $notification_message = "NEW - Invoice #{$inv}<br>Amount due: $" . number_format($invoice_total, 2);            $stmt = $pdo->prepare('INSERT INTO client_notifications (client_id, invoice_id, message, is_read, created_at) VALUES (?, ?, ?, 0, NOW())');
+            $invoice_total = $payment_amount + $tax_total;
+            $notification_message = "NEW - Invoice #{$inv}<br>Amount due: $" . number_format($invoice_total, 2);
+            $stmt = $pdo->prepare('INSERT INTO client_notifications (client_id, invoice_id, message, is_read, created_at) VALUES (?, ?, ?, 0, NOW())');
             $stmt->execute([$_POST['client_id'], $invoice['id'], $notification_message]);
         }
         
