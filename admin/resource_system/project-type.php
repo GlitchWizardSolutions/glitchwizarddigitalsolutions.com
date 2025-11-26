@@ -76,93 +76,6 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Project Type']
 ])?>
 
-<style>
-.form-professional {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-}
-
-.form-professional .form {
-    max-width: 100% !important;
-    width: 100% !important;
-}
-
-.form-professional label {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 8px;
-    display: block;
-    font-size: 14px;
-}
-
-.form-professional input[type="text"],
-.form-professional input[type="number"],
-.form-professional textarea {
-    width: 100%;
-    max-width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #6b46c1;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    background: #ffffff;
-    color: #2c3e50;
-    box-sizing: border-box;
-}
-
-.form-professional textarea {
-    resize: vertical;
-    min-height: 100px;
-    font-family: inherit;
-    line-height: 1.6;
-}
-
-.form-professional input:focus,
-.form-professional textarea:focus {
-    outline: none;
-    border-color: #8e44ad;
-    box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.15);
-    background: #ffffff;
-}
-
-.form-professional .form-row {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr 1fr !important;
-    gap: 20px !important;
-    margin-bottom: 20px !important;
-    width: 100%;
-}
-
-.form-professional .form-row .form-group {
-    margin-bottom: 0 !important;
-}
-
-.form-professional .form-group {
-    margin-bottom: 20px;
-    box-sizing: border-box;
-    width: 100%;
-    min-width: 0;
-}
-
-.form-professional .form-group label {
-    margin-bottom: 8px;
-}
-
-.form-professional .form-group input,
-.form-professional .form-group textarea {
-    margin-bottom: 0;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    min-width: 0;
-}
-
-@media (max-width: 768px) {
-    .form-professional .form-row {
-        grid-template-columns: 1fr !important;
-    }
-}
-</style>
-
 <div class="content-title mb-3">
     <div class="title">
      <i class="fa-solid fa-user-secret"></i>
@@ -173,16 +86,17 @@ if (isset($_GET['id'])) {
     </div>
 </div>
 
-<form action="" method="post" class="form-professional">
+<form action="" method="post">
 
-    <div class="content-block">
-        <div class="form responsive-width-100">
-
-            <!-- Row 1: Project Name + Value + Number of Days -->
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Project Template Details</h3>
+            
             <div class="form-row">
                 <div class="form-group">
-                    <label for="name">Project Name</label>
-                    <input type="text" name="name" id="name" placeholder="Project Name" value="<?=htmlspecialchars($record['name']??'', ENT_QUOTES)?>" required>
+                    <label for="name">Project Name <span class="required">*</span></label>
+                    <input type="text" name="name" id="name" placeholder="Enter project name" value="<?=htmlspecialchars($record['name']??'', ENT_QUOTES)?>" required>
                 </div>
                 
                 <div class="form-group">
@@ -196,27 +110,25 @@ if (isset($_GET['id'])) {
                 </div>
             </div>
 
-            <!-- Row 2: Description (full width) -->
             <div class="form-group">
                 <label for="description">Description</label>
-                <textarea name="description" id="description" placeholder="Project description and overview..."><?=htmlspecialchars($record['description']??'', ENT_QUOTES)?></textarea>
+                <textarea name="description" id="description" rows="4" placeholder="Project description and overview..."><?=htmlspecialchars($record['description']??'', ENT_QUOTES)?></textarea>
             </div>
 
-            <!-- Row 3: Deliverables (full width) -->
             <div class="form-group">
                 <label for="deliverables">Deliverables</label>
-                <textarea name="deliverables" id="deliverables" placeholder="List project deliverables..."><?=htmlspecialchars($record['deliverables']??'', ENT_QUOTES)?></textarea>
+                <textarea name="deliverables" id="deliverables" rows="4" placeholder="List project deliverables..."><?=htmlspecialchars($record['deliverables']??'', ENT_QUOTES)?></textarea>
             </div>
-
         </div>
-    </div>
+        
+        <div class="form-actions">
+            <a href="project-types.php" class="btn btn-secondary">Cancel</a>
+            <?php if ($page == 'Edit'): ?>
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this record?')">
+            <?php endif; ?>
+            <input type="submit" name="submit" value="Save" class="btn btn-success">
+        </div>
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="project-types.php" class="btn alt mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 
 </form>
