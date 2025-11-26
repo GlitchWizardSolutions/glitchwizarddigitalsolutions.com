@@ -1,6 +1,6 @@
 <?php $settings = array (
-  'site_url' => 'https://glitchwizarddigitalsolutions.com/client-dashboard/blog',
-  'blog_site_url' => 'https://glitchwizarddigitalsolutions.com/client-dashboard/blog',
+  'site_url' => defined('blog_site_url') ? blog_site_url : (defined('ENVIRONMENT') && ENVIRONMENT === 'development' ? 'http://localhost:3000/public_html/client-dashboard/blog/' : 'https://glitchwizarddigitalsolutions.com/client-dashboard/blog/'),
+  'blog_site_url' => defined('blog_site_url') ? blog_site_url : (defined('ENVIRONMENT') && ENVIRONMENT === 'development' ? 'http://localhost:3000/public_html/client-dashboard/blog/' : 'https://glitchwizarddigitalsolutions.com/client-dashboard/blog/'),
   'sitename' => 'GlitchWizard Solutions Knowledge Base',
   'description' => 'Tutorials and help articles for portal users',
   'email' => 'barbara@glitchwizarddigitalsolutions.com',

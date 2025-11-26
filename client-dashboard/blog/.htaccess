@@ -1,3 +1,6 @@
+# Set default index file
+DirectoryIndex index.php
+
 RewriteEngine On
 
 # Removes .php extension from URL

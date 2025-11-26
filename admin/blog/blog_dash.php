@@ -27,7 +27,7 @@ require 'assets/includes/admin_config.php';
 					<a href="add_image.php" class="btn btn-primary btn-sm"><i class="fa fa-camera-retro"></i> Add Image</a>
 					<a href="widgets.php" class="btn btn-primary btn-sm"><i class="fa fa-archive"></i> Widgets</a>
 					<a href="upload_file.php" class="btn btn-primary btn-sm"><i class="fa fa-upload"></i> Upload File</a>
-                    <a href="<?php echo $settings['site_url']; ?>" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i> Visit Site</a>
+                    <a href="<?php echo rtrim($settings['site_url'], '/') . '/'; ?>" class="btn btn-primary btn-sm" target="_blank"><i class="fa fa-eye"></i> Visit Site</a>
                   </div>
                 </div>
             </div>
