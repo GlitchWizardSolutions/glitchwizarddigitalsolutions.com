@@ -28,6 +28,7 @@ if (isset($_GET['delete'])) {
 // Bulk delete records
 if (isset($_POST['bulk_delete']) && !empty($_POST['selected_logs'])) {
     $selected_ids = $_POST['selected_logs'];
+    
     // Filter out any non-numeric or empty values
     $selected_ids = array_filter($selected_ids, function($id) {
         return is_numeric($id) && $id > 0;
@@ -38,7 +39,9 @@ if (isset($_POST['bulk_delete']) && !empty($_POST['selected_logs'])) {
         $stmt = $error_db->prepare("DELETE FROM error_handling WHERE id IN ($placeholders)");
         $stmt->execute(array_values($selected_ids));
     }
-    header('Location: error-logs.php?success_msg=3');
+    
+    // Redirect to page 1 to avoid empty page after deletion
+    header('Location: error-logs.php?success_msg=3&pagination_page=1');
     exit;
 }
 
