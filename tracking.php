@@ -72,6 +72,19 @@ if ($action && $id) {
             $url = isset($_GET['url']) ? $_GET['url'] : '';
             
             if ($url) {
+                // Decode URL if it was encoded
+                $url = urldecode($url);
+                
+                // If URL doesn't have a protocol, add https://
+                if (!preg_match('/^https?:\/\//i', $url)) {
+                    // Check if it's a relative URL starting with /
+                    if (strpos($url, '/') === 0) {
+                        $url = $base_url . ltrim($url, '/');
+                    } else {
+                        $url = 'https://' . $url;
+                    }
+                }
+                
                 // Create tracking table if it doesn't exist
                 $pdo->exec('CREATE TABLE IF NOT EXISTS newsletter_tracking (
                     id INT AUTO_INCREMENT PRIMARY KEY,

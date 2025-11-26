@@ -114,7 +114,7 @@ if (isset($_GET['copy'])) {
             <div class="form-group">
                 <label for="attachments">Attachments</label>
             <div class="attachments">
-                <?php foreach(explode(',', $newsletter['attachments']) as $attachment): ?>
+                <?php foreach(explode(',', $newsletter['attachments'] ?? '') as $attachment): ?>
                 <?php if (!$attachment) continue; ?>
                 <div class="attachment-wrapper">   
                     <label class="attachment">

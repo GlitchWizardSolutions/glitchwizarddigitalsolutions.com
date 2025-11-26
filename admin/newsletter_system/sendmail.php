@@ -431,7 +431,9 @@ $newsletters = $pdo->query('SELECT id, title FROM newsletters ORDER BY title ASC
                     <ul style="margin: 8px 0 0 20px; font-size: 13px; color: #e65100;">
                         <li><strong>%unsubscribe_link%</strong> - Automatically filled with unique unsubscribe URL for each subscriber</li>
                         <li><strong>%open_tracking_code%</strong> - Invisible 1x1 pixel image that tracks when emails are opened (subscribers only)</li>
-                        <li><strong>%click_link%</strong> - For click tracking, use: <code>&lt;a href="%click_link%https://example.com"&gt;Click Here&lt;/a&gt;</code></li>
+                        <li><strong>%click_link%</strong> - For click tracking:<br>
+                            &nbsp;&nbsp;• Relative URL: <code>&lt;a href="%click_link%/accessibility.php"&gt;Click&lt;/a&gt;</code><br>
+                            &nbsp;&nbsp;• Full URL: <code>&lt;a href="%click_link%https://yoursite.com/page.php"&gt;Click&lt;/a&gt;</code></li>
                         <li>Custom placeholders and subscriber-specific data will be replaced automatically</li>
                         <li><em>Note: Images are automatically converted to full URLs for email compatibility</em></li>
                         <li><em>Tracking codes only work for subscribers in the database, not custom email addresses</em></li>
