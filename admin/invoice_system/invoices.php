@@ -103,7 +103,11 @@ $where .= $search ? 'WHERE (i.invoice_number LIKE :search OR CONCAT(c.first_name
 // Add filters
 // Unsent emails filter
 if (isset($_GET['filter']) && $_GET['filter'] == 'unsent') {
-    $where .= ($where ? 'AND ' : 'WHERE ') . 'i.email_sent = 0 AND i.payment_status != "Paid" ';
+    // Check if email_sent column exists
+    $stmt = $pdo->query("SHOW COLUMNS FROM invoices LIKE 'email_sent'");
+    if ($stmt->rowCount() > 0) {
+        $where .= ($where ? 'AND ' : 'WHERE ') . 'i.email_sent = 0 AND i.payment_status != "Paid" ';
+    }
 }
 // Date start filter
 if ($datestart) {
@@ -238,12 +242,6 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
        <i class="fa-solid fa-file-invoice"></i>
         <div class="txt">
             <h2>Manage Invoices</h2>
-            <p>Create, update, and delete invoices.</p>
-        </div>
-    </div>
-</div>
-
-<?php include 'unsent-invoices-widget.php'; ?>
             <p>View, edit, and create invoices</p>
         </div>
     </div>
