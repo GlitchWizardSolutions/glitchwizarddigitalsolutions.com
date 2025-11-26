@@ -82,6 +82,101 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Domain']
 ])?>
 
+<style>
+.form-professional {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.form-professional .form {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+.form-professional label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+}
+
+.form-professional input[type="text"],
+.form-professional input[type="number"],
+.form-professional input[type="datetime-local"],
+.form-professional select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #6b46c1;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.form-professional input:focus,
+.form-professional select:focus {
+    outline: none;
+    border-color: #8e44ad;
+    box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.15);
+    background: #ffffff;
+}
+
+.form-professional select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b46c1' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 0;
+}
+
+.form-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-row .form-group,
+.form-row-3 .form-group {
+    margin-bottom: 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select {
+    margin-bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .form-row,
+    .form-row-3 {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
 <div class="content-title">
     <div class="title">
        <i class="fa-solid fa-globe"></i>
@@ -91,8 +186,8 @@ if (isset($_GET['id'])) {
         </div>
     </div>
 </div>
-<form action="" method="post">
 
+<form action="" method="post" class="form-professional">
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
         <a href="domains.php" class="btn alt mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
@@ -102,67 +197,87 @@ if (isset($_GET['id'])) {
     </div>
  
     <div class="content-block">
-
         <div class="form responsive-width-100">
  
-            <label for="domain">Domain Name</label>
-            <input type="text" name="domain" id="domain" placeholder="domain" value="<?=htmlspecialchars($record['domain']??'', ENT_QUOTES)?>">
- 
-                <label for="account_id">AccId</label>
-                <select name="account_id" id="account_id"> 
+            <!-- Row 1: Domain Name + Account ID -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="domain">Domain Name</label>
+                    <input type="text" name="domain" id="domain" placeholder="example.com" value="<?=htmlspecialchars($record['domain']??'', ENT_QUOTES)?>" required>
+                </div>
                 
-            <?php foreach($accounts as $row) :?>
-             <?php 
-                    $selected='';
-                    $value=$row['id'];
-                    $match=$record['account_id'];
-                    $match1=$row['id'];
-                    if($match1==$match){
-                       $selected='selected';
-                    }
-               ?>
-             <option value="<?=$row['id'] ?>"<?=$selected;?>><?=$row['full_name']?></option>
-            <?php endforeach ?>
-                </select>
-                <label for="due_date">Renewal Date</label>
-<?php if (isset($_GET['id'])) : ?>
-            
-            <input type="datetime-local" name="due_date" id="due_date" placeholder="due_date" value="<?=$record['due_date'] ?>" required> 
-<?php else : ?>
-  <input type="datetime-local" name="due_date" id="due_date" placeholder="due_date" value="<?=date('Y-m-d\TH:i') ?>" required>
-<?php endif; ?>
+                <div class="form-group">
+                    <label for="account_id">Account</label>
+                    <select name="account_id" id="account_id" required> 
+                        <option value="">Select Account</option>
+                        <?php foreach($accounts as $row): ?>
+                            <?php $selected = ($record['account_id'] == $row['id']) ? 'selected' : ''; ?>
+                            <option value="<?=$row['id']?>" <?=$selected?>><?=$row['full_name']?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
 
-            <label for="host_url">Host URL</label>
-            <input type="text" name="host_url" id="host_url" placeholder="host_url"  value="<?=htmlspecialchars($record['host_url']??'', ENT_QUOTES)?>">
-    
-            <label for="host_login">Host Login</label>
-            <input type="text" name="host_login" id="host_login" placeholder="host_login" value="<?=htmlspecialchars($record['host_login']??'', ENT_QUOTES)?>">
-            
-            <label for="host_password">Host Password</label>
-            <input type="text" name="host_password" id="host_password" placeholder="host_password" value="<?=htmlspecialchars($record['host_password']??'', ENT_QUOTES)?>">
-            
-            <label for="amount">Renewal Fee</label>
-            <input type="text" name="amount" id="amount" placeholder="amount" value="<?=htmlspecialchars($record['amount']??'', ENT_QUOTES)?>">
-            
-            <label for="notes">Notes</label>
-            <input type="text" name="notes" id="notes" placeholder="notes" value="<?=htmlspecialchars($record['notes']??'', ENT_QUOTES)?>">
-            
-            <label for="status">Status</label>
-            <select name="status" id="status">
-                <option value="Active" <?=($record['status']??'Active') == 'Active' ? 'selected' : ''?>>Active</option>
-                <option value="Inactive" <?=($record['status']??'') == 'Inactive' ? 'selected' : ''?>>Inactive</option>
-                <option value="Expired" <?=($record['status']??'') == 'Expired' ? 'selected' : ''?>>Expired</option>
-                <option value="Cancelled" <?=($record['status']??'') == 'Cancelled' ? 'selected' : ''?>>Cancelled</option>
-            </select>
+            <!-- Row 2: Status + Renewal Date + Renewal Fee -->
+            <div class="form-row-3">
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select name="status" id="status" required>
+                        <option value="Active" <?=($record['status']??'Active') == 'Active' ? 'selected' : ''?>>Active</option>
+                        <option value="Inactive" <?=($record['status']??'') == 'Inactive' ? 'selected' : ''?>>Inactive</option>
+                        <option value="Expired" <?=($record['status']??'') == 'Expired' ? 'selected' : ''?>>Expired</option>
+                        <option value="Cancelled" <?=($record['status']??'') == 'Cancelled' ? 'selected' : ''?>>Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="due_date">Renewal Date</label>
+                    <?php if (isset($_GET['id'])): ?>
+                        <input type="datetime-local" name="due_date" id="due_date" value="<?=$record['due_date']?>" required> 
+                    <?php else: ?>
+                        <input type="datetime-local" name="due_date" id="due_date" value="<?=date('Y-m-d\TH:i', strtotime('+1 year'))?>" required>
+                    <?php endif; ?>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount">Renewal Fee</label>
+                    <input type="number" step="0.01" name="amount" id="amount" placeholder="25.00" value="<?=htmlspecialchars($record['amount']??'25.00', ENT_QUOTES)?>" required>
+                </div>
+            </div>
+
+            <!-- Row 3: Host URL + Host Login + Host Password -->
+            <div class="form-row-3">
+                <div class="form-group">
+                    <label for="host_url">Host URL</label>
+                    <input type="text" name="host_url" id="host_url" placeholder="https://registrar.com" value="<?=htmlspecialchars($record['host_url']??'', ENT_QUOTES)?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="host_login">Host Login</label>
+                    <input type="text" name="host_login" id="host_login" placeholder="username" value="<?=htmlspecialchars($record['host_login']??'', ENT_QUOTES)?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="host_password">Host Password</label>
+                    <input type="text" name="host_password" id="host_password" placeholder="password" value="<?=htmlspecialchars($record['host_password']??'', ENT_QUOTES)?>">
+                </div>
+            </div>
+
+            <!-- Row 4: Notes (full width) -->
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <input type="text" name="notes" id="notes" placeholder="Additional notes..." value="<?=htmlspecialchars($record['notes']??'', ENT_QUOTES)?>">
+            </div>
+
         </div>
-
     </div>
+
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="domains.php" class="btn btn-secondary mar-right-2">Cancel</a>
+        <a href="domains.php" class="btn alt mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
+        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn btn-success">
+        <input type="submit" name="submit" value="Save" class="btn">
     </div>
 </form>
 <script src="assets/js/resource-system-script.js"></script>
