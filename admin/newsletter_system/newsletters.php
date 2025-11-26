@@ -79,7 +79,7 @@ if (isset($_GET['success_msg'])) {
 // Determine the URL
 $url = 'newsletters.php?search_query=' . $search . (isset($_GET['date_from']) ? '&date_from=' . $_GET['date_from'] : '') . (isset($_GET['date_to']) ? '&date_to=' . $_GET['date_to'] : '');
 ?>
-<?=template_admin_header('Newsletters', 'newsletters', 'newsletters')?>
+<?=template_admin_header('Newsletters', 'newsletters', 'view')?>
 
 <?=generate_breadcrumbs([
     ['label' => 'Newsletter System', 'url' => 'index.php'],

@@ -81,7 +81,7 @@ if (isset($_GET['copy'])) {
     }
 }
 ?>
-<?=template_admin_header($page . ' Newsletter', 'newsletters', 'newsletter')?>
+<?=template_admin_header($page . ' Newsletter', 'newsletters', 'manage')?>
 
 <?=generate_breadcrumbs([
     ['label' => 'Newsletter System', 'url' => 'index.php'],
