@@ -32,9 +32,98 @@ if (isset($_FILES['newsletter_image'])) {
             $counter++;
         }
         
-        if (move_uploaded_file($file['tmp_name'], $path)) {
+        // Resize image if it's not SVG (SVG is vector and doesn't need resizing)
+        if ($extension !== '.svg') {
+            // Get original image dimensions
+            list($orig_width, $orig_height) = getimagesize($file['tmp_name']);
+            
+            // Maximum dimensions for email images (800px width is good for most emails)
+            $max_width = 800;
+            $max_height = 1200;
+            
+            // Calculate new dimensions while maintaining aspect ratio
+            $resize_needed = false;
+            if ($orig_width > $max_width || $orig_height > $max_height) {
+                $resize_needed = true;
+                $ratio = min($max_width / $orig_width, $max_height / $orig_height);
+                $new_width = round($orig_width * $ratio);
+                $new_height = round($orig_height * $ratio);
+            } else {
+                $new_width = $orig_width;
+                $new_height = $orig_height;
+            }
+            
+            // Create image resource based on type
+            switch ($file['type']) {
+                case 'image/jpeg':
+                    $source = imagecreatefromjpeg($file['tmp_name']);
+                    break;
+                case 'image/png':
+                    $source = imagecreatefrompng($file['tmp_name']);
+                    break;
+                case 'image/gif':
+                    $source = imagecreatefromgif($file['tmp_name']);
+                    break;
+                case 'image/webp':
+                    $source = imagecreatefromwebp($file['tmp_name']);
+                    break;
+                default:
+                    // Fallback to original upload if type not supported
+                    if (move_uploaded_file($file['tmp_name'], $path)) {
+                        header('Content-Type: application/json');
+                        exit(json_encode(['location' => $path]));
+                    }
+                    header('Content-Type: application/json');
+                    exit(json_encode(['error' => 'Failed to upload image']));
+            }
+            
+            // Create new image with resized dimensions
+            $destination = imagecreatetruecolor($new_width, $new_height);
+            
+            // Preserve transparency for PNG and GIF
+            if ($file['type'] === 'image/png' || $file['type'] === 'image/gif') {
+                imagealphablending($destination, false);
+                imagesavealpha($destination, true);
+                $transparent = imagecolorallocatealpha($destination, 255, 255, 255, 127);
+                imagefilledrectangle($destination, 0, 0, $new_width, $new_height, $transparent);
+            }
+            
+            // Copy and resize
+            imagecopyresampled($destination, $source, 0, 0, 0, 0, $new_width, $new_height, $orig_width, $orig_height);
+            
+            // Save the resized image with quality optimization
+            switch ($file['type']) {
+                case 'image/jpeg':
+                    imagejpeg($destination, $path, 85); // 85% quality is good balance
+                    break;
+                case 'image/png':
+                    imagepng($destination, $path, 8); // Compression level 8 (0-9)
+                    break;
+                case 'image/gif':
+                    imagegif($destination, $path);
+                    break;
+                case 'image/webp':
+                    imagewebp($destination, $path, 85);
+                    break;
+            }
+            
+            // Free memory
+            imagedestroy($source);
+            imagedestroy($destination);
+            
             header('Content-Type: application/json');
-            exit(json_encode(['location' => $path]));
+            exit(json_encode([
+                'location' => website_url . 'admin/newsletter_system/' . $path,
+                'resized' => $resize_needed,
+                'original_size' => $orig_width . 'x' . $orig_height,
+                'new_size' => $new_width . 'x' . $new_height
+            ]));
+        } else {
+            // SVG - just move it without processing
+            if (move_uploaded_file($file['tmp_name'], $path)) {
+                header('Content-Type: application/json');
+                exit(json_encode(['location' => website_url . 'admin/newsletter_system/' . $path]));
+            }
         }
     }
     
@@ -55,7 +144,7 @@ if (isset($_GET['list_images'])) {
                 if (is_file($filepath) && preg_match('/\.(jpg|jpeg|png|gif|webp|svg)$/i', $file)) {
                     $images[] = [
                         'title' => $file,
-                        'value' => $filepath,
+                        'value' => website_url . 'admin/newsletter_system/' . $filepath,
                         'modified' => filemtime($filepath)
                     ];
                 }
@@ -112,8 +201,8 @@ if (isset($_POST['subject'])) {
             $unsubscribe_link = website_url . 'unsubscribe.php?id=' . sha1($subscriber['id'] . $subscriber['email']);
             
             // Replace tracking placeholders with actual tracking codes
-            $content = str_replace('%open_tracking_code%', '<img src="' . website_url . 'tracking.php?action=open&id=' . $tracking_code . '" width="1" height="1" alt="">', $content);
-            $content = str_replace('%click_link%', website_url . 'tracking.php?action=click&id=' . $tracking_code . '&url=', $content);
+            $content = str_replace('%open_tracking_code%', '<img src="' . website_url . 'admin/newsletter_system/tracking.php?action=open&id=' . $tracking_code . '" width="1" height="1" alt="">', $content);
+            $content = str_replace('%click_link%', website_url . 'admin/newsletter_system/tracking.php?action=click&id=' . $tracking_code . '&url=', $content);
             $content = str_replace('%unsubscribe_link%', $unsubscribe_link, $content);
         } else {
             // For non-subscribers (custom emails), remove tracking codes
@@ -121,6 +210,10 @@ if (isset($_POST['subject'])) {
             $content = str_replace('%click_link%', '', $content);
             $content = str_replace('%unsubscribe_link%', '', $content);
         }
+        
+        // Convert relative image URLs to absolute URLs for email compatibility
+        $content = preg_replace('/src="uploads\//', 'src="' . website_url . 'admin/newsletter_system/uploads/', $content);
+        $content = preg_replace('/src="\.\.\/uploads\//', 'src="' . website_url . 'admin/newsletter_system/uploads/', $content);
         
         // Send the mail
         $response = admin_sendmail($_POST['from'], $_POST['from_name'], $recipient_email, $_POST['subject'], $content, $attachments);
@@ -309,9 +402,10 @@ $newsletters = $pdo->query('SELECT id, title FROM newsletters ORDER BY title ASC
                     <ul style="margin: 8px 0 0 20px; font-size: 13px; color: #0d47a1;">
                         <li><strong>Alternative Description</strong> - Describes the image for accessibility (goes in alt="" attribute). Shows when image fails to load.</li>
                         <li><strong>Class</strong> - Use "Responsive (Recommended)" for images that auto-fit to email width, or "Full Width" for banner images.</li>
-                        <li>Images automatically resize to fit email templates - no need to manually adjust dimensions!</li>
-                        <li>You can drag corners to resize images visually in the editor.</li>
-                        <li>Keep image file sizes under 500KB for faster email loading.</li>
+                        <li><strong>Automatic Optimization:</strong> Images larger than 800px wide are automatically resized and compressed for faster email loading!</li>
+                        <li>You can still drag corners to resize images visually in the editor if needed.</li>
+                        <li>Original aspect ratio is always preserved during resizing.</li>
+                        <li>SVG images are not resized (they're vector-based and scale perfectly).</li>
                     </ul>
                 </div>
                 <div class="info-box" style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
@@ -319,9 +413,10 @@ $newsletters = $pdo->query('SELECT id, title FROM newsletters ORDER BY title ASC
                     <ul style="margin: 8px 0 0 20px; font-size: 13px; color: #e65100;">
                         <li><strong>%unsubscribe_link%</strong> - Automatically filled with unique unsubscribe URL for each subscriber</li>
                         <li><strong>%open_tracking_code%</strong> - Invisible 1x1 pixel image that tracks when emails are opened (subscribers only)</li>
-                        <li><strong>%click_link%</strong> - Base URL for click tracking (use in href attributes to track link clicks)</li>
+                        <li><strong>%click_link%</strong> - For click tracking, use: <code>&lt;a href="%click_link%https://example.com"&gt;Click Here&lt;/a&gt;</code></li>
                         <li>Custom placeholders and subscriber-specific data will be replaced automatically</li>
-                        <li><em>Note: Tracking codes only work for subscribers in the database, not custom email addresses</em></li>
+                        <li><em>Note: Images are automatically converted to full URLs for email compatibility</em></li>
+                        <li><em>Tracking codes only work for subscribers in the database, not custom email addresses</em></li>
                     </ul>
                 </div>
                 <?php endif; ?>
@@ -378,7 +473,7 @@ tinymce.init({
     images_upload_url: 'sendmail.php',
     
     // Image settings for email compatibility
-    image_dimensions: true,
+    image_dimensions: false,  // Hide width/height input fields
     image_class_list: [
         {title: 'Responsive (Recommended)', value: 'responsive-image'},
         {title: 'Full Width', value: 'full-width-image'},
