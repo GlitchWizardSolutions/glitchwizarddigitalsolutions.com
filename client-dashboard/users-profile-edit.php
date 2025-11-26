@@ -60,7 +60,7 @@ if (isset($_POST['username'], $_POST['email'], $_POST['first_name'])) {
 			}
 			
 			if (move_uploaded_file($_FILES['avatar']['tmp_name'], $target_path)) {
-				$avatar_path = '/public_html/media/avatars/' . $filename;
+				$avatar_path = '/media/avatars/' . $filename;
 			} else {
 				$error_msg = 'Failed to upload avatar. Please try again.';
 			}
