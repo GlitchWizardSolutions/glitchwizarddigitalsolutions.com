@@ -45,36 +45,40 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Placeholder']
 ])?>
 
-<form method="post" class="form-professional">
+<div class="content-title mb-3">
+    <div class="icon alt"><?=svg_icon_settings()?></div>
+    <div class="txt">
+        <h2><?=$page?> Placeholder</h2>
+        <p class="subtitle"><?=$page == 'Edit' ? 'Modify custom placeholder' : 'Create new custom placeholder'?></p>
+    </div>
+</div>
 
-    <div class="content-title mb-3">
-        <div class="icon alt"><?=svg_icon_settings()?></div>
-        <div class="txt">
-            <h2><?=$page?> Placeholder</h2>
-            <p class="subtitle"><?=$page == 'Edit' ? 'Modify custom placeholder' : 'Create new custom placeholder'?></p>
+<form method="post">
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Placeholder Details</h3>
+
+            <div class="form-group">
+                <label for="placeholder_text">Placeholder <span class="required">*</span></label>
+                <input id="placeholder_text" type="text" name="placeholder_text" placeholder="%example%" value="<?=htmlspecialchars($custom_placeholder['placeholder_text'], ENT_QUOTES)?>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="placeholder_value">Value <span class="required">*</span></label>
+                <textarea id="placeholder_value" name="placeholder_value" rows="4" placeholder="Enter the replacement value..." required><?=htmlspecialchars($custom_placeholder['placeholder_value'], ENT_QUOTES)?></textarea>
+            </div>
         </div>
-        <div class="btns">
-            <a href="custom_placeholders.php" class="btn btn-secondary mar-right-1">Cancel</a>
+        
+        <div class="form-actions">
+            <a href="custom_placeholders.php" class="btn btn-secondary">Cancel</a>
             <?php if ($page == 'Edit'): ?>
-            <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-1" onclick="return confirm('Are you sure you want to delete this placeholder?')">
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this placeholder?')">
             <?php endif; ?>
             <input type="submit" name="submit" value="Save" class="btn btn-success">
         </div>
+
     </div>
-
-    <div class="form-section">
-        <h3 class="section-title">Placeholder Details</h3>
-
-            <label for="placeholder_text"><span class="required">*</span> Placeholder</label>
-            <input id="placeholder_text" type="text" name="placeholder_text" placeholder="%example%" value="<?=htmlspecialchars($custom_placeholder['placeholder_text'], ENT_QUOTES)?>" required>
-
-            <label for="placeholder_value"><span class="required">*</span> Value</label>
-            <textarea id="placeholder_value" name="placeholder_value" placeholder="Enter the replacement value..." required><?=htmlspecialchars($custom_placeholder['placeholder_value'], ENT_QUOTES)?></textarea>
-
-        </div>
-    
-    </div>
-
 </form>
 
 <?=template_admin_footer()?>
