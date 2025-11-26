@@ -81,7 +81,7 @@ if (isset($_GET['copy'])) {
     }
 }
 ?>
-<?=template_admin_header($page . ' Newsletter', 'newsletters', 'newsletters')?>
+<?=template_admin_header($page . ' Newsletter', 'newsletters', 'newsletter')?>
 
 <?=generate_breadcrumbs([
     ['label' => 'Newsletter System', 'url' => 'index.php'],
@@ -123,7 +123,6 @@ if (isset($_GET['copy'])) {
                         <input type="file" name="attachments[]">
                         <input type="hidden" name="current_attachments[]" value="<?=$attachment?>">
                     </label>
-                    <a href="#" class="remove" style="display:inline-flex">&times;</a>
                 </div>
                 <?php endforeach; ?>     
                 <div class="attachment-wrapper">              
@@ -132,7 +131,6 @@ if (isset($_GET['copy'])) {
                         <span>Select File</span>
                         <input type="file" name="attachments[]">
                     </label>
-                    <a href="#" class="remove">&times;</a>
                 </div>
             </div>
 

@@ -70,8 +70,8 @@ function template_admin_header($title, $selected = 'orders', $selected_child = '
             <span class="note">' . num_format($newsletters_total) . '</span>
         </a>
         <div class="sub">
-            <a href="newsletters.php"' . ($selected == 'newsletters' && $selected_child == 'view' ? ' class="selected"' : '') . '><span class="square"></span>View Newsletters</a>
-            <a href="newsletter.php"' . ($selected == 'newsletters' && $selected_child == 'manage' ? ' class="selected"' : '') . '><span class="square"></span>Create Newsletter</a>
+            <a href="newsletters.php"' . ($selected == 'newsletters' && $selected_child == 'newsletters' ? ' class="selected"' : '') . '><span class="square"></span>View Newsletters</a>
+            <a href="newsletter.php"' . ($selected == 'newsletters' && $selected_child == 'newsletter' ? ' class="selected"' : '') . '><span class="square"></span>Create Newsletter</a>
             <a href="newsletters_export.php"' . ($selected == 'newsletters' && $selected_child == 'export' ? ' class="selected"' : '') . '><span class="square"></span>Export Newsletter</a>
             <a href="newsletters_import.php"' . ($selected == 'newsletters' && $selected_child == 'import' ? ' class="selected"' : '') . '><span class="square"></span>Import Newsletter</a>
         </div>
@@ -90,11 +90,11 @@ function template_admin_header($title, $selected = 'orders', $selected_child = '
             <a href="subscribers_export.php"' . ($selected == 'subscribers' && $selected_child == 'export' ? ' class="selected"' : '') . '><span class="square"></span>Export Subscribers</a>
             <a href="subscribers_import.php"' . ($selected == 'subscribers' && $selected_child == 'import' ? ' class="selected"' : '') . '><span class="square"></span>Import Subscribers</a>
         </div>
-        <a href="sendmail.php"' . ($selected == 'sendmail' ? ' class="selected"' : '') . ' title="Send Mail">
+        <a href="sendmail.php"' . ($selected == 'sendmail' ? ' class="selected"' : '') . ' title="Send Newsletter">
             <span class="icon">
                 <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" /></svg>
             </span>
-            <span class="txt">Send Mail</span>
+            <span class="txt">Send Newsletter</span>
         </a>
         <a href="accounts.php"' . ($selected == 'accounts' ? ' class="selected"' : '') . ' title="Accounts">
             <span class="icon">

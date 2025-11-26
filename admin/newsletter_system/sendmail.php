@@ -69,79 +69,80 @@ $subscribers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Get all the newsletter templates
 $newsletters = $pdo->query('SELECT id, title FROM newsletters ORDER BY title ASC')->fetchAll(PDO::FETCH_ASSOC);
 ?>
-<?=template_admin_header('Send Mail', 'sendmail')?>
+<?=template_admin_header('Send Newsletter', 'newsletters', 'sendmail')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Newsletter System', 'url' => 'index.php'],
+    ['label' => 'Send Newsletter']
+])?>
 
 <div class="content-title mb-3">
     <div class="title">
-        <div class="icon">
-            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 2H2V17H4V4H17V2M21 22L18.5 20.32L16 22L13.5 20.32L11 22L8.5 20.32L6 22V6H21V22M10 10V12H17V10H10M15 14H10V16H15V14Z" /></svg>
-        </div>
+        <i class="fa-solid fa-envelope"></i>
         <div class="txt">
-            <h2>Send Email</h2>
-            <p>Send Email to Subscribers.</p>
+            <h2>Send Newsletter</h2>
+            <p>Send bulk emails to subscribers</p>
         </div>
     </div>
-             
 </div>
-<br><br>
-<form method="post" class="send-mail-form" enctype="multipart/form-data">
 
- <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-       
-    <div class="content-title mb-3">
-        <div class="btns">
-            <input type="submit" name="submit" value="Submit" class="btn green">
-        </div>
-    </div>
+<form method="post" enctype="multipart/form-data">
 
-    <div class="content-block">
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Email Details</h3>
 
-        <div class="form responsive-width-100">
+            <div class="form-group">
+                <label for="subject"><span class="required">*</span> Subject</label>
+                <input id="subject" type="text" name="subject" placeholder="Subject" required>
+            </div>
 
-            <label for="subject"><span class="required">*</span> Subject</label>
-            <input id="subject" type="text" name="subject" placeholder="Subject" required>
-
-            <div class="group">
-                <div class="item">
-                    <label for="from"><span class="required">*</span> From Email</label>
-                    <input id="from" type="email" name="from" placeholder="From Email" value="<?=mail_from?>" required>
-                </div>
-                <div class="item">
+            <div class="form-row">
+                <div class="form-group">
                     <label for="from_name"><span class="required">*</span> From Name</label>
                     <input id="from_name" type="text" name="from_name" placeholder="From Name" value="<?=htmlspecialchars(mail_from_name, ENT_QUOTES)?>" required>
                 </div>
+                <div class="form-group">
+                    <label for="from"><span class="required">*</span> From Email</label>
+                    <input id="from" type="email" name="from" placeholder="From Email" value="<?=mail_from?>" required>
+                </div>
             </div>
 
-            <label for="recipients"><span class="required">*</span> Recipients</label>
-            <div class="multi-checkbox recipients-multi-checkbox">
-                <div class="item check-all">
-                    <input id="check-all" type="checkbox">
-                    <input type="text" placeholder="Search...">
-                </div>
-                <div class="con">
-                    <?php foreach ($subscribers as $subscriber): ?>
-                    <div class="item">
-                        <input id="checkbox-<?=$subscriber['id']?>" type="checkbox" name="recipients[]" value="<?=$subscriber['email']?>">
-                        <label for="checkbox-<?=$subscriber['id']?>"><?=$subscriber['email']?></label>
+            <div class="form-group">
+                <label for="recipients"><span class="required">*</span> Recipients</label>
+                <div class="multi-checkbox recipients-multi-checkbox">
+                    <div class="item check-all">
+                        <input id="check-all" type="checkbox">
+                        <input type="text" placeholder="Search...">
                     </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-         <!--    <a href="#" class="add-link add-additional-recipients">+ Add Custom Recipients</a> -->
-
-            <label for="attachments">Attachments</label>
-            <div class="attachments">
-                <div class="attachment-wrapper">
-                    <label class="attachment">
-                        <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M384 480l48 0c11.4 0 21.9-6 27.6-15.9l112-192c5.8-9.9 5.8-22.1 .1-32.1S555.5 224 544 224l-400 0c-11.4 0-21.9 6-27.6 15.9L48 357.1 48 96c0-8.8 7.2-16 16-16l117.5 0c4.2 0 8.3 1.7 11.3 4.7l26.5 26.5c21 21 49.5 32.8 79.2 32.8L416 144c8.8 0 16 7.2 16 16l0 32 48 0 0-32c0-35.3-28.7-64-64-64L298.5 96c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7L64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l23.7 0L384 480z"/></svg>
-                        <span>Select File</span>
-                        <input type="file" name="attachments[]">
-                    </label>
-                    <a href="#" class="remove">&times;</a>
+                    <div class="con">
+                        <?php foreach ($subscribers as $subscriber): ?>
+                        <div class="item">
+                            <input id="checkbox-<?=$subscriber['id']?>" type="checkbox" name="recipients[]" value="<?=$subscriber['email']?>">
+                            <label for="checkbox-<?=$subscriber['id']?>"><?=$subscriber['email']?></label>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
 
-            <label for="content"><span class="required">*</span> <?=template_editor == 'tinymce'?'':'HTML '?>Email Template</label>
+            <div class="form-group">
+                <label for="attachments">Attachments</label>
+                <div class="attachments">
+                    <div class="attachment-wrapper">
+                        <label class="attachment">
+                            <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M384 480l48 0c11.4 0 21.9-6 27.6-15.9l112-192c5.8-9.9 5.8-22.1 .1-32.1S555.5 224 544 224l-400 0c-11.4 0-21.9 6-27.6 15.9L48 357.1 48 96c0-8.8 7.2-16 16-16l117.5 0c4.2 0 8.3 1.7 11.3 4.7l26.5 26.5c21 21 49.5 32.8 79.2 32.8L416 144c8.8 0 16 7.2 16 16l0 32 48 0 0-32c0-35.3-28.7-64-64-64L298.5 96c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7L64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l23.7 0L384 480z"/></svg>
+                            <span>Select File</span>
+                            <input type="file" name="attachments[]">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="content"><span class="required">*</span> <?=template_editor == 'tinymce'?'':'HTML '?>Email Template</label>
+            </div>
         </div>
 
         <?php if (template_editor == 'tinymce'): ?>
@@ -160,13 +161,15 @@ $newsletters = $pdo->query('SELECT id, title FROM newsletters ORDER BY title ASC
                     <a href="#" class="format-btn italic">Italic</a>
                     <a href="#" class="format-btn image">Image</a>
                 </div>
-                <div class="preview-btn">
-                    <a href="#" class="btn"><svg class="icon-left" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg>Preview</a>
-                </div>
             </div>
             <textarea id="content" name="content" placeholder="Enter your HTML template..." wrap="off" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
         </div>
         <?php endif; ?>
+        
+        <div class="form-actions">
+            <a href="index.php" class="btn btn-secondary">Cancel</a>
+            <input type="submit" name="submit" value="Send" class="btn btn-success">
+        </div>
 
     </div>
 
