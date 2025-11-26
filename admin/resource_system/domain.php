@@ -148,7 +148,12 @@ if (isset($_GET['id'])) {
             <input type="text" name="notes" id="notes" placeholder="notes" value="<?=htmlspecialchars($record['notes']??'', ENT_QUOTES)?>">
             
             <label for="status">Status</label>
-            <input type="text" name="status" id="status" placeholder="status" value="<?=htmlspecialchars($record['status']??'', ENT_QUOTES)?>">
+            <select name="status" id="status">
+                <option value="Active" <?=($record['status']??'Active') == 'Active' ? 'selected' : ''?>>Active</option>
+                <option value="Inactive" <?=($record['status']??'') == 'Inactive' ? 'selected' : ''?>>Inactive</option>
+                <option value="Expired" <?=($record['status']??'') == 'Expired' ? 'selected' : ''?>>Expired</option>
+                <option value="Cancelled" <?=($record['status']??'') == 'Cancelled' ? 'selected' : ''?>>Cancelled</option>
+            </select>
         </div>
 
     </div>
