@@ -29,15 +29,30 @@ if (isset($_GET['delete'])) {
 if (isset($_POST['bulk_delete']) && !empty($_POST['selected_logs'])) {
     $selected_ids = $_POST['selected_logs'];
     
-    // Filter out any non-numeric or empty values
-    $selected_ids = array_filter($selected_ids, function($id) {
-        return is_numeric($id) && $id > 0;
-    });
-    
-    if (!empty($selected_ids)) {
-        $placeholders = str_repeat('?,', count($selected_ids) - 1) . '?';
-        $stmt = $error_db->prepare("DELETE FROM error_handling WHERE id IN ($placeholders)");
-        $stmt->execute(array_values($selected_ids));
+    // Check if "delete all" was selected
+    if (isset($_POST['delete_all_records']) && $_POST['delete_all_records'] == '1') {
+        // Delete all records matching current search/filter
+        $where = '';
+        $where .= $search ? 'WHERE (application LIKE :search OR pagename LIKE :search OR section LIKE :search OR error_type LIKE :search OR severity LIKE :search OR thrown LIKE :search OR noted LIKE :search OR timestamp LIKE :search) ' : '';
+        
+        $stmt = $error_db->prepare('DELETE FROM error_handling ' . $where);
+        if ($search) {
+            $param3 = '%' . $search . '%';
+            $stmt->bindParam('search', $param3, PDO::PARAM_STR);
+        }
+        $stmt->execute();
+    } else {
+        // Delete only selected IDs
+        // Filter out any non-numeric or empty values
+        $selected_ids = array_filter($selected_ids, function($id) {
+            return is_numeric($id) && $id > 0;
+        });
+        
+        if (!empty($selected_ids)) {
+            $placeholders = str_repeat('?,', count($selected_ids) - 1) . '?';
+            $stmt = $error_db->prepare("DELETE FROM error_handling WHERE id IN ($placeholders)");
+            $stmt->execute(array_values($selected_ids));
+        }
     }
     
     // Redirect to page 1 to avoid empty page after deletion
@@ -135,6 +150,9 @@ $url = 'error-logs.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id
     <div style="margin-left: auto;">
         <button type="button" id="bulk-delete-btn" class="btn" style="background: #dc3545; color: white; display: none;" onclick="confirmBulkDelete()">
             <i class="fas fa-trash"></i> Delete Selected
+        </button>
+        <button type="button" id="delete-all-btn" class="btn" style="background: #d9534f; color: white; margin-left: 10px;" onclick="confirmDeleteAll()">
+            <i class="fas fa-trash-alt"></i> Delete All (<?=$records_total?>)
         </button>
     </div>
 </div>
@@ -262,6 +280,40 @@ function confirmBulkDelete() {
         bulkDeleteInput.name = 'bulk_delete';
         bulkDeleteInput.value = '1';
         form.appendChild(bulkDeleteInput);
+        form.submit();
+    }
+}
+
+function confirmDeleteAll() {
+    const totalRecords = <?=$records_total?>;
+    if (totalRecords === 0) {
+        alert('There are no records to delete.');
+        return;
+    }
+    
+    if (confirm(`⚠️ WARNING: This will delete ALL ${totalRecords} error log(s) matching your current search/filter.\n\nThis action cannot be undone. Are you sure?`)) {
+        const form = document.getElementById('bulk-delete-form');
+        
+        // Add hidden inputs
+        const bulkDeleteInput = document.createElement('input');
+        bulkDeleteInput.type = 'hidden';
+        bulkDeleteInput.name = 'bulk_delete';
+        bulkDeleteInput.value = '1';
+        form.appendChild(bulkDeleteInput);
+        
+        const deleteAllInput = document.createElement('input');
+        deleteAllInput.type = 'hidden';
+        deleteAllInput.name = 'delete_all_records';
+        deleteAllInput.value = '1';
+        form.appendChild(deleteAllInput);
+        
+        // Add a dummy checkbox so the form has selected_logs
+        const dummyCheckbox = document.createElement('input');
+        dummyCheckbox.type = 'hidden';
+        dummyCheckbox.name = 'selected_logs[]';
+        dummyCheckbox.value = '1';
+        form.appendChild(dummyCheckbox);
+        
         form.submit();
     }
 }
