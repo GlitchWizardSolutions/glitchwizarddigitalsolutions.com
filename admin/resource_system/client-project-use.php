@@ -79,7 +79,7 @@ if ($status == 'active') {
     $project_active = true; // Default to active
 } 
 ?>
-<?=template_admin_header('Client Project Usage', 'resources', 'projects')?>
+<?=template_admin_header('Client Project', 'resources', 'projects')?>
 
 <?=generate_breadcrumbs([
     ['label' => 'Resource System', 'url' => 'index.php'],

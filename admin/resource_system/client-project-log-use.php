@@ -135,7 +135,7 @@ if ($days_old <= 7) {
         <div style="background: white; padding: 20px; border-radius: 6px;">
             <div style="margin-bottom: 20px;">
                 <div style="background: #6c757d; color: white; padding: 8px 12px; border-radius: 4px; margin-bottom: 15px; font-weight: bold;">
-                    <?=date('F j, Y \a\t g:i A', strtotime($log_record['date_created']))?>
+                    <?=date('F j, Y \\a\\t g:i A', strtotime($log_record['date_created']))?>
                 </div>
                 
                 <?php if (!empty($log_record['dev_note'])): ?>
