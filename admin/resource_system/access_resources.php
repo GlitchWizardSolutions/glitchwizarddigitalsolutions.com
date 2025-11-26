@@ -77,7 +77,7 @@ $url = 'access_resources.php?search=' . $search . (isset($_GET['page_id']) ? '&p
     ['label' => 'Access Resources']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-key"></i>
         <div class="txt">

@@ -57,7 +57,7 @@ if (isset($_GET['delete-id'])) {
     ['title' => 'Menu Editor', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-bars"></i>
         <div class="txt">

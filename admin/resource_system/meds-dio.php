@@ -46,7 +46,7 @@ $meds = $onthego_db->query('SELECT * FROM meds WHERE patient = "Dio Moore" and s
     </form>
 </div>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <div class="txt">
             <h2>Dio Moore's Medications</h2>

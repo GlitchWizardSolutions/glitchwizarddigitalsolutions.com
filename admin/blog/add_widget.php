@@ -24,7 +24,7 @@ if (isset($_POST['add'])) {
     ['title' => 'Add Widget', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-archive"></i>
         <div class="txt">

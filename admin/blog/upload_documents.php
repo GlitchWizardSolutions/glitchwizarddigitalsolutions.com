@@ -124,7 +124,7 @@ if(isset($_FILES['file']['name']) && is_array($_FILES['file']['name'])) {
     ['title' => 'Upload Documents', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-upload"></i>
         <div class="txt">

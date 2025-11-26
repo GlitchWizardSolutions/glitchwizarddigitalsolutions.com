@@ -94,7 +94,7 @@ if (isset($_POST['file_type'])) {
     ['label' => 'Export Accounts']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-file-export"></i>
         <div class="txt">

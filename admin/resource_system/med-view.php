@@ -33,7 +33,7 @@ $copy="";
 ?>
     <?=template_admin_header($page . ' Medications', 'resources', 'meds')?>
     
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-circle-info"></i>
         <div class="txt">

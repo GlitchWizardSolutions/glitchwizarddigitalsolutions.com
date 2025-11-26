@@ -54,7 +54,7 @@ if (isset($_POST['submit'])) {
 <?=template_admin_header('Import records', 'resources', 'financials')?>
 
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
     <i class="fa-solid fa-file-import fa-lg"></i>
         <div class="txt">

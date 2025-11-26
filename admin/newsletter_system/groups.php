@@ -76,7 +76,7 @@ $url = 'groups.php?search_query=' . $search . (isset($_GET['date_from']) ? '&dat
     ['label' => 'Groups']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="icon alt"><?=svg_icon_newsletter()?></div>
     <div class="txt">
         <h2>Subscriber Groups</h2>

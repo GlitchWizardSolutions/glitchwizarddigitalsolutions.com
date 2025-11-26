@@ -83,7 +83,7 @@ $total_hancock_debits  = $stmt->fetchColumn();
     ['label' => 'Dashboard']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="icon"><?=svg_icon_budget()?></div>
     <div class="txt">
         <h2>Show me the MONEY!</h2>

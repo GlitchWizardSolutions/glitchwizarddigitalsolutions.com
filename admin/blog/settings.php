@@ -83,7 +83,7 @@ if (isset($_POST['save'])) {
     ['title' => 'Settings', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-cog"></i>
         <div class="txt">

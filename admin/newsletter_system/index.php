@@ -34,9 +34,9 @@ $campaigns = $pdo->query('SELECT
 
 <?=generate_breadcrumbs([
     ['label' => 'Newsletter Dashboard']
-])?>
+])?
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="icon alt"><?=svg_icon_dashboard()?></div>
     <div class="txt">
         <h2>Newsletter Dashboard</h2>

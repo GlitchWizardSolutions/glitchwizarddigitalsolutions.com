@@ -84,7 +84,7 @@ if (isset($_GET['edit-id'])) {
     ['title' => 'Posts', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-edit"></i>
         <div class="txt">

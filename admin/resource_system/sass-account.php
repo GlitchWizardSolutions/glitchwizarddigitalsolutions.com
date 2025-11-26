@@ -78,7 +78,102 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Account']
 ])?>
 
-<div class="content-title">
+<style>
+.form-professional {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.form-professional .form {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+.form-professional label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+}
+
+.form-professional input[type="text"],
+.form-professional input[type="email"],
+.form-professional select,
+.form-professional textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #6b46c1;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.form-professional textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+    line-height: 1.6;
+}
+
+.form-professional input:focus,
+.form-professional select:focus,
+.form-professional textarea:focus {
+    outline: none;
+    border-color: #8e44ad;
+    box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.15);
+    background: #ffffff;
+}
+
+.form-professional select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b46c1' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 0;
+}
+
+.form-row .form-group {
+    margin-bottom: 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    margin-bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-cloud"></i>
         <div class="txt">
@@ -87,58 +182,95 @@ if (isset($_GET['id'])) {
         </div>
     </div>
 </div>
-<form action="" method="post">
 
+<form action="" method="post" class="form-professional">
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="sass-accounts.php" class="btn btn-secondary mar-right-2">Cancel</a>
+        <a href="sass-accounts.php" class="btn alt mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
+        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn btn-success">
+        <input type="submit" name="submit" value="Save" class="btn">
     </div>
 
     <div class="content-block">
-
         <div class="form responsive-width-100">
 
-            <label for="resource"><i class="required">*</i> Resource</label>
-            <input id="resource" type="text" name="resource" placeholder="Resource Name" value="<?=htmlspecialchars($record['resource'], ENT_QUOTES)?>" required>
+            <!-- Row 1: Resource Name + URL -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="resource">Resource Name</label>
+                    <input type="text" name="resource" id="resource" placeholder="Resource Name" value="<?=htmlspecialchars($record['resource']??'', ENT_QUOTES)?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="url">URL</label>
+                    <input type="text" name="url" id="url" placeholder="https://example.com" value="<?=htmlspecialchars($record['url']??'', ENT_QUOTES)?>" required>
+                </div>
+            </div>
 
-            <label for="details">Details</label>
-            <textarea id="details" name="details" placeholder="Add Notes..."><?=htmlspecialchars($record['details'], ENT_QUOTES)?></textarea>
+            <!-- Row 2: Details (full width) -->
+            <div class="form-group">
+                <label for="details">Details</label>
+                <textarea name="details" id="details" placeholder="Add notes about this resource..."><?=htmlspecialchars($record['details']??'', ENT_QUOTES)?></textarea>
+            </div>
 
-            <label for="url"><i class="required">*</i> Url</label>
-            <input id="url" type="text" name="url" placeholder="Login Link" value="<?=htmlspecialchars($record['url'], ENT_QUOTES)?>" required>
+            <!-- Row 3: User ID + Password -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="userid">User ID</label>
+                    <input type="text" name="userid" id="userid" placeholder="Username" value="<?=htmlspecialchars($record['userid']??'', ENT_QUOTES)?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="text" name="password" id="password" placeholder="Password" value="<?=htmlspecialchars($record['password']??'', ENT_QUOTES)?>" required>
+                </div>
+            </div>
 
-            <label for="userid"><i class="required">*</i> User Id</label>
-            <input id="userid" type="text" name="userid" placeholder="User Id" value="<?=htmlspecialchars($record['userid'], ENT_QUOTES)?>" required>
+            <!-- Row 4: Name + Email -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" id="name" placeholder="Name on File" value="<?=htmlspecialchars($record['name']??'Barbara Moore', ENT_QUOTES)?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" placeholder="Email on File" value="<?=htmlspecialchars($record['email']??'webdev@glitchwizardsolutions.com', ENT_QUOTES)?>">
+                </div>
+            </div>
 
-            <label for="password"><i class="required">*</i> Password</label>
-            <input id="password" type="text" name="password" placeholder="Password" value="<?=htmlspecialchars($record['password'], ENT_QUOTES)?>" required>
-    
-            <label for="name"> Name</label>
-            <input id="name" type="text" name="name" placeholder="Name on File" value="<?=htmlspecialchars($record['name'], ENT_QUOTES)?>">
-            
-            <label for="email"> Email</label>
-            <input id="email" type="email" name="email" placeholder="Email on File" value="<?=htmlspecialchars($record['email'], ENT_QUOTES)?>">
+            <!-- Row 5: Investment + Type -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="investment">Investment</label>
+                    <select name="investment" id="investment">
+                        <option value="none" <?=($record['investment']??'none') == 'none' ? 'selected' : ''?>>None</option>
+                        <option value="lifetime" <?=($record['investment']??'') == 'lifetime' ? 'selected' : ''?>>Lifetime</option>
+                        <option value="subscription" <?=($record['investment']??'') == 'subscription' ? 'selected' : ''?>>Subscription</option>
+                        <option value="inactive" <?=($record['investment']??'') == 'inactive' ? 'selected' : ''?>>Inactive</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="type">Type</label>
+                    <select name="type" id="type">
+                        <option value="personal" <?=($record['type']??'personal') == 'personal' ? 'selected' : ''?>>Personal</option>
+                        <option value="business" <?=($record['type']??'') == 'business' ? 'selected' : ''?>>Business</option>
+                    </select>
+                </div>
+            </div>
 
-            <label for="investment">Investment</label>
-                <select name="investment" id="investment">
-                    <option value="lifetime"<?=$record['investment']=='lifetime'?' selected':''?>>Lifetime</option>
-                    <option value="subscription"<?=$record['investment']=='subscription'?' selected':''?>>Subscription</option>
-                    <option value="inactive"<?=$record['investment']=='inactive'?' selected':''?>>Inactive</option>
-                    <option value="none"<?=$record['investment']=='none'?' selected':''?>>None</option>
-                </select>
-
-                <label for="type">Type</label>
-                <select name="type" id="type">
-                    <option value="business"<?=$record['type']=='business'?' selected':''?>>Business</option>
-                    <option value="personal"<?=$record['type']=='personal'?' selected':''?>>Personal</option>
-                </select>
         </div>
-
     </div>
 
+    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
+        <a href="sass-accounts.php" class="btn alt mar-right-2">Cancel</a>
+        <?php if ($page == 'Edit'): ?>
+        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
+        <?php endif; ?>
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
+    </div>
 </form>
 <script src="assets/js/resource-system-script.js"></script>
 <?=template_admin_footer()?>

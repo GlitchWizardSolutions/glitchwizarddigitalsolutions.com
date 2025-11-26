@@ -48,7 +48,7 @@ if (isset($_GET['id'])) {
 
 <form method="post" class="form-professional">
 
-    <div class="content-title">
+    <div class="content-title mb-3">
         <div class="icon alt"><?=svg_icon_newsletter()?></div>
         <div class="txt">
             <h2><?=$page?> Group</h2>

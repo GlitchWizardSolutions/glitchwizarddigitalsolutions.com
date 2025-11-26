@@ -85,7 +85,7 @@ $url = 'meds.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' . $
 ?>
 <?=template_admin_header('Medications', 'resources', 'meds')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
     <i class="fa-regular fa-handshake"></i>
         <div class="txt">

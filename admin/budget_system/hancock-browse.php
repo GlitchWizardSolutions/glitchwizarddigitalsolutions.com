@@ -76,7 +76,7 @@ $num_results = $stmt->fetchColumn();
     ['label' => 'Hancock Table']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
 	<div class="icon"><?=svg_icon_budget()?></div>
 	<div class="txt">
 		<h2>Hancock Transactions Table</h2>

@@ -77,7 +77,7 @@ $url = 'project-types.php?search=' . $search . (isset($_GET['page_id']) ? '&page
     ['label' => 'Project Types']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-layer-group"></i>
         <div class="txt">

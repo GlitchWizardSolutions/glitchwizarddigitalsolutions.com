@@ -18,7 +18,7 @@ if (isset($_POST['add'])) {
     ['title' => 'Add Album', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-images"></i>
         <div class="txt">

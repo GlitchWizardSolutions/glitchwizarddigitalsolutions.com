@@ -85,7 +85,7 @@ $url = 'newsletters.php?search_query=' . $search . (isset($_GET['date_from']) ? 
     ['label' => 'Newsletters']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="icon"><?=svg_icon_newsletter()?></div>
     <div class="txt">
         <h2>Newsletters</h2>

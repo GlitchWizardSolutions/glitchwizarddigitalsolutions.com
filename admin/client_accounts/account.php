@@ -225,7 +225,7 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Account']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-user-pen"></i>
         <div class="txt">

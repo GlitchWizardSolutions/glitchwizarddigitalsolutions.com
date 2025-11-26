@@ -60,7 +60,7 @@ if (isset($_FILES['file']) && !empty($_FILES['file']['tmp_name'])) {
 
 <form method="post" enctype="multipart/form-data" class="form-professional">
 
-    <div class="content-title">
+    <div class="content-title mb-3">
         <div class="icon alt"><?=svg_icon_upload()?></div>
         <div class="txt">
             <h2>Import Newsletters</h2>

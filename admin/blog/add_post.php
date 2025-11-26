@@ -98,7 +98,7 @@ if (isset($_POST['add'])) {
     ['title' => 'Add Post', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-edit"></i>
         <div class="txt">

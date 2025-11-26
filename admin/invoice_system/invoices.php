@@ -237,7 +237,7 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
     ['label' => 'Invoices']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-file-invoice"></i>
         <div class="txt">

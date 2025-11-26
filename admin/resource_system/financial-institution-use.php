@@ -34,7 +34,7 @@ $copy="";
 ?>
     <?=template_admin_header($page . ' Financial Instututions', 'resources', 'cards')?>
     
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
   <a href="financial-institutions.php"<i class="fa-solid fa-file-invoice-dollar fa-2xl"></i></a>
         <div class="txt">

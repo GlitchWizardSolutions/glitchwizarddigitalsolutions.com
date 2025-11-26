@@ -118,7 +118,7 @@ $url = 'error-logs.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id
     ['label' => 'Error Logs']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-triangle-exclamation"></i>
         <div class="txt">

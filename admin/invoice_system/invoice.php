@@ -192,7 +192,7 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Invoice']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-file-invoice"></i>
         <div class="txt">

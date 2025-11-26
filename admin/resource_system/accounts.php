@@ -83,7 +83,7 @@ $url = 'accounts.php?search=' . $search . '&status=' . $status . '&activation=' 
 ?>
 <?=template_admin_header('Accounts', 'accounts', 'view')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <h2>Accounts</h2>
 </div>
 

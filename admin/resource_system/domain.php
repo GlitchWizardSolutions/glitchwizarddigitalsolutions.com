@@ -177,7 +177,7 @@ if (isset($_GET['id'])) {
 }
 </style>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-globe"></i>
         <div class="txt">
@@ -277,7 +277,7 @@ if (isset($_GET['id'])) {
         <?php if ($page == 'Edit'): ?>
         <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 </form>
 <script src="assets/js/resource-system-script.js"></script>

@@ -82,7 +82,7 @@ if (isset($_POST['file_type'])) {
 ?>
 <?=template_admin_header('Export Sass Resource records', 'resources', 'sass')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
     <i class="fa-solid fa-file-export fa-lg"></i>
         <div class="txt">

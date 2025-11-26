@@ -98,7 +98,7 @@ if (isset($_POST['file_type'], $_POST['table'])) {
 
 <form method="post" class="form-professional">
 
-    <div class="content-title">
+    <div class="content-title mb-3">
         <div class="icon alt"><?=svg_icon_download()?></div>
         <div class="txt">
             <h2>Export Subscribers</h2>

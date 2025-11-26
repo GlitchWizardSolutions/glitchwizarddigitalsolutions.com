@@ -50,7 +50,7 @@ if ($account['role'] != 'Admin' && $account['id'] != $record['acc_id']) {
 ?>
     <?=template_admin_header($page . ' Client Projects', 'resources', 'projects')?>
     
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-circle-info"></i>
         <div class="txt">

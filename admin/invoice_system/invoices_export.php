@@ -99,7 +99,7 @@ if (isset($_POST['file_type'], $_POST['table'])) {
     ['label' => 'Export']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-download"></i>
         <div class="txt">

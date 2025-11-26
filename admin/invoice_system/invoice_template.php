@@ -124,7 +124,7 @@ if (isset($_GET['id'])) {
 ?>
 <?=template_admin_header($page . ' Invoice Template', 'invoices', 'templates')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <div class="icon">
             <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 2H2V17H4V4H17V2M21 22L18.5 20.32L16 22L13.5 20.32L11 22L8.5 20.32L6 22V6H21V22M10 10V12H17V10H10M15 14H10V16H15V14Z" /></svg>

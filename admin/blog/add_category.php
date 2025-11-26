@@ -28,7 +28,7 @@ if (isset($_POST['add'])) {
     ['title' => 'Add Category', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-list-ol"></i>
         <div class="txt">

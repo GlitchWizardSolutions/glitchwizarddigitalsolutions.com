@@ -38,7 +38,7 @@ if (!$invoice) {
     ['label' => 'Invoice #' . $invoice['invoice_number']]
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-file-invoice"></i>
         <div class="txt">

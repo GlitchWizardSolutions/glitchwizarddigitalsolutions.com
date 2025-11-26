@@ -275,7 +275,7 @@ if (is_dir($upload_dir)) {
     ['label' => 'KB Image Upload']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-images"></i>
         <div class="txt">

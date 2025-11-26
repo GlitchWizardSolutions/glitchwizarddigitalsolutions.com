@@ -44,7 +44,7 @@ if (!$record) {
     ['label' => 'View Warranty']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-shield-halved"></i>
         <div class="txt">

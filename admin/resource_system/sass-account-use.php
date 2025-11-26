@@ -34,7 +34,7 @@ $copy="";
 ?>
     <?=template_admin_header($page . ' Sass Resource', 'resources', 'sass')?>
     
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
       <i class="fa-solid fa-circle-info" style='background:purple'></i>
         <div class="txt">

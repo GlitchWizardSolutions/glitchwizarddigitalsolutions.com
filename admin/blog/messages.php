@@ -17,7 +17,7 @@ if (isset($_GET['id'])) {
     ['title' => 'Messages', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-envelope"></i>
         <div class="txt">

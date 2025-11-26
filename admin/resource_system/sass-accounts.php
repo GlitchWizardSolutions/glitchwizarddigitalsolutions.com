@@ -74,7 +74,7 @@ $url = 'sass-accounts.php?search=' . $search . (isset($_GET['page_id']) ? '&page
     ['label' => 'SaaS Accounts']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-cloud"></i>
         <div class="txt">

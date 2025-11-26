@@ -99,7 +99,7 @@ $url = 'client-projects.php?search=' . $search . (isset($_GET['page_id']) ? '&pa
     ['label' => 'Client Projects']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-diagram-project"></i>
         <div class="txt">

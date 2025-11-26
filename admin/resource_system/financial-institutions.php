@@ -74,7 +74,7 @@ $url = 'financial-institutions.php?search=' . $search . (isset($_GET['page_id'])
     ['label' => 'Financial Institutions']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-credit-card"></i>
         <div class="txt">

@@ -96,7 +96,7 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Client']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-user"></i>
         <div class="txt">

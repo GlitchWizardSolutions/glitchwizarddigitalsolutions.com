@@ -176,12 +176,12 @@ if (isset($_GET['id'])) {
 }
 </style>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-diagram-project"></i>
         <div class="txt">
              <h2 class="responsive-width-100"><?=$page?> Client Project</h2>
-            <p>Manage client project details and assignments</p>
+            <p>Client project tracking and management</p>
         </div>
     </div>
 </div>
@@ -190,9 +190,9 @@ if (isset($_GET['id'])) {
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
         <a href="client-projects.php" class="btn alt mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this project AND it\'s logs?')">
+        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 
     <div class="content-block">

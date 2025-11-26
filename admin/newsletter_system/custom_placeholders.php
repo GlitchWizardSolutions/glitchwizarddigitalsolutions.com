@@ -73,7 +73,7 @@ $url = 'custom_placeholders.php?search_query=' . $search;
     ['label' => 'Custom Placeholders']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="icon alt"><?=svg_icon_settings()?></div>
     <div class="txt">
         <h2>Custom Placeholders</h2>

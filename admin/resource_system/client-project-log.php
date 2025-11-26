@@ -92,7 +92,7 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Log']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-clipboard-list"></i>
         <div class="txt">

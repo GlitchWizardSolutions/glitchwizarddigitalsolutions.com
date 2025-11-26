@@ -35,7 +35,7 @@ if (isset($_POST['add'])) {
     ['title' => 'Add Page', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-file-alt"></i>
         <div class="txt">

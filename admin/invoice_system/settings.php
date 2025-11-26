@@ -119,7 +119,7 @@ if (isset($_GET['error_msg'])) {
     ['label' => 'Settings']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-gear"></i>
         <div class="txt">

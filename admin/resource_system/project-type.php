@@ -5,6 +5,7 @@ This means accessing the login database.
 
 */
 require 'assets/includes/admin_config.php';
+include_once '../assets/includes/components.php';
  
 
 try {
@@ -69,61 +70,155 @@ if (isset($_GET['id'])) {
 ?>
 <?=template_admin_header($page . ' Project Types', 'resources', 'types')?>
 
-<div class="content-title">
+<?=generate_breadcrumbs([
+    ['label' => 'Resource System', 'url' => 'index.php'],
+    ['label' => 'Project Types', 'url' => 'project-types.php'],
+    ['label' => $page . ' Project Type']
+])?>
+
+<style>
+.form-professional {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.form-professional .form {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+.form-professional label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+}
+
+.form-professional input[type="text"],
+.form-professional input[type="number"],
+.form-professional textarea {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #6b46c1;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    color: #2c3e50;
+    box-sizing: border-box;
+}
+
+.form-professional textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+    line-height: 1.6;
+}
+
+.form-professional input:focus,
+.form-professional textarea:focus {
+    outline: none;
+    border-color: #8e44ad;
+    box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.15);
+    background: #ffffff;
+}
+
+.form-professional .form-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 20px !important;
+    margin-bottom: 20px !important;
+    width: 100%;
+}
+
+.form-professional .form-row .form-group {
+    margin-bottom: 0 !important;
+}
+
+.form-professional .form-group {
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+}
+
+.form-professional .form-group label {
+    margin-bottom: 8px;
+}
+
+.form-professional .form-group input,
+.form-professional .form-group textarea {
+    margin-bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+@media (max-width: 768px) {
+    .form-professional .form-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+
+<div class="content-title mb-3">
     <div class="title">
      <i class="fa-solid fa-user-secret"></i>
         <div class="txt">
              <h2 class="responsive-width-100"><?=$page?> Project Type</h2>
+             <p>Define project templates with deliverables and pricing</p>
         </div>
     </div>
 </div>
-<form action="" method="post">
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="project-types.php" class="btn btn-secondary mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn btn-success">
-    </div>
- 
+<form action="" method="post" class="form-professional">
+
     <div class="content-block">
-
         <div class="form responsive-width-100">
- 
-            <label for="name">Project</label>
-            <input type="text" name="name" id="name" style='background:cornsilk' placeholder="Project Name" value="<?=htmlspecialchars($record['name']??'', ENT_QUOTES)?>">
-            <div style="width:100%; margin:15px">
-            <strong>Current Description:</strong><br>
-             <?=htmlspecialchars($record['description']??'', ENT_QUOTES)?>
-            </div>
-            <label for="description">Description</label> 
-            <input type="text" height='50px' name="description" id="description" style='background:cornsilk' placeholder="Description"  value="<?=htmlspecialchars($record['description']??'', ENT_QUOTES)?>">
-            <label for="amount">Value</label>
-            <input type="number" name="amount" id="amount" style='background:cornsilk' placeholder=0.00 value="<?=htmlspecialchars($record['amount']??'', ENT_QUOTES)?>">
-            <div style="width:100%; margin:15px">
-            <strong>Current Description:</strong><br>
-             <?=htmlspecialchars($record['deliverables']??'', ENT_QUOTES)?>
-            </div>
- 
-            <label for="deliverables">Deliverables</label>
-            <input type="text" name="deliverables" id="deliverables" style='background:cornsilk' placeholder='List deliverables' value="<?=htmlspecialchars($record['deliverables']??'', ENT_QUOTES)?>">
-                       
-            <label for="frequency"># of Days</label>
-            <input type="number" name="frequency" id="frequency" style='background:cornsilk' placeholder=0 value="<?=htmlspecialchars($record['frequency']??'', ENT_QUOTES)?>">
-            
-  
-            
-        </div>
 
+            <!-- Row 1: Project Name + Value + Number of Days -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Project Name</label>
+                    <input type="text" name="name" id="name" placeholder="Project Name" value="<?=htmlspecialchars($record['name']??'', ENT_QUOTES)?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount">Value</label>
+                    <input type="number" name="amount" id="amount" placeholder="0.00" step="0.01" value="<?=htmlspecialchars($record['amount']??'', ENT_QUOTES)?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="frequency"># of Days</label>
+                    <input type="number" name="frequency" id="frequency" placeholder="0" value="<?=htmlspecialchars($record['frequency']??'', ENT_QUOTES)?>">
+                </div>
+            </div>
+
+            <!-- Row 2: Description (full width) -->
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea name="description" id="description" placeholder="Project description and overview..."><?=htmlspecialchars($record['description']??'', ENT_QUOTES)?></textarea>
+            </div>
+
+            <!-- Row 3: Deliverables (full width) -->
+            <div class="form-group">
+                <label for="deliverables">Deliverables</label>
+                <textarea name="deliverables" id="deliverables" placeholder="List project deliverables..."><?=htmlspecialchars($record['deliverables']??'', ENT_QUOTES)?></textarea>
+            </div>
+
+        </div>
     </div>
+
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="project-types.php" class="btn btn-secondary mar-right-2">Cancel</a>
+        <a href="project-types.php" class="btn alt mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
+        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
         <?php endif; ?>
         <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
+
 </form>
 <script src="assets/js/resource-system-script.js"></script>
 <?=template_admin_footer()?>

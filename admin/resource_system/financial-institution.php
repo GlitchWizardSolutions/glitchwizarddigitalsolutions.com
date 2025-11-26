@@ -78,7 +78,106 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Record']
 ])?>
 
-<div class="content-title">
+<style>
+.form-professional {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.form-professional .form {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+.form-professional label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+}
+
+.form-professional input[type="text"],
+.form-professional select {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #6b46c1;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    color: #2c3e50;
+    box-sizing: border-box;
+}
+
+.form-professional input:focus,
+.form-professional select:focus {
+    outline: none;
+    border-color: #8e44ad;
+    box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.15);
+    background: #ffffff;
+}
+
+.form-professional select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b46c1' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.form-professional .form-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 12px !important;
+    margin-bottom: 20px !important;
+    width: 100%;
+}
+
+.form-professional .form-row-2-1 {
+    display: grid !important;
+    grid-template-columns: 1fr 2fr !important;
+    gap: 12px !important;
+    margin-bottom: 20px !important;
+    width: 100%;
+}
+
+.form-professional .form-row .form-group,
+.form-professional .form-row-2-1 .form-group {
+    margin-bottom: 0 !important;
+}
+
+.form-professional .form-group {
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.form-professional .form-group label {
+    margin-bottom: 8px;
+}
+
+.form-professional .form-group input,
+.form-professional .form-group select {
+    margin-bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+@media (max-width: 768px) {
+    .form-professional .form-row,
+    .form-professional .form-row-2-1 {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-credit-card"></i>
         <div class="txt">
@@ -88,70 +187,107 @@ if (isset($_GET['id'])) {
     </div>
 </div>
 
-<form action="" method="post">
-
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="financial-institutions.php" class="btn btn-secondary mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn btn-success">
-    </div>
+<form action="" method="post" class="form-professional">
 
     <div class="content-block">
-
         <div class="form responsive-width-100">
-        
-            <label for="bank"><i class="required">*</i>Bank</label>
-            <input id="bank" type="text" name="bank" placeholder="Bank" value="<?=htmlspecialchars($record['bank']??'', ENT_QUOTES)?>" required>
-            
-            <label for="account_number"><i class="required">*</i>Account #</label>
-            <input id="account_number" type="text" name="account_number" placeholder="" value="<?=htmlspecialchars($record['account_number']??'', ENT_QUOTES)?>" required>
-            
-            <label for="routing_number"><i class="required">*</i>Routing</label>
-            <input id="routing_number" type="text" name="routing_number" placeholder="" value="<?=htmlspecialchars($record['routing_number']??'', ENT_QUOTES)?>" required>
-            
-             <label for="brand">Brand</label>
-                <select name="brand" id="brand">
-                    <option value="Visa"<?=$record['brand']=='Visa'?' selected':''?>>Visa</option>
-                    <option value="MasterCard"<?=$record['brand']=='MasterCard'?' selected':''?>>MasterCard</option>
-                    <option value="Discover"<?=$record['brand']=='Discover'?' selected':''?>>Discover</option>
-                    <option value="Amex"<?=$record['brand']=='Amex'?' selected':''?>>Amex</option>
-                    <option value="Home Depot"<?=$record['brand']=='Home Depot'?' selected':''?>>Home Depot</option>
-                    <option value="Other"<?=$record['brand']=='Other'?' selected':''?>>Other</option>
-                </select>
-            
-            <label for="description"><i class="required">*</i>Description</label>
-            <input id="description" type="text" name="description" placeholder="" value="<?=htmlspecialchars($record['description']??'', ENT_QUOTES)?>" required>
-            
-            <label for="name"><i class="required">*</i>Name</label>
-            <input id="name" type="text" name="name" placeholder="Name on card" value="<?=htmlspecialchars($record['name']??'', ENT_QUOTES)?>" required>
 
-               <label for="card_type">Card Type</label>
-                <select name="card_type" id="card_type">
-                    <option value="credit"<?=$record['card_type']=='credit'?' selected':''?>>Credit</option>
-                    <option value="debit-checking"<?=$record['card_type']=='debit-checking'?' selected':''?>>Debit Checking</option>
-                    <option value="debit-savings"<?=$record['card_type']=='debit-savings'?' selected':''?>>Debit Savings</option>
-                    <option value="gift"<?=$record['card_type']=='gift'?' selected':''?>>Gift Card</option>
-                </select>
+            <!-- Row 1: Bank + Account + Routing -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="bank">Bank</label>
+                    <input type="text" name="bank" id="bank" placeholder="Bank Name" value="<?=htmlspecialchars($record['bank']??'', ENT_QUOTES)?>" required>
+                </div>
                 
-            <label for="card_number"><i class="required">*</i>Card Number</label>
-            <input id="card_number" type="text" name="card_number" placeholder="#### #### #### ####" value="<?=htmlspecialchars($record['card_number']??'', ENT_QUOTES)?>" required>
-
-            <label for="expires"><i class="required">*</i> Expires</label>
-            <input id="expires" type="text" name="expires" placeholder="XX/XX" value="<?=htmlspecialchars($record['expires']??'', ENT_QUOTES)?>" required>
-    
-            <label for="code"> Code</label>
-            <input id="code" type="text" name="code" placeholder="XXX" value="<?=htmlspecialchars($record['code']??'', ENT_QUOTES)?>">
-            
-            <label for="zip_code"> ZipCode</label>
-            <input id="zip_code" type="text" name="zip_code" placeholder="XXXXX" value="<?=htmlspecialchars($record['zip_code']??'', ENT_QUOTES)?>">
-
-                 <label for="filepath"><i class="required">*</i>Filepath</label>
-            <input id="filepath" type="text" name="filepath" placeholder="Img" value="<?=htmlspecialchars($record['filepath']??'', ENT_QUOTES)?>" required>
+                <div class="form-group">
+                    <label for="account_number">Account #</label>
+                    <input type="text" name="account_number" id="account_number" placeholder="Account Number" value="<?=htmlspecialchars($record['account_number']??'', ENT_QUOTES)?>" required>
+                </div>
                 
+                <div class="form-group">
+                    <label for="routing_number">Routing</label>
+                    <input type="text" name="routing_number" id="routing_number" placeholder="Routing Number" value="<?=htmlspecialchars($record['routing_number']??'', ENT_QUOTES)?>" required>
+                </div>
+            </div>
+
+            <!-- Row 2: Brand + Card Type + Filepath -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="brand">Brand</label>
+                    <select name="brand" id="brand">
+                        <option value="">Select...</option>
+                        <option value="Visa" <?=($record['brand']??'') == 'Visa' ? 'selected' : ''?>>Visa</option>
+                        <option value="MasterCard" <?=($record['brand']??'') == 'MasterCard' ? 'selected' : ''?>>MasterCard</option>
+                        <option value="Discover" <?=($record['brand']??'') == 'Discover' ? 'selected' : ''?>>Discover</option>
+                        <option value="Amex" <?=($record['brand']??'') == 'Amex' ? 'selected' : ''?>>Amex</option>
+                        <option value="Home Depot" <?=($record['brand']??'') == 'Home Depot' ? 'selected' : ''?>>Home Depot</option>
+                        <option value="Other" <?=($record['brand']??'') == 'Other' ? 'selected' : ''?>>Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="card_type">Card Type</label>
+                    <select name="card_type" id="card_type">
+                        <option value="">Select...</option>
+                        <option value="credit" <?=($record['card_type']??'') == 'credit' ? 'selected' : ''?>>Credit</option>
+                        <option value="debit-checking" <?=($record['card_type']??'') == 'debit-checking' ? 'selected' : ''?>>Debit Checking</option>
+                        <option value="debit-savings" <?=($record['card_type']??'') == 'debit-savings' ? 'selected' : ''?>>Debit Savings</option>
+                        <option value="gift" <?=($record['card_type']??'') == 'gift' ? 'selected' : ''?>>Gift Card</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="filepath">Filepath</label>
+                    <input type="text" name="filepath" id="filepath" placeholder="Image Path" value="<?=htmlspecialchars($record['filepath']??'', ENT_QUOTES)?>" required>
+                </div>
+            </div>
+
+            <!-- Row 3: Name + Description (2/3 width) -->
+            <div class="form-row-2-1">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" id="name" placeholder="Name on Card" value="<?=htmlspecialchars($record['name']??'Barbara Moore', ENT_QUOTES)?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" name="description" id="description" placeholder="Card Description" value="<?=htmlspecialchars($record['description']??'', ENT_QUOTES)?>" required>
+                </div>
+            </div>
+
+            <!-- Row 4: Card Number + Expires + Code + Zip Code -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="card_number">Card Number</label>
+                    <input type="text" name="card_number" id="card_number" placeholder="#### #### #### ####" value="<?=htmlspecialchars($record['card_number']??'', ENT_QUOTES)?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expires">Expires</label>
+                    <input type="text" name="expires" id="expires" placeholder="MM/YY" value="<?=htmlspecialchars($record['expires']??'', ENT_QUOTES)?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="code">Code</label>
+                    <input type="text" name="code" id="code" placeholder="CVV" value="<?=htmlspecialchars($record['code']??'', ENT_QUOTES)?>">
+                </div>
+            </div>
+
+            <!-- Row 5: Zip Code (single field) -->
+            <div class="form-group">
+                <label for="zip_code">Zip Code</label>
+                <input type="text" name="zip_code" id="zip_code" placeholder="ZIP Code" value="<?=htmlspecialchars($record['zip_code']??'32327', ENT_QUOTES)?>">
+            </div>
+
         </div>
+    </div>
 
+    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
+        <a href="financial-institutions.php" class="btn alt mar-right-2">Cancel</a>
+        <?php if ($page == 'Edit'): ?>
+        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
+        <?php endif; ?>
+        <input type="submit" name="submit" value="Save" class="btn btn-success">
     </div>
 
 </form> 

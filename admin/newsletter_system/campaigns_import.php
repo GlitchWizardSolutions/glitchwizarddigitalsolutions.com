@@ -65,7 +65,7 @@ if (isset($_FILES['file'], $_POST['table']) && !empty($_FILES['file']['tmp_name'
 
 <form method="post" enctype="multipart/form-data" class="form-professional">
 
-    <div class="content-title">
+    <div class="content-title mb-3">
         <div class="icon alt"><?=svg_icon_upload()?></div>
         <div class="txt">
             <h2>Import Campaigns</h2>

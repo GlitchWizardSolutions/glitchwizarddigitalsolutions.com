@@ -81,7 +81,7 @@ try {
 ?>
 <?=template_admin_header('Resource System Dashboard', 'resources', 'dashboard')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-chart-line"></i>
         <div class="txt">

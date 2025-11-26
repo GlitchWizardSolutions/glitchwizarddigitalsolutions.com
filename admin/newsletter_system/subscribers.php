@@ -107,7 +107,7 @@ $url = 'subscribers.php?search_query=' . $search . (isset($_GET['status']) ? '&s
     ['label' => 'Subscribers']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="icon alt"><?=svg_icon_user()?></div>
     <div class="txt">
         <h2>Subscribers</h2>

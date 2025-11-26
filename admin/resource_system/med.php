@@ -75,7 +75,7 @@ if (isset($_GET['id'])) {
 }
 ?>
 <?=template_admin_header($page . ' Medications', 'resources', 'meds')?>
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
      <i class="fa-solid fa-user-secret"></i>
         <div class="txt">

@@ -55,7 +55,7 @@ if (isset($_POST['add'])) {
     ['title' => 'Add Image', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-camera-retro"></i>
         <div class="txt">

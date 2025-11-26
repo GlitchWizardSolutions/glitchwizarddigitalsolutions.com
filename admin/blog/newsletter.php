@@ -20,7 +20,7 @@ if (isset($_GET['unsubscribe'])) {
     ['title' => 'Newsletter', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-envelope"></i>
         <div class="txt">

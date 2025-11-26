@@ -57,7 +57,7 @@ if ($record['warranty_expiration_date']) {
     ['label' => 'Quick Reference']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-file-shield"></i>
         <div class="txt">

@@ -64,7 +64,7 @@ if (isset($_FILES['file']) && !empty($_FILES['file']['tmp_name'])) {
     ['label' => 'Import']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-upload"></i>
         <div class="txt">

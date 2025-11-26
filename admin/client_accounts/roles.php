@@ -24,7 +24,7 @@ $access_level_inactive = $pdo->query('SELECT access_level, COUNT(*) as total FRO
     ['label' => 'Roles & Access Levels']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-user-shield"></i>
         <div class="txt">

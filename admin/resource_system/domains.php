@@ -77,7 +77,7 @@ $url = 'domains.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' 
     ['label' => 'Domains']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-globe"></i>
         <div class="txt">

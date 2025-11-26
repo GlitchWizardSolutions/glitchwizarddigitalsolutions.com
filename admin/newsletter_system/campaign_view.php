@@ -227,7 +227,7 @@ if (isset($_GET['success_msg'])) {
     ['label' => htmlspecialchars($campaign['title'], ENT_QUOTES)]
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <h2 class="responsive-width-100 normal">
         <a href="campaigns.php">
             Campaigns

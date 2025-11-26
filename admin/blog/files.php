@@ -36,7 +36,7 @@ if (isset($_GET['delete-id'])) {
     ['title' => 'Files', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-file"></i>
         <div class="txt">

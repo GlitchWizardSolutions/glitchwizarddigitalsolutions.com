@@ -22,7 +22,7 @@ if (isset($_POST['add'])) {
     ['title' => 'Add Menu', 'url' => '']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-bars"></i>
         <div class="txt">
