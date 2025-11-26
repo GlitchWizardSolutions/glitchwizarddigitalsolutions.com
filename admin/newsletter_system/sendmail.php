@@ -111,9 +111,12 @@ if (isset($_FILES['newsletter_image'])) {
             imagedestroy($source);
             imagedestroy($destination);
             
+            // Use BASE_URL for absolute URL
+            $base_url = defined('BASE_URL') ? BASE_URL : 'https://glitchwizarddigitalsolutions.com/';
+            
             header('Content-Type: application/json');
             exit(json_encode([
-                'location' => website_url . 'admin/newsletter_system/' . $path,
+                'location' => $base_url . 'admin/newsletter_system/' . $path,
                 'resized' => $resize_needed,
                 'original_size' => $orig_width . 'x' . $orig_height,
                 'new_size' => $new_width . 'x' . $new_height
@@ -121,8 +124,9 @@ if (isset($_FILES['newsletter_image'])) {
         } else {
             // SVG - just move it without processing
             if (move_uploaded_file($file['tmp_name'], $path)) {
+                $base_url = defined('BASE_URL') ? BASE_URL : 'https://glitchwizarddigitalsolutions.com/';
                 header('Content-Type: application/json');
-                exit(json_encode(['location' => website_url . 'admin/newsletter_system/' . $path]));
+                exit(json_encode(['location' => $base_url . 'admin/newsletter_system/' . $path]));
             }
         }
     }
@@ -138,13 +142,15 @@ if (isset($_GET['list_images'])) {
     
     if (is_dir($upload_dir)) {
         $files = scandir($upload_dir);
+        $base_url = defined('BASE_URL') ? BASE_URL : 'https://glitchwizarddigitalsolutions.com/';
+        
         foreach ($files as $file) {
             if ($file !== '.' && $file !== '..') {
                 $filepath = $upload_dir . $file;
                 if (is_file($filepath) && preg_match('/\.(jpg|jpeg|png|gif|webp|svg)$/i', $file)) {
                     $images[] = [
                         'title' => $file,
-                        'value' => website_url . 'admin/newsletter_system/' . $filepath,
+                        'value' => $base_url . 'admin/newsletter_system/' . $filepath,
                         'modified' => filemtime($filepath)
                     ];
                 }
@@ -198,11 +204,14 @@ if (isset($_POST['subject'])) {
         if ($subscriber) {
             // Generate unique tracking code for this subscriber
             $tracking_code = sha1($subscriber['id'] . $subscriber['email'] . time());
-            $unsubscribe_link = website_url . 'unsubscribe.php?id=' . sha1($subscriber['id'] . $subscriber['email']);
+            
+            // Use BASE_URL instead of broken website_url (which points to non-existent /newsletter/ folder)
+            $base_url = defined('BASE_URL') ? BASE_URL : 'https://glitchwizarddigitalsolutions.com/';
+            $unsubscribe_link = $base_url . 'admin/newsletter_system/unsubscribe.php?id=' . sha1($subscriber['id'] . $subscriber['email']);
             
             // Replace tracking placeholders with actual tracking codes
-            $content = str_replace('%open_tracking_code%', '<img src="' . website_url . 'admin/newsletter_system/tracking.php?action=open&id=' . $tracking_code . '" width="1" height="1" alt="">', $content);
-            $content = str_replace('%click_link%', website_url . 'admin/newsletter_system/tracking.php?action=click&id=' . $tracking_code . '&url=', $content);
+            $content = str_replace('%open_tracking_code%', '<img src="' . $base_url . 'admin/newsletter_system/tracking.php?action=open&id=' . $tracking_code . '" width="1" height="1" alt="">', $content);
+            $content = str_replace('%click_link%', $base_url . 'admin/newsletter_system/tracking.php?action=click&id=' . $tracking_code . '&url=', $content);
             $content = str_replace('%unsubscribe_link%', $unsubscribe_link, $content);
         } else {
             // For non-subscribers (custom emails), remove tracking codes
@@ -212,8 +221,9 @@ if (isset($_POST['subject'])) {
         }
         
         // Convert relative image URLs to absolute URLs for email compatibility
-        $content = preg_replace('/src="uploads\//', 'src="' . website_url . 'admin/newsletter_system/uploads/', $content);
-        $content = preg_replace('/src="\.\.\/uploads\//', 'src="' . website_url . 'admin/newsletter_system/uploads/', $content);
+        $base_url = defined('BASE_URL') ? BASE_URL : 'https://glitchwizarddigitalsolutions.com/';
+        $content = preg_replace('/src="uploads\//', 'src="' . $base_url . 'admin/newsletter_system/uploads/', $content);
+        $content = preg_replace('/src="\.\.\/uploads\//', 'src="' . $base_url . 'admin/newsletter_system/uploads/', $content);
         
         // Send the mail
         $response = admin_sendmail($_POST['from'], $_POST['from_name'], $recipient_email, $_POST['subject'], $content, $attachments);
