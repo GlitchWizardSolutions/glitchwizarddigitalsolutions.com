@@ -245,7 +245,14 @@ function confirmBulkDelete() {
     }
     
     if (confirm(`Are you sure you want to delete ${checkboxes.length} error log(s)?`)) {
-        document.getElementById('bulk-delete-form').submit();
+        // Add the bulk_delete input to the form
+        const form = document.getElementById('bulk-delete-form');
+        const bulkDeleteInput = document.createElement('input');
+        bulkDeleteInput.type = 'hidden';
+        bulkDeleteInput.name = 'bulk_delete';
+        bulkDeleteInput.value = '1';
+        form.appendChild(bulkDeleteInput);
+        form.submit();
     }
 }
 </script>
