@@ -101,6 +101,10 @@ $param3 = '%' . $search . '%';
 $where = '';
 $where .= $search ? 'WHERE (i.invoice_number LIKE :search OR CONCAT(c.first_name, " ", c.last_name) LIKE :search) ' : '';
 // Add filters
+// Unsent emails filter
+if (isset($_GET['filter']) && $_GET['filter'] == 'unsent') {
+    $where .= ($where ? 'AND ' : 'WHERE ') . 'i.email_sent = 0 AND i.payment_status != "Paid" ';
+}
 // Date start filter
 if ($datestart) {
     $where .= ($where ? 'AND ' : 'WHERE ') . 'i.due_date >= :datestart ';
@@ -234,6 +238,12 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
        <i class="fa-solid fa-file-invoice"></i>
         <div class="txt">
             <h2>Manage Invoices</h2>
+            <p>Create, update, and delete invoices.</p>
+        </div>
+    </div>
+</div>
+
+<?php include 'unsent-invoices-widget.php'; ?>
             <p>View, edit, and create invoices</p>
         </div>
     </div>
