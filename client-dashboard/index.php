@@ -35,6 +35,32 @@ include includes_path . 'page-setup.php';
                 </div>
               </div>
             </div><!-- End Customers Card -->
+            
+            <!-- Client Journey Cards -->
+            <div class="row">
+              <div class="col-md-6">
+                <div class="card info-card">
+                  <div class="card-body">
+                    <h5 class="card-title">Getting Started <span>| Step 1</span></h5>
+                    <div class="d-flex align-items-center">
+                      <!-- Content will be added based on access level -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="card info-card">
+                  <div class="card-body">
+                    <h5 class="card-title">Next Steps <span>| Step 2</span></h5>
+                    <div class="d-flex align-items-center">
+                      <!-- Content will be added based on access level -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- End Client Journey Cards -->
+            
           </div>
         </div><!-- End Left side columns -->
 
