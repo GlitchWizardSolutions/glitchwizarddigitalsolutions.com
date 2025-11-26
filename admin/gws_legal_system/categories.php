@@ -48,7 +48,7 @@ $url = 'categories.php?search=' . $search;
 ?>
 <?=template_admin_header('Legal Filing Categories', 'ticketing', 'legal')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-list"></i>
         <div class="txt">

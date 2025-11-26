@@ -63,37 +63,41 @@ if (isset($_FILES['file'], $_POST['table']) && !empty($_FILES['file']['tmp_name'
     ['label' => 'Import Subscribers']
 ])?>
 
-<form method="post" enctype="multipart/form-data" class="form-professional">
+<div class="content-title mb-3">
+    <div class="icon alt"><?=svg_icon_upload()?></div>
+    <div class="txt">
+        <h2>Import Subscribers</h2>
+        <p class="subtitle">Upload subscriber data in CSV, JSON, XML, or TXT format</p>
+    </div>
+</div>
 
-    <div class="content-title mb-3">
-        <div class="icon alt"><?=svg_icon_upload()?></div>
-        <div class="txt">
-            <h2>Import Subscribers</h2>
-            <p class="subtitle">Upload subscriber data files</p>
+<form method="post" enctype="multipart/form-data">
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Import Details</h3>
+
+            <div class="form-group">
+                <label for="table">Table <span class="required">*</span></label>
+                <select name="table" id="table" required>
+                    <option value="subscribers">Subscribers</option>
+                    <option value="groups">Groups</option>
+                    <option value="group_subscribers">Group Subscribers</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="file">File <span class="required">*</span></label>
+                <input type="file" name="file" id="file" accept=".csv,.json,.xml,.txt" required>
+            </div>
         </div>
-        <div class="btns">
-            <a href="subscribers.php" class="btn btn-secondary mar-right-1">Cancel</a>
+        
+        <div class="form-actions">
+            <a href="subscribers.php" class="btn btn-secondary">Cancel</a>
             <input type="submit" name="submit" value="Import" class="btn btn-success">
         </div>
-    </div>
-
-    <div class="form-section">
-        <h3 class="section-title">Upload File</h3>
-
-            <label for="table"><span class="required">*</span> Table</label>
-            <select name="table" id="table" required>
-                <option value="subscribers">Subscribers</option>
-                <option value="groups">Groups</option>
-                <option value="group_subscribers">Group Subscribers</option>
-            </select>
-
-            <label for="file"><span class="required">*</span> File</label>
-            <input type="file" name="file" id="file" accept=".csv,.json,.xml,.txt" required>
-
-        </div>
 
     </div>
-
 </form>
 
 <?=template_admin_footer()?>

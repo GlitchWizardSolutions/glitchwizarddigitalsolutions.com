@@ -35,7 +35,7 @@ $resolved_tickets_total = $stmt->fetchColumn();
 ?>
 <?=template_admin_header('Manage Legal Filings', 'ticketing', 'legal')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <h2>GWS Legal Requirements System</h2>
 </div>
 

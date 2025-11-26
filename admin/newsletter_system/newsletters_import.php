@@ -58,30 +58,32 @@ if (isset($_FILES['file']) && !empty($_FILES['file']['tmp_name'])) {
     ['label' => 'Import Newsletters']
 ])?>
 
-<form method="post" enctype="multipart/form-data" class="form-professional">
+<div class="content-title mb-3">
+    <div class="icon alt"><?=svg_icon_upload()?></div>
+    <div class="txt">
+        <h2>Import Newsletters</h2>
+        <p class="subtitle">Upload newsletter data in CSV, JSON, XML, or TXT format</p>
+    </div>
+</div>
 
-    <div class="content-title mb-3">
-        <div class="icon alt"><?=svg_icon_upload()?></div>
-        <div class="txt">
-            <h2>Import Newsletters</h2>
-            <p class="subtitle">Upload CSV, JSON, XML, or TXT file to import newsletters</p>
+<form method="post" enctype="multipart/form-data">
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Import Details</h3>
+
+            <div class="form-group">
+                <label for="file">File <span class="required">*</span></label>
+                <input type="file" name="file" id="file" accept=".csv,.json,.xml,.txt" required>
+            </div>
         </div>
-        <div class="btns">
-            <a href="newsletters.php" class="btn btn-secondary mar-right-1">Cancel</a>
+        
+        <div class="form-actions">
+            <a href="newsletters.php" class="btn btn-secondary">Cancel</a>
             <input type="submit" name="submit" value="Import" class="btn btn-success">
         </div>
-    </div>
-
-    <div class="form-section">
-        <h3 class="section-title">Upload File</h3>
-
-            <label for="file"><span class="required">*</span> File</label>
-            <input type="file" name="file" id="file" accept=".csv,.json,.xml,.txt" required>
-
-        </div>
 
     </div>
-
 </form>
 
 <?=template_admin_footer()?>

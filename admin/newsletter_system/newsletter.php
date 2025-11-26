@@ -135,7 +135,9 @@ if (isset($_GET['copy'])) {
                 </div>
             </div>
 
-            <label for="content"><span class="required">*</span> <?=template_editor == 'tinymce'?'':'HTML '?>Template</label>
+            <div class="form-group">
+                <label for="content">Content <span class="required">*</span></label>
+            </div>
         </div>
 
         <?php if (template_editor == 'tinymce'): ?>
@@ -161,9 +163,16 @@ if (isset($_GET['copy'])) {
             <textarea id="content" name="content" placeholder="Enter your HTML template..." wrap="off" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"><?=htmlspecialchars($newsletter['content'], ENT_QUOTES)?></textarea>
         </div>
         <?php endif; ?>
+        
+        <div class="form-actions">
+            <a href="newsletters.php" class="btn btn-secondary">Cancel</a>
+            <?php if ($page == 'Edit'): ?>
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this newsletter?')">
+            <?php endif; ?>
+            <input type="submit" name="submit" value="Save" class="btn btn-success">
+        </div>
 
     </div>
-
 </form>
 
 <?php if (template_editor == 'tinymce'): ?>

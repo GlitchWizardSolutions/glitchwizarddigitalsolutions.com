@@ -202,11 +202,17 @@ if (isset($_GET['id'])) {
                     <?php endforeach; ?>
                 </div>
             </div>
-
+        </div>
+        
+        <div class="form-actions">
+            <a href="campaigns.php" class="btn btn-secondary">Cancel</a>
+            <?php if ($page == 'Edit'): ?>
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this campaign?')">
+            <?php endif; ?>
+            <input type="submit" name="submit" value="Save" class="btn btn-success">
         </div>
 
     </div>
-
 </form>
 
 <?=template_admin_footer()?>

@@ -63,39 +63,43 @@ if (isset($_FILES['file'], $_POST['table']) && !empty($_FILES['file']['tmp_name'
     ['label' => 'Import Campaigns']
 ])?>
 
-<form method="post" enctype="multipart/form-data" class="form-professional">
+<div class="content-title mb-3">
+    <div class="icon alt"><?=svg_icon_upload()?></div>
+    <div class="txt">
+        <h2>Import Campaigns</h2>
+        <p class="subtitle">Upload campaign data files in CSV, JSON, XML, or TXT format</p>
+    </div>
+</div>
 
-    <div class="content-title mb-3">
-        <div class="icon alt"><?=svg_icon_upload()?></div>
-        <div class="txt">
-            <h2>Import Campaigns</h2>
-            <p class="subtitle">Upload campaign data files</p>
+<form method="post" enctype="multipart/form-data">
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Import Details</h3>
+
+            <div class="form-group">
+                <label for="table">Table <span class="required">*</span></label>
+                <select id="table" name="table" required>
+                    <option value="campaigns">Campaigns</option>
+                    <option value="campaign_items">Campaign Items</option>
+                    <option value="campaign_clicks">Campaign Clicks</option>
+                    <option value="campaign_opens">Campaign Opens</option>
+                    <option value="campaign_unsubscribes">Campaign Unsubscribes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="file">File <span class="required">*</span></label>
+                <input type="file" name="file" id="file" accept=".csv,.json,.xml,.txt" required>
+            </div>
         </div>
-        <div class="btns">
-            <a href="campaigns.php" class="btn btn-secondary mar-right-1">Cancel</a>
+        
+        <div class="form-actions">
+            <a href="campaigns.php" class="btn btn-secondary">Cancel</a>
             <input type="submit" name="submit" value="Import" class="btn btn-success">
         </div>
-    </div>
-
-    <div class="form-section">
-        <h3 class="section-title">Upload File</h3>
-
-            <label for="table"><span class="required">*</span> Table</label>
-            <select id="table" name="table" required>
-                <option value="campaigns">Campaigns</option>
-                <option value="campaign_items">Campaign Items</option>
-                <option value="campaign_clicks">Campaign Clicks</option>
-                <option value="campaign_opens">Campaign Opens</option>
-                <option value="campaign_unsubscribes">Campaign Unsubscribes</option>
-            </select>
-
-            <label for="file"><span class="required">*</span> File</label>
-            <input type="file" name="file" id="file" accept=".csv,.json,.xml,.txt" required>
-
-        </div>
 
     </div>
-
 </form>
 
 <?=template_admin_footer()?>

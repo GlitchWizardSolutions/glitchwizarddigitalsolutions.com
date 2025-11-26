@@ -94,35 +94,37 @@ if (isset($_POST['file_type'])) {
     ['label' => 'Export Newsletters']
 ])?>
 
-<form method="post" class="form-professional">
+<div class="content-title mb-3">
+    <div class="icon alt"><?=svg_icon_download()?></div>
+    <div class="txt">
+        <h2>Export Newsletters</h2>
+        <p class="subtitle">Download newsletter data in CSV, JSON, XML, or TXT format</p>
+    </div>
+</div>
 
-    <div class="content-title mb-3">
-        <div class="icon alt"><?=svg_icon_download()?></div>
-        <div class="txt">
-            <h2>Export Newsletters</h2>
-            <p class="subtitle">Download newsletter data as CSV, JSON, XML, or TXT</p>
+<form method="post">
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Export Details</h3>
+
+            <div class="form-group">
+                <label for="file_type">File Type <span class="required">*</span></label>
+                <select id="file_type" name="file_type" required>
+                    <option value="csv">CSV</option>
+                    <option value="txt">TXT</option>
+                    <option value="json">JSON</option>
+                    <option value="xml">XML</option>
+                </select>
+            </div>
         </div>
-        <div class="btns">
-            <a href="newsletters.php" class="btn btn-secondary mar-right-1">Cancel</a>
+        
+        <div class="form-actions">
+            <a href="newsletters.php" class="btn btn-secondary">Cancel</a>
             <input type="submit" name="submit" value="Export" class="btn btn-success">
         </div>
-    </div>
-
-    <div class="form-section">
-        <h3 class="section-title">Export Options</h3>
-
-            <label for="file_type"><span class="required">*</span> File Type</label>
-            <select id="file_type" name="file_type" required>
-                <option value="csv">CSV</option>
-                <option value="txt">TXT</option>
-                <option value="json">JSON</option>
-                <option value="xml">XML</option>
-            </select>
-
-        </div>
 
     </div>
-
 </form>
 
 <?=template_admin_footer()?>

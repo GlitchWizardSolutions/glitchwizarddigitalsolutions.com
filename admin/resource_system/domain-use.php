@@ -1,24 +1,37 @@
 <?php
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require 'assets/includes/admin_config.php';
 try {
 	$login_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name . ';charset=' . db_charset, db_user, db_pass); 
 	$login_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $exception) {
 	// If there is an error with the connection, stop the script and display the error.
-	exit('Failed to connect to the login system database!');
+	exit('Failed to connect to the login system database: ' . $exception->getMessage());
 }
 $page = 'View';
 
 // Check whether the record ID is specified
 if (isset($_GET['id'])) {
     // Retrieve the records from the database
-    $stmt = $login_db ->prepare('SELECT * FROM domains d, accounts a, invoice_clients i WHERE d.account_id=i.acc_id AND d.invoice_client_id = i.id AND d.id = ?');
-    $stmt->execute([ $_GET['id'] ]);
-    $records = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    $stmt = $login_db ->prepare('SELECT * FROM client_projects WHERE domain_id = ?');
-    $stmt->execute([ $_GET['id'] ]);
-    $projects = $stmt->fetchAll (PDO::FETCH_ASSOC);
+    try {
+        $stmt = $login_db->prepare('SELECT d.*, i.business_name, a.full_name FROM domains d LEFT JOIN invoice_clients i ON d.invoice_client_id = i.id LEFT JOIN accounts a ON d.account_id = a.id WHERE d.id = ?');
+        $stmt->execute([ $_GET['id'] ]);
+        $records = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Check if record exists
+        if (!$records) {
+            exit('Domain not found! ID: ' . htmlspecialchars($_GET['id']));
+        }
+        
+        $stmt = $login_db->prepare('SELECT * FROM client_projects WHERE domain_id = ?');
+        $stmt->execute([ $_GET['id'] ]);
+        $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        exit('Database error: ' . $e->getMessage());
+    }
     
 } else {
     exit('No ID specified!');
@@ -56,36 +69,36 @@ $copy="";
 <div class="content-block">
     <div class="table"style="width:100%">
         <table>
-              <td class="title">Domain Name: </td><td><?=htmlspecialchars($records['domain'], ENT_QUOTES)?></td>
+              <td class="title">Domain Name: </td><td><?=htmlspecialchars($records['domain'] ?? '', ENT_QUOTES)?></td>
                 </tr>
                  <tr>
-                <td class="title">Status: </td><td><?=htmlspecialchars($records['status'], ENT_QUOTES)?></td>
+                <td class="title">Status: </td><td><?=htmlspecialchars($records['status'] ?? '', ENT_QUOTES)?></td>
+                </tr>
                 </tr>
                 <tr>
-                 <tr>
-                <td class="title">Business: </td><td><?=htmlspecialchars($records['business_name'], ENT_QUOTES)?></td>
+                <td class="title">Business: </td><td><?=htmlspecialchars($records['business_name'] ?? '', ENT_QUOTES)?></td>
                 </tr>
                 <tr>
                 <tr>
-               <td class="title">Member Name</td> <td><?=htmlspecialchars($records['full_name'], ENT_QUOTES)?></td>
+               <td class="title">Member Name</td> <td><?=htmlspecialchars($records['full_name'] ?? '', ENT_QUOTES)?></td>
                 </tr>
                 <tr>
-               <td class="title">Date Due:</td> <td><?=date("m/d/y", strtotime($records['due_date'])?? '')?></td>
+               <td class="title">Date Due:</td> <td><?=!empty($records['due_date']) ? date("m/d/y", strtotime($records['due_date'])) : ''?></td>
                 </tr>
                 <tr>
-               <td class="title">Amount Due:</td> <td>$<?=htmlspecialchars($records['amount'], ENT_QUOTES)?></td>
+               <td class="title">Amount Due:</td> <td>$<?=htmlspecialchars($records['amount'] ?? '', ENT_QUOTES)?></td>
                 </tr>
               <tr>
-               <td class="title">Renewal Host: </td><td><?=htmlspecialchars($records['host_url'], ENT_QUOTES)?></td>
+               <td class="title">Renewal Host: </td><td><?=htmlspecialchars($records['host_url'] ?? '', ENT_QUOTES)?></td>
                     </tr>
                 <tr>
-               <td class="title">Host Login: </td><td><?=htmlspecialchars($records['host_login'], ENT_QUOTES)?></td>
+               <td class="title">Host Login: </td><td><?=htmlspecialchars($records['host_login'] ?? '', ENT_QUOTES)?></td>
                 </tr>
                 <tr>
-               <td class="title">Host Password:</td> <td><?=htmlspecialchars($records['host_password'], ENT_QUOTES)?></td>
+               <td class="title">Host Password:</td> <td><?=htmlspecialchars($records['host_password'] ?? '', ENT_QUOTES)?></td>
                 </tr>
                 <tr>
-               <td class="title">Instructions:</td> <td><?=htmlspecialchars($records['notes'], ENT_QUOTES)?></td>
+               <td class="title">Instructions:</td> <td><?=htmlspecialchars($records['notes'] ?? '', ENT_QUOTES)?></td>
                 </tr>
             <tbody>
                 <tr>

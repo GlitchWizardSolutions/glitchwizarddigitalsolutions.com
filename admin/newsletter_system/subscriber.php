@@ -164,13 +164,21 @@ if (isset($_GET['id'])) {
                 </div>
             </div>
 
-            <label for="date_subbed"><span class="required">*</span> Date Subbed</label>
-            <input id="date_subbed" type="datetime-local" name="date_subbed" value="<?=date('Y-m-d\TH:i', strtotime($subscriber['date_subbed']))?>" required>
-
+            <div class="form-group">
+                <label for="date_subbed">Date Subscribed <span class="required">*</span></label>
+                <input id="date_subbed" type="datetime-local" name="date_subbed" value="<?=date('Y-m-d\TH:i', strtotime($subscriber['date_subbed']))?>" required>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <a href="subscribers.php" class="btn btn-secondary">Cancel</a>
+            <?php if ($page == 'Edit'): ?>
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this subscriber?')">
+            <?php endif; ?>
+            <input type="submit" name="submit" value="Save" class="btn btn-success">
         </div>
 
     </div>
-
 </form>
 
 <?=template_admin_footer()?>
