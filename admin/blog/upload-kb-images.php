@@ -1,7 +1,7 @@
 <?php
 // Knowledge Base Image Upload Form
-require '../assets/includes/admin_config.php';
-include_once '../assets/includes/components.php';
+require 'assets/includes/admin_config.php';
+include_once 'assets/includes/components.php';
 
 // Define required images with descriptions
 $required_images = [
