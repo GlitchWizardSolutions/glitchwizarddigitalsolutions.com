@@ -163,6 +163,12 @@ $url = 'caches.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' .
                                     </span>
                                     View
                                 </a>
+                                <a href="cache-use.php?id=<?=$record['id']?>" style="color:green">
+                                    <span class="icon">
+                                      <i class="fa-solid fa-bolt fa-xs"></i>
+                                    </span>
+                                    Use
+                                </a>
                                 <a href="cache.php?id=<?=$record['id']?>" style='color:orange'>
                                     <span class="icon">
                                      <i class="fa-regular fa-pen-to-square fa-xs"></i>

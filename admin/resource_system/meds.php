@@ -182,6 +182,12 @@ $url = 'meds.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' . $
                                     </span>
                                     View
                                 </a>
+                                <a href="med-use.php?id=<?=$record['id']?>" style="color:green">
+                                    <span class="icon">
+                                      <i class="fa-solid fa-bolt fa-xs"></i>
+                                    </span>
+                                    Use
+                                </a>
                                 <a href="med.php?id=<?=$record['id']?>" style='color:orange'>
                                     <span class="icon">
                                      <i class="fa-regular fa-pen-to-square fa-xs"></i>

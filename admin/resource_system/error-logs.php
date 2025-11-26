@@ -216,6 +216,12 @@ $url = 'error-logs.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id
                                     </span>
                                     View
                                 </a>
+                                <a href="error-log-use.php?id=<?=$record['id']?>" style="color:green">
+                                    <span class="icon">
+                                      <i class="fa-solid fa-bolt fa-xs"></i>
+                                    </span>
+                                    Use
+                                </a>
                                 
                                 <a class="red" href="error-logs.php?delete=<?=$record['id']?>" onclick="return confirm('Are you sure you want to delete this project and ALL logs?')">
                                     <span class="icon">

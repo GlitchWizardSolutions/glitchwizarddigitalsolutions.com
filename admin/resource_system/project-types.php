@@ -149,6 +149,12 @@ $url = 'project-types.php?search=' . $search . (isset($_GET['page_id']) ? '&page
                                     </span>
                                     View
                                 </a>
+                                <a href="project-type-use.php?id=<?=$record['id']?>" style="color:green">
+                                    <span class="icon">
+                                      <i class="fa-solid fa-bolt fa-xs"></i>
+                                    </span>
+                                    Use
+                                </a>
                                 <a href="project-type.php?id=<?=$record['id']?>" style='color:orange'>
                                     <span class="icon">
                                      <i class="fa-regular fa-pen-to-square fa-xs"></i>
