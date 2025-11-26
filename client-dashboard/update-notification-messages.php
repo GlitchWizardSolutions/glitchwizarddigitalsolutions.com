@@ -52,7 +52,7 @@ if ($notifications) {
             $invoice_num = $matches[1];
             $amount = $matches[2];
             $new_message = "NEW - Invoice #{$invoice_num}<br>Amount due: $$amount";
-        }
+        } 
         // Update "Payment of $XXX received for Invoice #YYY. Invoice is now fully paid."
         elseif (preg_match('/Payment of \$([^\s]+) received for Invoice #([^\.]+)\. Invoice is now fully paid\./', $old_message, $matches)) {
             $amount = $matches[1];
