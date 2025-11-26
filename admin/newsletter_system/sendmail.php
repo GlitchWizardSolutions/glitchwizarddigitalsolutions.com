@@ -1,34 +1,152 @@
 <?php
 require 'assets/includes/admin_config.php';
 include_once '../assets/includes/components.php';
+
+// Handle image uploads for newsletter editor
+if (isset($_FILES['newsletter_image'])) {
+    $upload_dir = 'uploads/';
+    
+    // Create directory if it doesn't exist
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+    
+    $file = $_FILES['newsletter_image'];
+    $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    
+    if (!in_array($file['type'], $allowed_types)) {
+        header('Content-Type: application/json');
+        exit(json_encode(['error' => 'Invalid file type. Only images are allowed.']));
+    }
+    
+    if ($file['error'] === 0) {
+        $fileInfo = pathinfo($file['name']);
+        $filename = preg_replace('/[^a-zA-Z0-9_-]/', '_', $fileInfo['filename']);
+        $extension = isset($fileInfo['extension']) ? '.' . strtolower($fileInfo['extension']) : '';
+        $path = $upload_dir . $filename . $extension;
+        $counter = 1;
+        
+        // Handle duplicate filenames
+        while (file_exists($path)) {
+            $path = $upload_dir . $filename . '_(' . $counter . ')' . $extension;
+            $counter++;
+        }
+        
+        if (move_uploaded_file($file['tmp_name'], $path)) {
+            header('Content-Type: application/json');
+            exit(json_encode(['location' => $path]));
+        }
+    }
+    
+    header('Content-Type: application/json');
+    exit(json_encode(['error' => 'Failed to upload image']));
+}
+
+// Get list of uploaded images for the image browser
+if (isset($_GET['list_images'])) {
+    $upload_dir = 'uploads/';
+    $images = [];
+    
+    if (is_dir($upload_dir)) {
+        $files = scandir($upload_dir);
+        foreach ($files as $file) {
+            if ($file !== '.' && $file !== '..') {
+                $filepath = $upload_dir . $file;
+                if (is_file($filepath) && preg_match('/\.(jpg|jpeg|png|gif|webp|svg)$/i', $file)) {
+                    $images[] = [
+                        'title' => $file,
+                        'value' => $filepath,
+                        'modified' => filemtime($filepath)
+                    ];
+                }
+            }
+        }
+    }
+    
+    // Sort by modified date, newest first
+    usort($images, function($a, $b) {
+        return $b['modified'] - $a['modified'];
+    });
+    
+    header('Content-Type: application/json');
+    exit(json_encode($images));
+}
+
 // Get all placeholders
 $placeholders = $pdo->query('SELECT * FROM custom_placeholders')->fetchAll(PDO::FETCH_ASSOC);
-// If submit form, send mail to the specified recipient
+// If submit form, send mail to the specified recipients
 if (isset($_POST['subject'])) {
     include_once 'functions.php';
+    
+    // Validate recipients
+    if (!isset($_POST['recipients']) || !is_array($_POST['recipients']) || empty($_POST['recipients'])) {
+        exit('Error: No recipients selected');
+    }
+    
     // Get attachments
     $attachments = isset($_POST['attachments']) ? $_POST['attachments'] : [];
     $attachments = array_map(function($attachment) {
         return '../' . $attachment;
     }, $attachments);
-    // Replace placeholders in the content
-    $content = $_POST['content'];
-    foreach ($placeholders as $placeholder) {
-        $content = str_replace($placeholder['placeholder_text'], $placeholder['placeholder_value'], $content);
+    
+    // Send email to each recipient
+    $success_count = 0;
+    $failed_count = 0;
+    $errors = [];
+    
+    foreach ($_POST['recipients'] as $recipient_email) {
+        // Replace placeholders in the content
+        $content = $_POST['content'];
+        foreach ($placeholders as $placeholder) {
+            $content = str_replace($placeholder['placeholder_text'], $placeholder['placeholder_value'], $content);
+        }
+        
+        // Get subscriber from database
+        $stmt = $pdo->prepare('SELECT * FROM subscribers WHERE email = ?');
+        $stmt->execute([ $recipient_email ]);
+        $subscriber = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($subscriber) {
+            // Generate unique tracking code for this subscriber
+            $tracking_code = sha1($subscriber['id'] . $subscriber['email'] . time());
+            $unsubscribe_link = website_url . 'unsubscribe.php?id=' . sha1($subscriber['id'] . $subscriber['email']);
+            
+            // Replace tracking placeholders with actual tracking codes
+            $content = str_replace('%open_tracking_code%', '<img src="' . website_url . 'tracking.php?action=open&id=' . $tracking_code . '" width="1" height="1" alt="">', $content);
+            $content = str_replace('%click_link%', website_url . 'tracking.php?action=click&id=' . $tracking_code . '&url=', $content);
+            $content = str_replace('%unsubscribe_link%', $unsubscribe_link, $content);
+        } else {
+            // For non-subscribers (custom emails), remove tracking codes
+            $content = str_replace('%open_tracking_code%', '', $content);
+            $content = str_replace('%click_link%', '', $content);
+            $content = str_replace('%unsubscribe_link%', '', $content);
+        }
+        
+        // Send the mail
+        $response = admin_sendmail($_POST['from'], $_POST['from_name'], $recipient_email, $_POST['subject'], $content, $attachments);
+        
+        if ($response === 'success') {
+            $success_count++;
+        } else {
+            $failed_count++;
+            $errors[] = $recipient_email . ': ' . $response;
+        }
     }
-    // Get subscriber from database
-    $stmt = $pdo->prepare('SELECT * FROM subscribers WHERE email = ?');
-    $stmt->execute([ $_POST['recipient'] ]);
-    $subscriber = $stmt->fetch(PDO::FETCH_ASSOC);
-    $unsubscribe_link = $subscriber ? website_url . 'unsubscribe.php?id=' . sha1($subscriber['id'] . $subscriber['email']) : '';
-    // Update unsubscribe link
-    $content = str_replace('%unsubscribe_link%', $unsubscribe_link, $content);
-    // Remove unnecessary placeholders
-    $content = str_replace('%open_tracking_code%', '', $content);
-    $content = str_replace('%click_link%', '', $content);
-    // Send the mail
-    $response = admin_sendmail($_POST['from'], $_POST['from_name'], $_POST['recipient'], $_POST['subject'], $content, $attachments);
-    exit($response);
+    
+    // Return results as JSON
+    header('Content-Type: application/json');
+    if ($failed_count == 0) {
+        exit(json_encode([
+            'status' => 'success',
+            'message' => 'Successfully sent to ' . $success_count . ' recipient' . ($success_count != 1 ? 's' : '') . '!'
+        ]));
+    } else {
+        exit(json_encode([
+            'status' => 'partial',
+            'message' => 'Sent to ' . $success_count . ' recipient(s), but ' . $failed_count . ' failed.',
+            'errors' => $errors
+        ]));
+    }
 }
 // iterate attachments and move files to the attachments directory
 if (isset($_FILES['attachments']) && is_array($_FILES['attachments'])) {
@@ -87,7 +205,7 @@ $newsletters = $pdo->query('SELECT id, title FROM newsletters ORDER BY title ASC
     </div>
 </div>
 
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" id="send-newsletter-form">
 
     <div class="form-professional">
         
@@ -112,18 +230,60 @@ $newsletters = $pdo->query('SELECT id, title FROM newsletters ORDER BY title ASC
 
             <div class="form-group">
                 <label for="recipients"><span class="required">*</span> Recipients</label>
-                <div class="multi-checkbox recipients-multi-checkbox">
-                    <div class="item check-all">
-                        <input id="check-all" type="checkbox">
-                        <input type="text" placeholder="Search...">
-                    </div>
-                    <div class="con">
-                        <?php foreach ($subscribers as $subscriber): ?>
-                        <div class="item">
-                            <input id="checkbox-<?=$subscriber['id']?>" type="checkbox" name="recipients[]" value="<?=$subscriber['email']?>">
-                            <label for="checkbox-<?=$subscriber['id']?>"><?=$subscriber['email']?></label>
+                <p style="margin: 0 0 10px 0; color: #666; font-size: 14px;">Select subscribers from the list below or add custom email addresses</p>
+                
+                <div class="recipients-section">
+                    <div class="recipients-controls">
+                        <div class="search-box">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="recipient-search" placeholder="Search subscribers... (type to filter in real-time)">
                         </div>
-                        <?php endforeach; ?>
+                        <div class="action-buttons">
+                            <button type="button" class="btn btn-secondary btn-sm" id="select-all-recipients">
+                                <i class="fa-solid fa-check-double"></i> Select All
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="deselect-all-recipients">
+                                <i class="fa-solid fa-times"></i> Deselect All
+                            </button>
+                            <button type="button" class="btn btn-primary btn-sm add-additional-recipients">
+                                <i class="fa-solid fa-plus"></i> Add Custom Email
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="recipients-table-wrapper">
+                        <table class="recipients-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">
+                                        <input type="checkbox" id="check-all-recipients" title="Select/Deselect All">
+                                    </th>
+                                    <th>Email Address</th>
+                                    <th style="width: 100px;">Source</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recipients-list">
+                                <?php foreach ($subscribers as $subscriber): ?>
+                                <tr class="recipient-row">
+                                    <td>
+                                        <input type="checkbox" id="checkbox-<?=$subscriber['id']?>" name="recipients[]" value="<?=$subscriber['email']?>">
+                                    </td>
+                                    <td>
+                                        <label for="checkbox-<?=$subscriber['id']?>" style="cursor: pointer; margin: 0;">
+                                            <?=htmlspecialchars($subscriber['email'], ENT_QUOTES)?>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-primary">Subscriber</span>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="recipients-summary">
+                        <span id="selected-count">0</span> recipient(s) selected
                     </div>
                 </div>
             </div>
@@ -143,6 +303,28 @@ $newsletters = $pdo->query('SELECT id, title FROM newsletters ORDER BY title ASC
 
             <div class="form-group">
                 <label for="content"><span class="required">*</span> <?=template_editor == 'tinymce'?'':'HTML '?>Email Template</label>
+                <?php if (template_editor == 'tinymce'): ?>
+                <div class="info-box" style="background: #e7f3ff; border-left: 4px solid #2196F3; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
+                    <p style="margin: 0; font-size: 13px; color: #0d47a1;"><strong><i class="fa-solid fa-info-circle"></i> Image Tips:</strong></p>
+                    <ul style="margin: 8px 0 0 20px; font-size: 13px; color: #0d47a1;">
+                        <li><strong>Alternative Description</strong> - Describes the image for accessibility (goes in alt="" attribute). Shows when image fails to load.</li>
+                        <li><strong>Class</strong> - Use "Responsive (Recommended)" for images that auto-fit to email width, or "Full Width" for banner images.</li>
+                        <li>Images automatically resize to fit email templates - no need to manually adjust dimensions!</li>
+                        <li>You can drag corners to resize images visually in the editor.</li>
+                        <li>Keep image file sizes under 500KB for faster email loading.</li>
+                    </ul>
+                </div>
+                <div class="info-box" style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
+                    <p style="margin: 0; font-size: 13px; color: #e65100;"><strong><i class="fa-solid fa-code"></i> Available Placeholders:</strong></p>
+                    <ul style="margin: 8px 0 0 20px; font-size: 13px; color: #e65100;">
+                        <li><strong>%unsubscribe_link%</strong> - Automatically filled with unique unsubscribe URL for each subscriber</li>
+                        <li><strong>%open_tracking_code%</strong> - Invisible 1x1 pixel image that tracks when emails are opened (subscribers only)</li>
+                        <li><strong>%click_link%</strong> - Base URL for click tracking (use in href attributes to track link clicks)</li>
+                        <li>Custom placeholders and subscriber-specific data will be replaced automatically</li>
+                        <li><em>Note: Tracking codes only work for subscribers in the database, not custom email addresses</em></li>
+                    </ul>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -192,9 +374,173 @@ tinymce.init({
     height: 600,
     branding: false,
     promotion: false,
-    automatic_uploads: false,
-    image_title: true,
+    automatic_uploads: true,
+    images_upload_url: 'sendmail.php',
+    
+    // Image settings for email compatibility
+    image_dimensions: true,
+    image_class_list: [
+        {title: 'Responsive (Recommended)', value: 'responsive-image'},
+        {title: 'Full Width', value: 'full-width-image'},
+        {title: 'None', value: ''}
+    ],
+    
+    // Default image settings
+    image_advtab: true,
     image_description: true,
+    image_title: false,  // Disable title field (not needed for emails)
+    
+    // Content style for responsive images
+    content_style: `
+        .responsive-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        .full-width-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    `,
+    
+    images_upload_handler: function (blobInfo, progress) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'sendmail.php', true);
+            
+            const formData = new FormData();
+            formData.append('newsletter_image', blobInfo.blob(), blobInfo.filename());
+            
+            xhr.upload.onprogress = (e) => {
+                progress(e.loaded / e.total * 100);
+            };
+            
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    const json = JSON.parse(xhr.responseText);
+                    if (json.error) {
+                        reject(json.error);
+                    } else {
+                        resolve(json.location);
+                    }
+                } else {
+                    reject('HTTP Error: ' + xhr.status);
+                }
+            };
+            
+            xhr.onerror = () => {
+                reject('Image upload failed');
+            };
+            
+            xhr.send(formData);
+        });
+    },
+    file_picker_callback: function(callback, value, meta) {
+        if (meta.filetype === 'image') {
+            // Create a custom image browser modal
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            
+            input.onchange = function() {
+                const file = this.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function() {
+                    // Upload the file
+                    const formData = new FormData();
+                    formData.append('newsletter_image', file);
+                    
+                    fetch('sendmail.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                        } else {
+                            // Return with default responsive class and alt text
+                            callback(data.location, { 
+                                alt: file.name.replace(/\.[^/.]+$/, ''),
+                                class: 'responsive-image'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        alert('Upload failed: ' + error);
+                    });
+                };
+                
+                reader.readAsDataURL(file);
+            };
+            
+            // Also show option to browse existing images
+            if (confirm('Click OK to upload a new image, or Cancel to browse existing images')) {
+                input.click();
+            } else {
+                // Browse existing images
+                fetch('sendmail.php?list_images=1')
+                    .then(response => response.json())
+                    .then(images => {
+                        if (images.length === 0) {
+                            alert('No images uploaded yet. Please upload an image first.');
+                            input.click();
+                            return;
+                        }
+                        
+                        // Create a simple image selector
+                        let html = '<div style="padding: 20px; max-height: 400px; overflow-y: auto;">';
+                        html += '<h3 style="margin-top: 0;">Select an Image</h3>';
+                        html += '<p style="color: #666; font-size: 13px; margin-bottom: 15px;">Images will automatically be responsive in email templates</p>';
+                        html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">';
+                        
+                        images.forEach((img, index) => {
+                            html += `
+                                <div style="border: 2px solid #ddd; border-radius: 8px; padding: 10px; cursor: pointer; text-align: center;" 
+                                     onclick="selectImage('${img.value}', '${img.title}')" 
+                                     onmouseover="this.style.borderColor='#6b46c1'" 
+                                     onmouseout="this.style.borderColor='#ddd'">
+                                    <img src="${img.value}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 4px;">
+                                    <div style="margin-top: 5px; font-size: 11px; color: #666; overflow: hidden; text-overflow: ellipsis;">${img.title}</div>
+                                </div>
+                            `;
+                        });
+                        
+                        html += '</div>';
+                        html += '<div style="margin-top: 20px; text-align: center;">';
+                        html += '<button onclick="closeImageBrowser()" style="padding: 8px 20px; background: #6b46c1; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>';
+                        html += '</div>';
+                        html += '</div>';
+                        
+                        const modal = document.createElement('div');
+                        modal.id = 'image-browser-modal';
+                        modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+                        
+                        const content = document.createElement('div');
+                        content.style.cssText = 'background: white; border-radius: 8px; max-width: 800px; width: 90%; max-height: 80vh; overflow: hidden;';
+                        content.innerHTML = html;
+                        
+                        modal.appendChild(content);
+                        document.body.appendChild(modal);
+                        
+                        // Add global functions for image selection
+                        window.selectImage = function(src, alt) {
+                            callback(src, { 
+                                alt: alt.replace(/\.[^/.]+$/, ''),
+                                class: 'responsive-image'
+                            });
+                            closeImageBrowser();
+                        };
+                        
+                        window.closeImageBrowser = function() {
+                            document.getElementById('image-browser-modal').remove();
+                        };
+                    });
+            }
+        }
+    },
     license_key: 'gpl',
     setup: function (editor) {
         editor.ui.registry.addMenuButton('insert_meta', {
@@ -301,5 +647,348 @@ tinymce.init({
 });
 </script>
 <?php endif; ?>
+
+<style>
+.recipients-section {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.recipients-controls {
+    padding: 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 8px 12px 8px 35px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.recipients-table-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.recipients-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.recipients-table thead {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+}
+
+.recipients-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    background: #f8f9fa;
+}
+
+.recipients-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.recipient-row {
+    transition: background-color 0.2s;
+}
+
+.recipient-row:hover {
+    background-color: #f8f9fa;
+}
+
+.recipient-row.custom-email {
+    background-color: #fff3cd;
+}
+
+.recipient-row.custom-email:hover {
+    background-color: #ffe69c;
+}
+
+.recipients-table input[type="checkbox"] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 12px;
+    text-transform: uppercase;
+}
+
+.badge-primary {
+    background-color: #e7e3f5;
+    color: #6b46c1;
+}
+
+.badge-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.recipients-summary {
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    font-weight: 600;
+    color: #495057;
+}
+
+#selected-count {
+    color: #6b46c1;
+    font-size: 16px;
+}
+
+.remove-recipient {
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+}
+
+.remove-recipient:hover {
+    color: #bd2130;
+}
+</style>
+
+<script>
+// Recipients table functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const recipientsList = document.getElementById('recipients-list');
+    const checkAllCheckbox = document.getElementById('check-all-recipients');
+    const searchInput = document.getElementById('recipient-search');
+    const selectedCountSpan = document.getElementById('selected-count');
+    let customEmailCounter = 0;
+    
+    // Update selected count
+    function updateSelectedCount() {
+        const checkedCount = document.querySelectorAll('input[name="recipients[]"]:checked').length;
+        selectedCountSpan.textContent = checkedCount;
+    }
+    
+    // Check all functionality
+    checkAllCheckbox.addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.recipient-row:not([style*="display: none"]) input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+        updateSelectedCount();
+    });
+    
+    // Select all button
+    document.getElementById('select-all-recipients').addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.recipient-row:not([style*="display: none"]) input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = true);
+        checkAllCheckbox.checked = true;
+        updateSelectedCount();
+    });
+    
+    // Deselect all button
+    document.getElementById('deselect-all-recipients').addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('input[name="recipients[]"]');
+        checkboxes.forEach(cb => cb.checked = false);
+        checkAllCheckbox.checked = false;
+        updateSelectedCount();
+    });
+    
+    // Search functionality
+    searchInput.addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.recipient-row');
+        
+        rows.forEach(row => {
+            const email = row.querySelector('label').textContent.toLowerCase();
+            if (email.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    // Prevent Enter key from submitting form when in search box
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    });
+    
+    // Update count when individual checkboxes change
+    document.addEventListener('change', function(e) {
+        if (e.target.name === 'recipients[]') {
+            updateSelectedCount();
+        }
+    });
+    
+    // Add custom email functionality
+    document.querySelector('.add-additional-recipients').addEventListener('click', function() {
+        const email = prompt('Enter email address:');
+        if (email && email.trim()) {
+            // Validate email
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(email.trim())) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            // Check if email already exists
+            const existingEmails = Array.from(document.querySelectorAll('input[name="recipients[]"]'))
+                .map(cb => cb.value.toLowerCase());
+            
+            if (existingEmails.includes(email.trim().toLowerCase())) {
+                alert('This email address is already in the list');
+                return;
+            }
+            
+            // Add the custom email to the table
+            customEmailCounter++;
+            const newRow = document.createElement('tr');
+            newRow.className = 'recipient-row custom-email';
+            newRow.innerHTML = `
+                <td>
+                    <input type="checkbox" id="checkbox-custom-${customEmailCounter}" name="recipients[]" value="${email.trim()}" checked>
+                </td>
+                <td>
+                    <label for="checkbox-custom-${customEmailCounter}" style="cursor: pointer; margin: 0;">
+                        ${email.trim()}
+                    </label>
+                </td>
+                <td>
+                    <span class="badge badge-warning">Custom</span>
+                    <i class="fa-solid fa-trash remove-recipient" title="Remove"></i>
+                </td>
+            `;
+            
+            recipientsList.appendChild(newRow);
+            
+            // Add remove functionality
+            newRow.querySelector('.remove-recipient').addEventListener('click', function() {
+                if (confirm('Remove this email address?')) {
+                    newRow.remove();
+                    updateSelectedCount();
+                }
+            });
+            
+            updateSelectedCount();
+        }
+    });
+    
+    // Initialize count
+    updateSelectedCount();
+    
+    // Handle form submission
+    const form = document.getElementById('send-newsletter-form');
+    const submitButton = form.querySelector('input[type="submit"]');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Check if TinyMCE is being used and save content
+        if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
+            tinymce.get('content').save();
+        }
+        
+        // Validate recipients
+        const checkedRecipients = document.querySelectorAll('input[name="recipients[]"]:checked').length;
+        if (checkedRecipients === 0) {
+            alert('Please select at least one recipient!');
+            return;
+        }
+        
+        // Disable submit button and show loading state
+        submitButton.disabled = true;
+        submitButton.value = 'Sending...';
+        submitButton.style.opacity = '0.6';
+        
+        // Submit form via AJAX
+        const formData = new FormData(form);
+        
+        fetch('sendmail.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Re-enable submit button
+            submitButton.disabled = false;
+            submitButton.value = 'Send';
+            submitButton.style.opacity = '1';
+            
+            if (data.status === 'success') {
+                // Show success message
+                alert('✓ ' + data.message);
+                
+                // Optionally clear the form or redirect
+                // form.reset();
+                // if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
+                //     tinymce.get('content').setContent('');
+                // }
+            } else if (data.status === 'partial') {
+                // Show partial success message
+                let errorDetails = '';
+                if (data.errors && data.errors.length > 0) {
+                    errorDetails = '\\n\\nErrors:\\n' + data.errors.join('\\n');
+                }
+                alert('⚠ ' + data.message + errorDetails);
+            } else {
+                alert('Error: ' + (data.message || 'Unknown error occurred'));
+            }
+        })
+        .catch(error => {
+            // Re-enable submit button
+            submitButton.disabled = false;
+            submitButton.value = 'Send';
+            submitButton.style.opacity = '1';
+            
+            alert('Error sending newsletter: ' + error);
+            console.error('Error:', error);
+        });
+    });
+});
+</script>
 
 <?=template_admin_footer()?>

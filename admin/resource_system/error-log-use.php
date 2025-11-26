@@ -116,18 +116,24 @@ $days_old = (int)$error_date->diff($now)->format('%a');
                 <span class="label">Timestamp:</span>
                 <span class="value"><?=date('M d, Y h:i A', strtotime($record['timestamp']))?></span>
             </div>
+            <div class="info-item full-width">
+                <span class="label">Path:</span>
+                <span class="value"><?=htmlspecialchars($record['path'] ?? '', ENT_QUOTES)?></span>
+            </div>
             <div class="info-item">
                 <span class="label">Page Name:</span>
                 <span class="value"><?=htmlspecialchars($record['pagename'] ?? '', ENT_QUOTES)?></span>
             </div>
             <div class="info-item">
-                <span class="label">Path:</span>
-                <span class="value"><?=htmlspecialchars($record['path'] ?? '', ENT_QUOTES)?></span>
-            </div>
-            <div class="info-item">
                 <span class="label">Section:</span>
                 <span class="value"><?=htmlspecialchars($record['section'] ?? '', ENT_QUOTES)?></span>
             </div>
+            <?php if (!empty($record['noted'])): ?>
+            <div class="info-item">
+                <span class="label">Notes:</span>
+                <span class="value"><?=nl2br(htmlspecialchars($record['noted'], ENT_QUOTES))?></span>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -176,7 +182,7 @@ $days_old = (int)$error_date->diff($now)->format('%a');
             </div>
             <?php endif; ?>
             <?php if (!empty($record['request_uri'])): ?>
-            <div class="info-item">
+            <div class="info-item full-width">
                 <span class="label">Request URI:</span>
                 <span class="value"><?=htmlspecialchars($record['request_uri'], ENT_QUOTES)?></span>
             </div>
@@ -322,6 +328,9 @@ $days_old = (int)$error_date->diff($now)->format('%a');
     background: white;
     border-radius: 6px;
     border: 1px solid #dee2e6;
+}
+.info-item.full-width {
+    grid-column: 1 / -1;
 }
 .info-item .label {
     font-weight: bold;
