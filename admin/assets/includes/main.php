@@ -74,6 +74,23 @@ function template_admin_header($title, $selected = 'dashboard', $selected_child 
     $base_url = BASE_URL . 'admin';
     $outside_url = BASE_URL;
     
+    // Get count of unsent invoices for admin notification bell
+    $unsent_invoices_count = 0;
+    try {
+        $stmt = $pdo->query("SHOW COLUMNS FROM invoices LIKE 'email_sent'");
+        if ($stmt->rowCount() > 0) {
+            $stmt = $pdo->query("
+                SELECT COUNT(*) as count
+                FROM invoices 
+                WHERE email_sent = 0
+                AND payment_status != 'Paid'
+            ");
+            $unsent_invoices_count = $stmt->fetchColumn();
+        }
+    } catch (Exception $e) {
+        $unsent_invoices_count = 0;
+    }
+    
     // Retrieve the counts
     // Retrieve the total number of campaigns
     $campaigns_total = $pdo->query('SELECT COUNT(*) FROM campaigns')->fetchColumn();
@@ -266,6 +283,17 @@ echo '<!DOCTYPE html>
                 <a class="responsive-toggle" href="#" title="Toggle Menu"></a>
                  
                 <div class="space-between"></div>
+                
+                <!-- Unsent Invoices Notification Bell -->
+                <div class="dropdown right" style="margin-right: 15px;">
+                    <a href= "' . $base_url . '/invoice_system/invoices.php?filter=unsent" title="Unsent invoice emails" style="position: relative; display: inline-block; padding: 10px 15px; text-decoration: none; color: #333;">
+                        <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="fill: ' . ($unsent_invoices_count > 0 ? 'rgb(120, 13, 227)' : '#999') . ';">
+                            <path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/>
+                        </svg>
+                        ' . ($unsent_invoices_count > 0 ? '<span style="position: absolute; top: 5px; right: 8px; background: #dc3545; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;">' . $unsent_invoices_count . '</span>' : '') . '
+                    </a>
+                </div>
+                
                 <div class="dropdown right">
                     ' . $profile_img . '
                     <div class="list">

@@ -260,6 +260,45 @@
 
         </li><!-- End Notification Dropdown Items for Recent Client Logins -->
         
+   <!--Unsent Invoice Emails Notification Bell-->
+   <li class="nav-item dropdown">
+          <a class="nav-link nav-icon" href="<?php echo $base_url; ?>/../admin/invoice_system/invoices.php?filter=unsent" title="Unsent invoice emails">
+         <span id="boot-icon" class="bi bi-envelope-exclamation" style="font-size: 2rem; color: <?php echo ($unsent_invoices_count > 0 ? 'rgb(120, 13, 227)' : '#999'); ?>;"></span>
+           <br>
+           <?php if($unsent_invoices_count <= 0) : ?>
+          <span class="badge bg-transparent badge-number"><?=$unsent_invoices_count ?></span>
+           <?php else : ?>
+            <span class="badge bg-danger badge-number"><?=$unsent_invoices_count ?></span>
+            <?php endif; ?>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+            <li class="dropdown-header">
+              Invoices with unsent emails.
+            </li>
+            
+            <?php if ($unsent_invoices_count > 0): ?>
+            <li><hr class="dropdown-divider"></li>
+            <li class="notification-item">
+                <div class="row mx-auto" style='text-align:center'>
+                     <p style='font-size: 1em'><strong><?=$unsent_invoices_count ?></strong> invoice<?=$unsent_invoices_count != 1 ? 's' : ''?> created but email not sent.</p>
+                </div> 
+		    </li>
+		    <?php else: ?>
+		    <li><hr class="dropdown-divider"></li>
+		    <li class="notification-item">
+              <i class="bi bi-check-circle text-success"></i>
+              <div>
+                <p>All invoice emails have been sent.</p>
+              </div>
+            </li>
+            <?php endif; ?>
+            <hr class="dropdown-divider">
+            <li class="dropdown-footer">
+              <a href="<?php echo $base_url; ?>/../admin/invoice_system/invoices.php?filter=unsent">View Unsent Invoices</a>
+            </li>
+          </ul>
+        </li><!-- End Unsent Invoice Emails Notification Bell -->
+        
    <!--BREAK-->
           <li class="nav-item dropdown">
           <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown" title="Critical Bugs!">

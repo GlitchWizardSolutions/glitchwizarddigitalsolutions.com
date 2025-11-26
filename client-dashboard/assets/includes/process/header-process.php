@@ -47,6 +47,23 @@ $stmt = $pdo->prepare('SELECT COUNT(*) FROM tickets WHERE ticket_status != "clos
 $stmt->execute();
 $admin_notification_bell = $stmt->fetchColumn();
 
+// Get count of unsent invoice emails for admin notification bell
+$unsent_invoices_count = 0;
+try {
+    $stmt = $pdo->query("SHOW COLUMNS FROM invoices LIKE 'email_sent'");
+    if ($stmt->rowCount() > 0) {
+        $stmt = $pdo->query("
+            SELECT COUNT(*) as count
+            FROM invoices 
+            WHERE email_sent = 0
+            AND payment_status != 'Paid'
+        ");
+        $unsent_invoices_count = $stmt->fetchColumn();
+    }
+} catch (Exception $e) {
+    $unsent_invoices_count = 0;
+}
+
 
 // Counts the number of tickets where the admin has replied.  Sets the notification bell number at the top of the page.
 $stmt = $pdo->prepare('SELECT COUNT(*) FROM tickets WHERE acc_id = ?  AND ticket_status != "closed" AND last_comment = "Admin" ORDER BY created DESC');
