@@ -70,17 +70,20 @@ if (isset($_GET['success_msg'])) {
 // Determine the URL
 $url = 'groups.php?search_query=' . $search . (isset($_GET['date_from']) ? '&date_from=' . $_GET['date_from'] : '') . (isset($_GET['date_to']) ? '&date_to=' . $_GET['date_to'] : '');
 ?>
-<?=template_admin_header('groups', 'subscribers', 'groups')?>
+<?=template_admin_header('Groups', 'newsletters', 'subscribers')?>
 
 <?=generate_breadcrumbs([
+    ['label' => 'Newsletter System', 'url' => 'index.php'],
     ['label' => 'Groups']
 ])?>
 
 <div class="content-title mb-3">
-    <div class="icon alt"><?=svg_icon_newsletter()?></div>
-    <div class="txt">
-        <h2>Subscriber Groups</h2>
-        <p class="subtitle">Organize subscribers into groups for targeted campaigns</p>
+    <div class="title">
+        <i class="fa-solid fa-layer-group"></i>
+        <div class="txt">
+            <h2>Subscriber Groups</h2>
+            <p>Organize subscribers into groups for targeted campaigns</p>
+        </div>
     </div>
 </div>
 

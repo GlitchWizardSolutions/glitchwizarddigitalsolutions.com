@@ -101,17 +101,20 @@ if (isset($_GET['success_msg'])) {
 // Determine the URL
 $url = 'subscribers.php?search_query=' . $search . (isset($_GET['status']) ? '&status=' . $_GET['status'] : '') . (isset($_GET['date_from']) ? '&date_from=' . $_GET['date_from'] : '') . (isset($_GET['date_to']) ? '&date_to=' . $_GET['date_to'] : '') . (isset($_GET['confirmed']) ? '&confirmed=' . $_GET['confirmed'] : '');
 ?>
-<?=template_admin_header('Subscribers', 'subscribers', 'view')?>
+<?=template_admin_header('Subscribers', 'newsletters', 'subscribers')?>
 
 <?=generate_breadcrumbs([
+    ['label' => 'Newsletter System', 'url' => 'index.php'],
     ['label' => 'Subscribers']
 ])?>
 
 <div class="content-title mb-3">
-    <div class="icon alt"><?=svg_icon_user()?></div>
-    <div class="txt">
-        <h2>Subscribers</h2>
-        <p class="subtitle">Manage newsletter subscribers and subscriptions</p>
+    <div class="title">
+        <i class="fa-solid fa-users"></i>
+        <div class="txt">
+            <h2>Subscribers</h2>
+            <p>Manage newsletter subscribers and subscriptions</p>
+        </div>
     </div>
 </div>
 

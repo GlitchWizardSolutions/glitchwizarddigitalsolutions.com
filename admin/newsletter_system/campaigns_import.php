@@ -56,18 +56,21 @@ if (isset($_FILES['file'], $_POST['table']) && !empty($_FILES['file']['tmp_name'
     }
 }
 ?>
-<?=template_admin_header('Import Campaigns', 'campaigns', 'import')?>
+<?=template_admin_header('Import Campaigns', 'newsletters', 'campaigns')?>
 
 <?=generate_breadcrumbs([
+    ['label' => 'Newsletter System', 'url' => 'index.php'],
     ['label' => 'Campaigns', 'url' => 'campaigns.php'],
     ['label' => 'Import Campaigns']
 ])?>
 
 <div class="content-title mb-3">
-    <div class="icon alt"><?=svg_icon_upload()?></div>
-    <div class="txt">
-        <h2>Import Campaigns</h2>
-        <p class="subtitle">Upload campaign data files in CSV, JSON, XML, or TXT format</p>
+    <div class="title">
+        <i class="fa-solid fa-upload"></i>
+        <div class="txt">
+            <h2>Import Campaigns</h2>
+            <p>Upload campaign data files in CSV, JSON, XML, or TXT format</p>
+        </div>
     </div>
 </div>
 

@@ -81,37 +81,38 @@ if (isset($_GET['copy'])) {
     }
 }
 ?>
-<?=template_admin_header($page . ' Newsletter', 'newsletters', 'manage')?>
+<?=template_admin_header($page . ' Newsletter', 'newsletters', 'newsletters')?>
 
 <?=generate_breadcrumbs([
+    ['label' => 'Newsletter System', 'url' => 'index.php'],
     ['label' => 'Newsletters', 'url' => 'newsletters.php'],
     ['label' => $page . ' Newsletter']
 ])?>
 
-<form method="post" enctype="multipart/form-data" class="form-professional">
-
-    <div class="content-title mb-3">
-        <div class="icon alt"><?=svg_icon_newsletter()?></div>
+<div class="content-title mb-3">
+    <div class="title">
+        <i class="fa-solid fa-newspaper"></i>
         <div class="txt">
             <h2><?=$page?> Newsletter</h2>
-            <p class="subtitle"><?=$page == 'Edit' ? 'Modify newsletter template' : 'Create new newsletter template'?></p>
-        </div>
-        <div class="btns">
-            <a href="newsletters.php" class="btn btn-secondary mar-right-1">Cancel</a>
-            <?php if ($page == 'Edit'): ?>
-            <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-1" onclick="return confirm('Are you sure you want to delete this newsletter?')">
-            <?php endif; ?>
-            <input type="submit" name="submit" value="Save" class="btn btn-success">
+            <p><?=$page == 'Edit' ? 'Modify newsletter template' : 'Create new newsletter template'?></p>
         </div>
     </div>
+</div>
 
-    <div class="form-section">
-        <h3 class="section-title">Newsletter Details</h3>
+<form method="post" enctype="multipart/form-data">
 
-            <label for="title"><span class="required">*</span> Title</label>
-            <input id="title" type="text" name="title" placeholder="Title" value="<?=htmlspecialchars($newsletter['title'], ENT_QUOTES)?>" required>
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Newsletter Details</h3>
 
-            <label for="attachments">Attachments</label>
+            <div class="form-group">
+                <label for="title"><span class="required">*</span> Title</label>
+                <input id="title" type="text" name="title" placeholder="Title" value="<?=htmlspecialchars($newsletter['title'], ENT_QUOTES)?>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="attachments">Attachments</label>
             <div class="attachments">
                 <?php foreach(explode(',', $newsletter['attachments']) as $attachment): ?>
                 <?php if (!$attachment) continue; ?>

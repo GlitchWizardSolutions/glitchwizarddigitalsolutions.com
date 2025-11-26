@@ -95,77 +95,80 @@ if (isset($_GET['id'])) {
     }
 }
 ?>
-<?=template_admin_header($page . ' Subscriber', 'subscribers', 'manage')?>
+<?=template_admin_header($page . ' Subscriber', 'newsletters', 'subscribers')?>
 
 <?=generate_breadcrumbs([
+    ['label' => 'Newsletter System', 'url' => 'index.php'],
     ['label' => 'Subscribers', 'url' => 'subscribers.php'],
     ['label' => $page . ' Subscriber']
 ])?>
 
-<form method="post" class="form-professional">
-
-    <div class="content-title mb-3">
-        <div class="icon alt"><?=svg_icon_user()?></div>
+<div class="content-title mb-3">
+    <div class="title">
+        <i class="fa-solid fa-user"></i>
         <div class="txt">
             <h2><?=$page?> Subscriber</h2>
-            <p class="subtitle"><?=$page == 'Edit' ? 'Modify subscriber details' : 'Add new newsletter subscriber'?></p>
-        </div>
-        <div class="btns">
-            <a href="subscribers.php" class="btn btn-secondary mar-right-1">Cancel</a>
-            <?php if ($page == 'Edit'): ?>
-            <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-1" onclick="return confirm('Are you sure you want to delete this subscriber?')">
-            <?php endif; ?>
-            <input type="submit" name="submit" value="Save" class="btn btn-success">
+            <p><?=$page == 'Edit' ? 'Modify subscriber details' : 'Add new newsletter subscriber'?></p>
         </div>
     </div>
+</div>
 
-    <?php if (isset($error_msg)): ?>
-    <div class="mar-top-4">
+<form method="post">
+
+    <div class="form-professional">
+        
+        <?php if (isset($error_msg)): ?>
         <div class="msg error">
             <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
             <p><?=$error_msg?></p>
             <svg class="close" width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
         </div>
-    </div>
-    <?php endif; ?>
+        <?php endif; ?>
+        
+        <div class="form-section">
+            <h3 class="section-title">Subscriber Details</h3>
 
-    <div class="content-block">
+            <div class="form-group">
+                <label for="email"><span class="required">*</span> Email</label>
+                <input id="email" type="email" name="email" placeholder="Email" value="<?=htmlspecialchars($subscriber['email'], ENT_QUOTES)?>" required>
+            </div>
 
-        <div class="form responsive-width-100">
+            <div class="form-group">
+                <label for="confirmed"><span class="required">*</span> Confirmed</label>
+                <select id="confirmed" name="confirmed" required>
+                    <option value="1"<?=$subscriber['confirmed']==1?' selected':''?>>Yes</option>
+                    <option value="0"<?=$subscriber['confirmed']==0?' selected':''?>>No</option>
+                </select>
+            </div>
 
-            <label for="email"><span class="required">*</span> Email</label>
-            <input id="email" type="email" name="email" placeholder="Email" value="<?=htmlspecialchars($subscriber['email'], ENT_QUOTES)?>" required>
+            <div class="form-group">
+                <label for="status"><span class="required">*</span> Status</label>
+                <select id="status" name="status" required>
+                    <option value="Subscribed"<?=$subscriber['status']=='Subscribed'?' selected':''?>>Subscribed</option>
+                    <option value="Unsubscribed"<?=$subscriber['status']=='Unsubscribed'?' selected':''?>>Unsubscribed</option>
+                </select>
+            </div>
 
-            <label for="confirmed"><span class="required">*</span> Confirmed</label>
-            <select id="confirmed" name="confirmed" required>
-                <option value="1"<?=$subscriber['confirmed']==1?' selected':''?>>Yes</option>
-                <option value="0"<?=$subscriber['confirmed']==0?' selected':''?>>No</option>
-            </select>
-
-            <label for="status"><span class="required">*</span> Status</label>
-            <select id="status" name="status" required>
-                <option value="Subscribed"<?=$subscriber['status']=='Subscribed'?' selected':''?>>Subscribed</option>
-                <option value="Unsubscribed"<?=$subscriber['status']=='Unsubscribed'?' selected':''?>>Unsubscribed</option>
-            </select>
-
-            <label for="groups">Groups</label>
-            <div class="multiselect" data-name="groups[]">
-                <?php foreach ($subscriber['groups'] as $group): ?>
-                <span class="item" data-value="<?=$group['id']?>">
-                    <i class="remove">&times;</i><?=$group['title']?>
-                    <input type="hidden" name="groups[]" value="<?=$group['id']?>">
-                </span>
-                <?php endforeach; ?>
-                <input type="text" class="search" id="group" placeholder="Groups">
-                <div class="list">
-                    <?php foreach ($groups as $group): ?>
-                    <span data-value="<?=$group['id']?>"><?=$group['title']?></span>
+            <div class="form-group">
+                <label for="groups">Groups</label>
+                <div class="multiselect" data-name="groups[]">
+                    <?php foreach ($subscriber['groups'] as $group): ?>
+                    <span class="item" data-value="<?=$group['id']?>">
+                        <i class="remove">&times;</i><?=$group['title']?>
+                        <input type="hidden" name="groups[]" value="<?=$group['id']?>">
+                    </span>
                     <?php endforeach; ?>
+                    <input type="text" class="search" id="group" placeholder="Groups">
+                    <div class="list">
+                        <?php foreach ($groups as $group): ?>
+                        <span data-value="<?=$group['id']?>"><?=$group['title']?></span>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="date_subbed">Date Subscribed <span class="required">*</span></label>
+                <label for="date_subbed"><span class="required">*</span> Date Subscribed</label>
                 <input id="date_subbed" type="datetime-local" name="date_subbed" value="<?=date('Y-m-d\TH:i', strtotime($subscriber['date_subbed']))?>" required>
             </div>
         </div>

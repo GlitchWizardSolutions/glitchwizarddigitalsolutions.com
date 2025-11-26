@@ -56,18 +56,21 @@ if (isset($_FILES['file'], $_POST['table']) && !empty($_FILES['file']['tmp_name'
     }
 }
 ?>
-<?=template_admin_header('Import Subscribers', 'subscribers', 'import')?>
+<?=template_admin_header('Import Subscribers', 'newsletters', 'subscribers')?>
 
 <?=generate_breadcrumbs([
+    ['label' => 'Newsletter System', 'url' => 'index.php'],
     ['label' => 'Subscribers', 'url' => 'subscribers.php'],
     ['label' => 'Import Subscribers']
 ])?>
 
 <div class="content-title mb-3">
-    <div class="icon alt"><?=svg_icon_upload()?></div>
-    <div class="txt">
-        <h2>Import Subscribers</h2>
-        <p class="subtitle">Upload subscriber data in CSV, JSON, XML, or TXT format</p>
+    <div class="title">
+        <i class="fa-solid fa-upload"></i>
+        <div class="txt">
+            <h2>Import Subscribers</h2>
+            <p>Upload subscriber data in CSV, JSON, XML, or TXT format</p>
+        </div>
     </div>
 </div>
 

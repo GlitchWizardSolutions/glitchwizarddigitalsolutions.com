@@ -87,18 +87,21 @@ if (isset($_POST['file_type'])) {
     }
 }
 ?>
-<?=template_admin_header('Export Newsletters', 'newsletters', 'export')?>
+<?=template_admin_header('Export Newsletters', 'newsletters', 'newsletters')?>
 
 <?=generate_breadcrumbs([
+    ['label' => 'Newsletter System', 'url' => 'index.php'],
     ['label' => 'Newsletters', 'url' => 'newsletters.php'],
     ['label' => 'Export Newsletters']
 ])?>
 
 <div class="content-title mb-3">
-    <div class="icon alt"><?=svg_icon_download()?></div>
-    <div class="txt">
-        <h2>Export Newsletters</h2>
-        <p class="subtitle">Download newsletter data in CSV, JSON, XML, or TXT format</p>
+    <div class="title">
+        <i class="fa-solid fa-download"></i>
+        <div class="txt">
+            <h2>Export Newsletters</h2>
+            <p>Download newsletter data in CSV, JSON, XML, or TXT format</p>
+        </div>
     </div>
 </div>
 

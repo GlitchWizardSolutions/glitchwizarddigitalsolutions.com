@@ -121,85 +121,95 @@ if (isset($_GET['id'])) {
     }
 }
 ?>
-<?=template_admin_header($page . ' Campaign', 'campaigns', 'manage')?>
+<?=template_admin_header($page . ' Campaign', 'newsletters', 'campaigns')?>
 
 <?=generate_breadcrumbs([
+    ['label' => 'Newsletter System', 'url' => 'index.php'],
     ['label' => 'Campaigns', 'url' => 'campaigns.php'],
     ['label' => $page . ' Campaign']
 ])?>
 
-<form method="post" class="form-professional">
-
-    <div class="content-title mb-3">
-        <div class="icon alt"><?=svg_icon_newsletter()?></div>
+<div class="content-title mb-3">
+    <div class="title">
+        <i class="fa-solid fa-bullhorn"></i>
         <div class="txt">
             <h2><?=$page?> Campaign</h2>
-            <p class="subtitle"><?=$page == 'Edit' ? 'Modify campaign details' : 'Create new email campaign'?></p>
-        </div>
-        <div class="btns">
-            <a href="campaigns.php" class="btn btn-secondary mar-right-1">Cancel</a>
-            <?php if ($page == 'Edit'): ?>
-            <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-1" onclick="return confirm('Are you sure you want to delete this campaign?')">
-            <?php endif; ?>
-            <input type="submit" name="submit" value="Save" class="btn btn-success">
+            <p><?=$page == 'Edit' ? 'Modify campaign details' : 'Create new email campaign'?></p>
         </div>
     </div>
+</div>
 
-    <div class="form-section">
-        <h3 class="section-title">Campaign Details</h3>
+<form method="post">
 
-            <label for="title"><span class="required">*</span> Title</label>
-            <input id="title" type="text" name="title" placeholder="Title" value="<?=htmlspecialchars($campaign['title'], ENT_QUOTES)?>" required>
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Campaign Details</h3>
 
-            <label for="start_date"><span class="required">*</span> Start Date</label>
-            <input id="start_date" type="datetime-local" name="start_date" placeholder="Date" value="<?=date('Y-m-d\TH:i', strtotime($campaign['submit_date']))?>" required>
+            <div class="form-group">
+                <label for="title"><span class="required">*</span> Title</label>
+                <input id="title" type="text" name="title" placeholder="Title" value="<?=htmlspecialchars($campaign['title'], ENT_QUOTES)?>" required>
+            </div>
 
-            <label for="newsletter_id"><span class="required">*</span> Newsletter</label>
-            <select id="newsletter_id" name="newsletter_id" required>
-                <option value="" disabled>(select newsletter)</option>
-                <?php foreach ($newsletters as $newsletter): ?>
-                <option value="<?=$newsletter['id']?>"<?=$campaign['newsletter_id']==$newsletter['id']?' selected':''?>><?=$newsletter['id']?> - <?=$newsletter['title']?></option>
-                <?php endforeach; ?>
-            </select>
+            <div class="form-group">
+                <label for="start_date"><span class="required">*</span> Start Date</label>
+                <input id="start_date" type="datetime-local" name="start_date" placeholder="Date" value="<?=date('Y-m-d\TH:i', strtotime($campaign['submit_date']))?>" required>
+            </div>
 
-            <label for="status">Status</label>
-            <select id="status" name="status">
-                <option value="Active"<?=$campaign['status']=='Active'?' selected':''?>>Active</option>
-                <option value="Inactive"<?=$campaign['status']=='Inactive'?' selected':''?>>Inactive</option>
-                <option value="Paused"<?=$campaign['status']=='Paused'?' selected':''?>>Paused</option>
-                <option value="Completed"<?=$campaign['status']=='Completed'?' selected':''?>>Completed</option>
-                <option value="Cancelled"<?=$campaign['status']=='Cancelled'?' selected':''?>>Cancelled</option>
-            </select>
-
-            <label for="groups">Groups</label>
-            <div class="multi-checkbox">
-                <div class="item check-all">
-                    <input id="check-all" type="checkbox">
-                    <input type="text" placeholder="Search...">
-                </div>
-                <div class="con">
-                    <?php foreach ($groups as $group): ?>
-                    <div class="item">
-                        <input id="checkbox-group-<?=$group['id']?>" type="checkbox" name="groups[]" value="<?=$group['id']?>"<?=isset($campaign['groups']) && in_array($group['id'], explode(',', $campaign['groups']))?' checked':''?>>
-                        <label for="checkbox-group-<?=$group['id']?>"><?=$group['title']?> (<?=num_format($group['num_subscribers'])?> recipient<?=$group['num_subscribers'] != 1 ? 's' : ''?>)</label>
-                    </div>
+            <div class="form-group">
+                <label for="newsletter_id"><span class="required">*</span> Newsletter</label>
+                <select id="newsletter_id" name="newsletter_id" required>
+                    <option value="" disabled>(select newsletter)</option>
+                    <?php foreach ($newsletters as $newsletter): ?>
+                    <option value="<?=$newsletter['id']?>"<?=$campaign['newsletter_id']==$newsletter['id']?' selected':''?>><?=$newsletter['id']?> - <?=$newsletter['title']?></option>
                     <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="Active"<?=$campaign['status']=='Active'?' selected':''?>>Active</option>
+                    <option value="Inactive"<?=$campaign['status']=='Inactive'?' selected':''?>>Inactive</option>
+                    <option value="Paused"<?=$campaign['status']=='Paused'?' selected':''?>>Paused</option>
+                    <option value="Completed"<?=$campaign['status']=='Completed'?' selected':''?>>Completed</option>
+                    <option value="Cancelled"<?=$campaign['status']=='Cancelled'?' selected':''?>>Cancelled</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="groups">Groups</label>
+                <div class="multi-checkbox">
+                    <div class="item check-all">
+                        <input id="check-all" type="checkbox">
+                        <input type="text" placeholder="Search...">
+                    </div>
+                    <div class="con">
+                        <?php foreach ($groups as $group): ?>
+                        <div class="item">
+                            <input id="checkbox-group-<?=$group['id']?>" type="checkbox" name="groups[]" value="<?=$group['id']?>"<?=isset($campaign['groups']) && in_array($group['id'], explode(',', $campaign['groups']))?' checked':''?>>
+                            <label for="checkbox-group-<?=$group['id']?>"><?=$group['title']?> (<?=num_format($group['num_subscribers'])?> recipient<?=$group['num_subscribers'] != 1 ? 's' : ''?>)</label>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
 
-            <label for="recipients">Recipients</label>
-            <div class="multi-checkbox">
-                <div class="item check-all">
-                    <input id="check-all" type="checkbox">
-                    <input type="text" placeholder="Search...">
-                </div>
-                <div class="con">
-                    <?php foreach ($subscribers as $subscriber): ?>
-                    <div class="item">
-                        <input id="checkbox-<?=$subscriber['id']?>" type="checkbox" name="recipients[]" value="<?=$subscriber['id']?>"<?=isset($campaign_items) && in_array($subscriber['id'], $campaign_items)?' checked':''?>>
-                        <label for="checkbox-<?=$subscriber['id']?>"><?=$subscriber['email']?></label>
+            <div class="form-group">
+                <label for="recipients">Recipients</label>
+                <div class="multi-checkbox">
+                    <div class="item check-all">
+                        <input id="check-all" type="checkbox">
+                        <input type="text" placeholder="Search...">
                     </div>
-                    <?php endforeach; ?>
+                    <div class="con">
+                        <?php foreach ($subscribers as $subscriber): ?>
+                        <div class="item">
+                            <input id="checkbox-<?=$subscriber['id']?>" type="checkbox" name="recipients[]" value="<?=$subscriber['id']?>"<?=isset($campaign_items) && in_array($subscriber['id'], $campaign_items)?' checked':''?>>
+                            <label for="checkbox-<?=$subscriber['id']?>"><?=$subscriber['email']?></label>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
         </div>

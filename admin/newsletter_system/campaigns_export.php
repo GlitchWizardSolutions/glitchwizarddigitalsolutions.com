@@ -89,18 +89,21 @@ if (isset($_POST['file_type'], $_POST['table'])) {
     }
 }
 ?>
-<?=template_admin_header('Export Campaigns', 'campaigns', 'export')?>
+<?=template_admin_header('Export Campaigns', 'newsletters', 'campaigns')?>
 
 <?=generate_breadcrumbs([
+    ['label' => 'Newsletter System', 'url' => 'index.php'],
     ['label' => 'Campaigns', 'url' => 'campaigns.php'],
     ['label' => 'Export Campaigns']
 ])?>
 
 <div class="content-title mb-3">
-    <div class="icon alt"><?=svg_icon_download()?></div>
-    <div class="txt">
-        <h2>Export Campaigns</h2>
-        <p class="subtitle">Download campaign data in CSV, JSON, XML, or TXT format</p>
+    <div class="title">
+        <i class="fa-solid fa-download"></i>
+        <div class="txt">
+            <h2>Export Campaigns</h2>
+            <p>Download campaign data in CSV, JSON, XML, or TXT format</p>
+        </div>
     </div>
 </div>
 
