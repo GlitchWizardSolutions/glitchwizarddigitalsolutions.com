@@ -16,7 +16,7 @@ try {
 }
 // Delete record
 if (isset($_GET['delete'])) {
-    $stmt = $invoice_system_db->prepare('DELETE FROM access_resource WHERE id = ?');
+    $stmt = $access_resource->prepare('DELETE FROM access_resource WHERE id = ?');
     $stmt->execute([ $_GET['delete'] ]);
     header('Location: access_resources.php?success_msg=3');
     exit;
