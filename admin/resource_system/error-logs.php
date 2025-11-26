@@ -24,6 +24,17 @@ if (isset($_GET['delete'])) {
     header('Location: error-logs.php?success_msg=3');
     exit;
 }
+
+// Bulk delete records
+if (isset($_POST['bulk_delete']) && !empty($_POST['selected_logs'])) {
+    $selected_ids = $_POST['selected_logs'];
+    $placeholders = str_repeat('?,', count($selected_ids) - 1) . '?';
+    $stmt = $error_db->prepare("DELETE FROM error_handling WHERE id IN ($placeholders)");
+    $stmt->execute($selected_ids);
+    header('Location: error-logs.php?success_msg=3');
+    exit;
+}
+
 // Retrieve the GET request parameters (if specified)
 $pagination_page = isset($_GET['pagination_page']) ? $_GET['pagination_page'] : 1;
 $search = isset($_GET['search']) ? $_GET['search'] : '';
@@ -110,13 +121,23 @@ $url = 'error-logs.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id
             </label>
         </div>
     </form>
+    
+    <div style="margin-left: auto;">
+        <button type="button" id="bulk-delete-btn" class="btn" style="background: #dc3545; color: white; display: none;" onclick="confirmBulkDelete()">
+            <i class="fas fa-trash"></i> Delete Selected
+        </button>
+    </div>
 </div>
 
+<form id="bulk-delete-form" method="post" action="">
 <div class="content-block">
     <div class="table">
         <table>
             <thead>
-                <tr>  
+                <tr>
+                    <td style="width: 40px;">
+                        <input type="checkbox" id="select-all" onclick="toggleSelectAll(this)">
+                    </td>
                     <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=timestamp'?>">Timestamp<?php if ($order_by=='timestamp'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
                     <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=severity'?>">Severity<?php if ($order_by=='severity'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
                     <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=application'?>">Application<?php if ($order_by=='application'): ?><i class="fas fa-level-<?=str_replace(['ASC', 'DESC'], ['up','down'], $order)?>-alt fa-xs"></i><?php endif; ?></a></td>
@@ -134,6 +155,9 @@ $url = 'error-logs.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id
                 <?php else: ?>
                 <?php foreach ($records as $record): ?>
                 <tr>
+                     <td>
+                        <input type="checkbox" name="selected_logs[]" value="<?=$record['id']?>" class="log-checkbox" onchange="updateBulkDeleteButton()">
+                     </td>
                      <td><?=date('m-d-y h:ia', strtotime($record['timestamp']))?></td>
                      <td>
                         <?php
@@ -181,6 +205,7 @@ $url = 'error-logs.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id
         </table>
     </div>
 </div>
+</form>
 
 <div class="pagination">
     <?php if ($pagination_page > 1): ?>
@@ -191,5 +216,38 @@ $url = 'error-logs.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id
     <a href="<?=$url?>&pagination_page=<?=$pagination_page+1?>&order=<?=$order?>&order_by=<?=$order_by?>">Next</a>
     <?php endif; ?>
 </div>
+<script>
+function toggleSelectAll(checkbox) {
+    const checkboxes = document.querySelectorAll('.log-checkbox');
+    checkboxes.forEach(cb => cb.checked = checkbox.checked);
+    updateBulkDeleteButton();
+}
+
+function updateBulkDeleteButton() {
+    const checkboxes = document.querySelectorAll('.log-checkbox:checked');
+    const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+    const selectAllCheckbox = document.getElementById('select-all');
+    
+    if (checkboxes.length > 0) {
+        bulkDeleteBtn.style.display = 'inline-block';
+        bulkDeleteBtn.textContent = `Delete Selected (${checkboxes.length})`;
+    } else {
+        bulkDeleteBtn.style.display = 'none';
+        selectAllCheckbox.checked = false;
+    }
+}
+
+function confirmBulkDelete() {
+    const checkboxes = document.querySelectorAll('.log-checkbox:checked');
+    if (checkboxes.length === 0) {
+        alert('Please select at least one error log to delete.');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to delete ${checkboxes.length} error log(s)?`)) {
+        document.getElementById('bulk-delete-form').submit();
+    }
+}
+</script>
 <script src="assets/js/resource-system-script.js"></script>
 <?=template_admin_footer()?>
