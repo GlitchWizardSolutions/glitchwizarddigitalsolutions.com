@@ -171,232 +171,6 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Warranty']
 ])?>
 
-<style>
-.form-professional {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-}
-
-.form-professional .form {
-    max-width: 100% !important;
-    width: 100% !important;
-}
-
-.form-professional label {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 8px;
-    display: block;
-    font-size: 14px;
-}
-
-.form-professional input[type="text"],
-.form-professional input[type="date"],
-.form-professional input[type="file"],
-.form-professional select,
-.form-professional textarea {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #6b46c1;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    background: #ffffff;
-    color: #2c3e50;
-    margin-bottom: 20px;
-    box-sizing: border-box;
-}
-
-.form-professional textarea {
-    resize: vertical;
-    min-height: 100px;
-    font-family: inherit;
-    line-height: 1.6;
-}
-
-.form-professional input:focus,
-.form-professional select:focus,
-.form-professional textarea:focus {
-    outline: none;
-    border-color: #8e44ad;
-    box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.15);
-    background: #ffffff;
-}
-
-.form-professional select {
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b46c1' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    padding-right: 40px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 0;
-}
-
-.form-row-3 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 0;
-}
-
-.form-row .form-group,
-.form-row-3 .form-group {
-    margin-bottom: 0;
-}
-
-.form-group {
-    margin-bottom: 20px;
-    box-sizing: border-box;
-    width: 100%;
-}
-
-.form-group label {
-    margin-bottom: 8px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    margin-bottom: 0;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.tooltip-container {
-    position: relative;
-    display: inline-block;
-}
-
-.tooltip-container .tooltip-icon {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    background: #6b46c1;
-    color: white;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 18px;
-    font-size: 12px;
-    cursor: help;
-    margin-left: 8px;
-    vertical-align: middle;
-}
-
-.tooltip-container .tooltip-text {
-    visibility: hidden;
-    width: 320px;
-    background-color: #2c3e50;
-    color: #fff;
-    text-align: left;
-    border-radius: 6px;
-    padding: 10px 12px;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -160px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 1.4;
-}
-
-.tooltip-container .tooltip-text::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #2c3e50 transparent transparent transparent;
-}
-
-.tooltip-container:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-}
-
-.attachment-preview {
-    margin-top: 25px;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 2px solid #e9ecef;
-}
-
-.attachment-preview strong {
-    color: #2c3e50;
-    font-size: 14px;
-    display: block;
-    margin-bottom: 15px;
-}
-
-.attachment-grid {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-.attachment-item {
-    text-align: center;
-    background: white;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #dee2e6;
-}
-
-.attachment-item img {
-    object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-}
-
-.attachment-item a.file-link {
-    display: block;
-    padding: 20px;
-    text-decoration: none;
-}
-
-.attachment-item .file-name {
-    font-size: 11px;
-    margin-top: 8px;
-    word-break: break-all;
-    color: #495057;
-}
-
-.attachment-item .delete-link {
-    color: #dc3545;
-    font-size: 12px;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 5px;
-}
-
-.attachment-item .delete-link:hover {
-    text-decoration: underline;
-}
-
-@media (max-width: 768px) {
-    .form-row,
-    .form-row-3 {
-        grid-template-columns: 1fr;
-    }
-    
-    .tooltip-container .tooltip-text {
-        width: 240px;
-        margin-left: -120px;
-    }
-}
-</style>
-
 <div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-shield-halved"></i>
@@ -407,15 +181,15 @@ if (isset($_GET['id'])) {
     </div>
 </div>
 
-<form action="" method="post" enctype="multipart/form-data" class="form-professional">
-
-    <div class="content-block">
-        <div class="form responsive-width-100">
+<form action="" method="post" enctype="multipart/form-data">
+    <div class="form-professional">
+        <div class="form-section">
+            <h3 class="section-title">Warranty Information</h3>
 
             <!-- Row 1: Title + Warranty Type -->
             <div class="form-row">
                 <div class="form-group">
-                    <label for="title">Title</label>
+                    <label for="title">Title <span class="required">*</span></label>
                     <input type="text" name="title" id="title" placeholder="Product Name" value="<?=htmlspecialchars($record['title']??'', ENT_QUOTES)?>" required>
                 </div>
                 
@@ -436,7 +210,7 @@ if (isset($_GET['id'])) {
 
             <!-- Row 2: Message/Description (full width) -->
             <div class="form-group">
-                <label for="msg">Message/Description</label>
+                <label for="msg">Message/Description <span class="required">*</span></label>
                 <textarea name="msg" id="msg" placeholder="Warranty details, terms, conditions..." rows="4" required><?=htmlspecialchars($record['msg']??'', ENT_QUOTES)?></textarea>
             </div>
 
@@ -448,7 +222,7 @@ if (isset($_GET['id'])) {
                 </div>
                 
                 <div class="form-group">
-                    <label for="ticket_status">Status</label>
+                    <label for="ticket_status">Status <span class="required">*</span></label>
                     <select name="ticket_status" id="ticket_status" required>
                         <option value="new" <?=($record['ticket_status']??'new') == 'new' ? 'selected' : ''?>>New</option>
                         <option value="active" <?=($record['ticket_status']??'') == 'active' ? 'selected' : ''?>>Active</option>
@@ -524,15 +298,13 @@ if (isset($_GET['id'])) {
             <?php endif; ?>
 
         </div>
+        <div class="form-actions">
+            <a href="warranties.php" class="btn btn-secondary">Cancel</a>
+            <?php if ($page == 'Edit'): ?>
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this record?')">
+            <?php endif; ?>
+            <input type="submit" name="submit" value="Save" class="btn btn-success">
+        </div>
     </div>
-
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="warranties.php" class="btn alt mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn btn-success">
-    </div>
-
 </form> 
 <?=template_admin_footer()?>

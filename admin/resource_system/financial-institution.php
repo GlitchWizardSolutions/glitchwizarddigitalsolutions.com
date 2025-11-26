@@ -78,105 +78,6 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Record']
 ])?>
 
-<style>
-.form-professional {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-}
-
-.form-professional .form {
-    max-width: 100% !important;
-    width: 100% !important;
-}
-
-.form-professional label {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 8px;
-    display: block;
-    font-size: 14px;
-}
-
-.form-professional input[type="text"],
-.form-professional select {
-    width: 100%;
-    max-width: 100%;
-    padding: 10px 12px;
-    border: 2px solid #6b46c1;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    background: #ffffff;
-    color: #2c3e50;
-    box-sizing: border-box;
-}
-
-.form-professional input:focus,
-.form-professional select:focus {
-    outline: none;
-    border-color: #8e44ad;
-    box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.15);
-    background: #ffffff;
-}
-
-.form-professional select {
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b46c1' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    padding-right: 40px;
-}
-
-.form-professional .form-row {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr 1fr !important;
-    gap: 12px !important;
-    margin-bottom: 20px !important;
-    width: 100%;
-}
-
-.form-professional .form-row-2-1 {
-    display: grid !important;
-    grid-template-columns: 1fr 2fr !important;
-    gap: 12px !important;
-    margin-bottom: 20px !important;
-    width: 100%;
-}
-
-.form-professional .form-row .form-group,
-.form-professional .form-row-2-1 .form-group {
-    margin-bottom: 0 !important;
-}
-
-.form-professional .form-group {
-    margin-bottom: 20px;
-    box-sizing: border-box;
-    width: 100%;
-    min-width: 0;
-    overflow: hidden;
-}
-
-.form-professional .form-group label {
-    margin-bottom: 8px;
-}
-
-.form-professional .form-group input,
-.form-professional .form-group select {
-    margin-bottom: 0;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    min-width: 0;
-}
-
-@media (max-width: 768px) {
-    .form-professional .form-row,
-    .form-professional .form-row-2-1 {
-        grid-template-columns: 1fr !important;
-    }
-}
-</style>
-
 <div class="content-title mb-3">
     <div class="title">
        <i class="fa-solid fa-credit-card"></i>
@@ -187,25 +88,25 @@ if (isset($_GET['id'])) {
     </div>
 </div>
 
-<form action="" method="post" class="form-professional">
-
-    <div class="content-block">
-        <div class="form responsive-width-100">
+<form action="" method="post">
+    <div class="form-professional">
+        <div class="form-section">
+            <h3 class="section-title">Financial Information</h3>
 
             <!-- Row 1: Bank + Account + Routing -->
             <div class="form-row">
                 <div class="form-group">
-                    <label for="bank">Bank</label>
+                    <label for="bank">Bank <span class="required">*</span></label>
                     <input type="text" name="bank" id="bank" placeholder="Bank Name" value="<?=htmlspecialchars($record['bank']??'', ENT_QUOTES)?>" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="account_number">Account #</label>
+                    <label for="account_number">Account # <span class="required">*</span></label>
                     <input type="text" name="account_number" id="account_number" placeholder="Account Number" value="<?=htmlspecialchars($record['account_number']??'', ENT_QUOTES)?>" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="routing_number">Routing</label>
+                    <label for="routing_number">Routing <span class="required">*</span></label>
                     <input type="text" name="routing_number" id="routing_number" placeholder="Routing Number" value="<?=htmlspecialchars($record['routing_number']??'', ENT_QUOTES)?>" required>
                 </div>
             </div>
@@ -237,7 +138,7 @@ if (isset($_GET['id'])) {
                 </div>
                 
                 <div class="form-group">
-                    <label for="filepath">Filepath</label>
+                    <label for="filepath">Filepath <span class="required">*</span></label>
                     <input type="text" name="filepath" id="filepath" placeholder="Image Path" value="<?=htmlspecialchars($record['filepath']??'', ENT_QUOTES)?>" required>
                 </div>
             </div>
@@ -245,25 +146,25 @@ if (isset($_GET['id'])) {
             <!-- Row 3: Name + Description (2/3 width) -->
             <div class="form-row-2-1">
                 <div class="form-group">
-                    <label for="name">Name</label>
+                    <label for="name">Name <span class="required">*</span></label>
                     <input type="text" name="name" id="name" placeholder="Name on Card" value="<?=htmlspecialchars($record['name']??'Barbara Moore', ENT_QUOTES)?>" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="description">Description</label>
+                    <label for="description">Description <span class="required">*</span></label>
                     <input type="text" name="description" id="description" placeholder="Card Description" value="<?=htmlspecialchars($record['description']??'', ENT_QUOTES)?>" required>
                 </div>
             </div>
 
-            <!-- Row 4: Card Number + Expires + Code + Zip Code -->
+            <!-- Row 4: Card Number + Expires + Code -->
             <div class="form-row">
                 <div class="form-group">
-                    <label for="card_number">Card Number</label>
+                    <label for="card_number">Card Number <span class="required">*</span></label>
                     <input type="text" name="card_number" id="card_number" placeholder="#### #### #### ####" value="<?=htmlspecialchars($record['card_number']??'', ENT_QUOTES)?>" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="expires">Expires</label>
+                    <label for="expires">Expires <span class="required">*</span></label>
                     <input type="text" name="expires" id="expires" placeholder="MM/YY" value="<?=htmlspecialchars($record['expires']??'', ENT_QUOTES)?>" required>
                 </div>
                 
@@ -280,16 +181,14 @@ if (isset($_GET['id'])) {
             </div>
 
         </div>
+        <div class="form-actions">
+            <a href="financial-institutions.php" class="btn btn-secondary">Cancel</a>
+            <?php if ($page == 'Edit'): ?>
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this record?')">
+            <?php endif; ?>
+            <input type="submit" name="submit" value="Save" class="btn btn-success">
+        </div>
     </div>
-
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="financial-institutions.php" class="btn alt mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this record?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn btn-success">
-    </div>
-
 </form> 
 <script src="assets/js/resource-system-script.js"></script>
 <?=template_admin_footer()?>
