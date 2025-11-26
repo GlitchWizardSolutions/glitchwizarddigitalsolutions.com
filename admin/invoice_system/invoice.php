@@ -151,10 +151,8 @@ if (isset($_GET['id'])) {
         
         // Create notification for unpaid invoices only
         if ($_POST['payment_status'] != 'Paid') {
-            $invoice_total = $payment_amount + $tax_total;
-            $notification_message = "NEW - Invoice #{$inv} - Amount due: $" . number_format($invoice_total, 2);
-            
-            $stmt = $pdo->prepare('INSERT INTO client_notifications (client_id, invoice_id, message, is_read, created_at) VALUES (?, ?, ?, 0, NOW())');
+        $invoice_total = $payment_amount + $tax_total;
+        $notification_message = "NEW - Invoice #{$inv}<br>Amount due: $" . number_format($invoice_total, 2);            $stmt = $pdo->prepare('INSERT INTO client_notifications (client_id, invoice_id, message, is_read, created_at) VALUES (?, ?, ?, 0, NOW())');
             $stmt->execute([$_POST['client_id'], $invoice['id'], $notification_message]);
         }
         

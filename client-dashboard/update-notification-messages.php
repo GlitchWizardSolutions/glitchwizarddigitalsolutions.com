@@ -45,12 +45,13 @@ if ($notifications) {
         if (preg_match('/New invoice #([^\s]+) created - Amount due: \$(.+)/', $old_message, $matches)) {
             $invoice_num = $matches[1];
             $amount = $matches[2];
-            $new_message = "NEW - Invoice #{$invoice_num} - Amount due: $$amount";
+            $new_message = "NEW - Invoice #{$invoice_num}<br>Amount due: $$amount";
         }
-        // Update "NEW - Invoice #XXX - Amount due: $YYY" (already has prefix, just keep it)
-        elseif (preg_match('/NEW - Invoice #(.+) - Amount due: \$(.+)/', $old_message, $matches)) {
-            // Already in correct format, skip
-            $new_message = $old_message;
+        // Update "NEW - Invoice #XXX - Amount due: $YYY" (remove dash)
+        elseif (preg_match('/NEW - Invoice #([^\s-]+)\s*-\s*Amount due: \$(.+)/', $old_message, $matches)) {
+            $invoice_num = $matches[1];
+            $amount = $matches[2];
+            $new_message = "NEW - Invoice #{$invoice_num}<br>Amount due: $$amount";
         }
         // Update "Payment of $XXX received for Invoice #YYY. Invoice is now fully paid."
         elseif (preg_match('/Payment of \$([^\s]+) received for Invoice #([^\.]+)\. Invoice is now fully paid\./', $old_message, $matches)) {
