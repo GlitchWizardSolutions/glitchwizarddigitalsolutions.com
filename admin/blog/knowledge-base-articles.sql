@@ -2,6 +2,10 @@
 -- Run this in glitchwizarddigi_envato_blog_db database
 -- This will create 6 initial articles with proper categories
 
+-- Set character set to support emojis and special characters
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- First, let's make sure we have the Getting Started category
 INSERT INTO categories (category, slug) VALUES 
 ('Getting Started', 'getting-started')
