@@ -75,48 +75,75 @@ if (isset($_GET['id'])) {
 }
 ?>
 <?=template_admin_header($page . ' Medications', 'resources', 'meds')?>
+
+<?=generate_breadcrumbs([
+    ['label' => 'Medications', 'url' => 'meds.php'],
+    ['label' => $page . ' Medication']
+])?>
+
 <div class="content-title mb-3">
     <div class="title">
      <i class="fa-solid fa-user-secret"></i>
         <div class="txt">
              <h2 class="responsive-width-100"><?=$page?> Medications</h2>
+             <p>Manage medication records</p>
         </div>
     </div>
 </div>
 <form action="" method="post">
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="meds.php" class="btn alt mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this item?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn">
-    </div>
-
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
-  
-            <label for="patient"><i class="required">*</i> Patient</label>
-            <input id="patient" type="text" name="patient" placeholder="Patient" value="<?=htmlspecialchars($record['patient'], ENT_QUOTES)?>" required>
-            <label for="type"> Type</label>
-            <input id="type" type="text" name="type" placeholder="Type" value="<?=htmlspecialchars($record['type'], ENT_QUOTES)?>">
-
-            <label for="name"> Name</label>
-            <input id="name" type="text" name="name" placeholder="Name" value="<?=htmlspecialchars($record['name'], ENT_QUOTES)?>" >
-    
-            <label for="dosage"> Dosage</label>
-            <input id="dosage" type="text" name="dosage" placeholder="Dosage" value="<?=htmlspecialchars($record['dosage'], ENT_QUOTES)?>">
-
-            <label for="type">Frequency</label>
-            <input id="frequency" type="text" name="frequency" placeholder="Frequency" value="<?=htmlspecialchars($record['frequency'], ENT_QUOTES)?>" >
-
-            <label for="notes">Notes</label>
-            <input id="notes" type="text" name="notes" placeholder="Notes" value="<?=htmlspecialchars($record['notes'], ENT_QUOTES)?>" >
-            <label for="status">Status</label>
-            <input id="status" type="text" name="status" placeholder="Status" value="<?=htmlspecialchars($record['status'], ENT_QUOTES)?>" >
-    
-
+    <div class="form-professional">
+        
+        <!-- Medication Information Section -->
+        <div class="form-section">
+            <h3 class="section-title">Medication Information</h3>
+            
+            <div class="form-group">
+                <label for="patient">Patient <span class="required">*</span></label>
+                <input id="patient" type="text" name="patient" placeholder="Patient name" value="<?=htmlspecialchars($record['patient'], ENT_QUOTES)?>" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Medication Name</label>
+                    <input id="name" type="text" name="name" placeholder="Medication name" value="<?=htmlspecialchars($record['name'], ENT_QUOTES)?>" >
+                </div>
+                
+                <div class="form-group">
+                    <label for="type">Type</label>
+                    <input id="type" type="text" name="type" placeholder="Type" value="<?=htmlspecialchars($record['type'], ENT_QUOTES)?>">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dosage">Dosage</label>
+                    <input id="dosage" type="text" name="dosage" placeholder="Dosage amount" value="<?=htmlspecialchars($record['dosage'], ENT_QUOTES)?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="frequency">Frequency</label>
+                    <input id="frequency" type="text" name="frequency" placeholder="How often" value="<?=htmlspecialchars($record['frequency'], ENT_QUOTES)?>" >
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="status">Status</label>
+                <input id="status" type="text" name="status" placeholder="Active, Discontinued, etc." value="<?=htmlspecialchars($record['status'], ENT_QUOTES)?>" >
+            </div>
+            
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" placeholder="Additional notes..." rows="4"><?=htmlspecialchars($record['notes'], ENT_QUOTES)?></textarea>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <a href="meds.php" class="btn btn-secondary">Cancel</a>
+            <?php if ($page == 'Edit'): ?>
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this medication?')">
+            <?php endif; ?>
+            <input type="submit" name="submit" value="Save" class="btn btn-success">
         </div>
 
     </div>

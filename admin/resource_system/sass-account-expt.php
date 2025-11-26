@@ -86,31 +86,33 @@ if (isset($_POST['file_type'])) {
     <div class="title">
     <i class="fa-solid fa-file-export fa-lg"></i>
         <div class="txt">
-                  <h2 class="responsive-width-100">Export Records</h2>
-            <p>Export records to CSV, TXT, JSON, or XML file.</p>
+                  <h2 class="responsive-width-100">Export SASS Accounts</h2>
+            <p>Export records to CSV, TXT, JSON, or XML file</p>
         </div>
     </div>
 </div>
 
 <form action="" method="post">
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="sass-accounts.php" class="btn alt mar-right-2">Cancel</a>
-        <input type="submit" name="submit" value="Export" class="btn btn-success">
-    </div>
-
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
-
-            <label for="file_type"><i class="required">*</i> File Type</label>
-            <select id="file_type" name="file_type" required>
-                <option value="csv">CSV</option>
-                <option value="txt">TXT</option>
-                <option value="json">JSON</option>
-                <option value="xml">XML</option>
-            </select>
-
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Export Options</h3>
+            
+            <div class="form-group">
+                <label for="file_type">File Type <span class="required">*</span></label>
+                <select id="file_type" name="file_type" required>
+                    <option value="csv">CSV</option>
+                    <option value="txt">TXT</option>
+                    <option value="json">JSON</option>
+                    <option value="xml">XML</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <a href="sass-accounts.php" class="btn btn-secondary">Cancel</a>
+            <input type="submit" name="submit" value="Export" class="btn btn-success">
         </div>
 
     </div>

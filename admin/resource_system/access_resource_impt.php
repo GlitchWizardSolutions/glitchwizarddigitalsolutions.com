@@ -58,40 +58,46 @@ if (isset($_POST['submit'])) {
     <div class="title">
     <i class="fa-solid fa-file-import fa-lg"></i>
         <div class="txt">
-                  <h2 class="responsive-width-100">Import Records</h2>
-            <p>Import records from a CSV file, fill in the form below and submit.</p>
+                  <h2 class="responsive-width-100">Import Access Resources</h2>
+            <p>Import project access credentials from a CSV file</p>
         </div>
     </div>
 </div>
+
+<?php if ($error_msg): ?>
+<div class="msg error">
+    <p><?=$error_msg?></p>
+</div>
+<?php endif; ?>
+
+<?php if ($success_msg): ?>
+<div class="msg success">
+    <p><?=$success_msg?></p>
+</div>
+<?php endif; ?>
  
-    <form action="" method="post" enctype="multipart/form-data" class="crud-form">
+<form action="" method="post" enctype="multipart/form-data">
 
-    <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="is_importants.php" class="btn alt mar-right-2">Cancel</a>
-        <button type="submit" name="submit" class="btn btn-success">Import</button>
-    </div>
-    <div class="content-block">
-
-        <div class="form responsive-width-100">
-        <div class="cols">
-            <div class="form-control">
-                <label for="csv">CSV File</label>
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">File Upload</h3>
+            
+            <div class="form-group">
+                <label for="csv">CSV File <span class="required">*</span></label>
                 <input type="file" name="csv" id="csv" accept=".csv" required>
+                <small>Upload a CSV file with access resource data</small>
             </div>
         </div>
+        
+        <div class="form-actions">
+            <a href="is_importants.php" class="btn btn-secondary">Cancel</a>
+            <button type="submit" name="submit" class="btn btn-success">Import</button>
+        </div>
 
-        <?php if ($error_msg): ?>
-        <p class="msg-error"><?=$error_msg?></p>
-        <?php endif; ?>
-
-        <?php if ($success_msg): ?>
-        <p class="msg-success"><?=$success_msg?></p>
-        <?php endif; ?>
-        <br>
-         </div>
-
-    </div>      
-    </form>
+    </div>
+      
+</form>
 
 
 <script src="assets/js/not_important_script.js"></script>
