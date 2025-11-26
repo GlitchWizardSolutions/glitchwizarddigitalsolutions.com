@@ -3,15 +3,15 @@
 -- This will create 6 initial articles with proper categories
 
 -- First, let's make sure we have the Getting Started category
-INSERT INTO categories (name, description) VALUES 
-('Getting Started', 'Essential guides to help you navigate the client portal')
-ON DUPLICATE KEY UPDATE description = 'Essential guides to help you navigate the client portal';
+INSERT INTO categories (category, slug) VALUES 
+('Getting Started', 'getting-started')
+ON DUPLICATE KEY UPDATE slug = 'getting-started';
 
 -- Get the category ID (you may need to adjust this based on your existing categories)
-SET @getting_started_cat = (SELECT id FROM categories WHERE name = 'Getting Started' LIMIT 1);
+SET @getting_started_cat = (SELECT id FROM categories WHERE category = 'Getting Started' LIMIT 1);
 
 -- Article 1: How to Use the Knowledge Base (FEATURED)
-INSERT INTO posts (title, slug, content, image, date, category, active, featured, author) VALUES (
+INSERT INTO posts (title, slug, content, image, date, time, category_id, active, featured, author_id) VALUES (
 'How to Use the Knowledge Base',
 'how-to-use-knowledge-base',
 '<div class="kb-article">
@@ -67,15 +67,16 @@ INSERT INTO posts (title, slug, content, image, date, category, active, featured
 </div>
 </div>',
 '/client-dashboard/blog/assets/img/kb/kb-overview-homepage.png',
-NOW(),
+CURDATE(),
+CURTIME(),
 @getting_started_cat,
 'Yes',
 'Yes',
-'Admin'
+1
 );
 
 -- Article 2: How to Use the Ticketing System
-INSERT INTO posts (title, slug, content, image, date, category, active, featured, author) VALUES (
+INSERT INTO posts (title, slug, content, image, date, time, category_id, active, featured, author_id) VALUES (
 'How to Use the Ticketing System',
 'how-to-use-ticketing-system',
 '<div class="kb-article">
@@ -172,15 +173,16 @@ INSERT INTO posts (title, slug, content, image, date, category, active, featured
 </div>
 </div>',
 '/client-dashboard/blog/assets/img/kb/ticket-submit-form.png',
-NOW(),
+CURDATE(),
+CURTIME(),
 @getting_started_cat,
 'Yes',
 'No',
-'Admin'
+1
 );
 
 -- Article 3: How to Use the Documentation System
-INSERT INTO posts (title, slug, content, image, date, category, active, featured, author) VALUES (
+INSERT INTO posts (title, slug, content, image, date, time, category_id, active, featured, author_id) VALUES (
 'How to Use the Documentation System',
 'how-to-use-documentation-system',
 '<div class="kb-article">
@@ -277,15 +279,16 @@ INSERT INTO posts (title, slug, content, image, date, category, active, featured
 </div>
 </div>',
 '/client-dashboard/blog/assets/img/kb/docs-file-list.png',
-NOW(),
+CURDATE(),
+CURTIME(),
 @getting_started_cat,
 'Yes',
 'No',
-'Admin'
+1
 );
 
 -- Article 4: How to View and Pay Invoices
-INSERT INTO posts (title, slug, content, image, date, category, active, featured, author) VALUES (
+INSERT INTO posts (title, slug, content, image, date, time, category_id, active, featured, author_id) VALUES (
 'How to View and Pay Invoices',
 'how-to-view-and-pay-invoices',
 '<div class="kb-article">
@@ -422,15 +425,16 @@ INSERT INTO posts (title, slug, content, image, date, category, active, featured
 </ul>
 </div>',
 '/client-dashboard/blog/assets/img/kb/invoice-detail.png',
-NOW(),
+CURDATE(),
+CURTIME(),
 @getting_started_cat,
 'Yes',
 'No',
-'Admin'
+1
 );
 
 -- Article 5: How to Update Your Profile & Business Information
-INSERT INTO posts (title, slug, content, image, date, category, active, featured, author) VALUES (
+INSERT INTO posts (title, slug, content, image, date, time, category_id, active, featured, author_id) VALUES (
 'How to Update Your Profile and Business Information',
 'how-to-update-profile',
 '<div class="kb-article">
@@ -551,15 +555,16 @@ INSERT INTO posts (title, slug, content, image, date, category, active, featured
 </ol>
 </div>',
 '/client-dashboard/blog/assets/img/kb/profile-edit-form.png',
-NOW(),
+CURDATE(),
+CURTIME(),
 @getting_started_cat,
 'Yes',
 'No',
-'Admin'
+1
 );
 
 -- Article 6: How to Change Your Username and Password
-INSERT INTO posts (title, slug, content, image, date, category, active, featured, author) VALUES (
+INSERT INTO posts (title, slug, content, image, date, time, category_id, active, featured, author_id) VALUES (
 'How to Change Your Username and Password',
 'how-to-change-username-password',
 '<div class="kb-article">
@@ -734,11 +739,12 @@ INSERT INTO posts (title, slug, content, image, date, category, active, featured
 </ul>
 </div>',
 '/client-dashboard/blog/assets/img/kb/password-change-form.png',
-NOW(),
+CURDATE(),
+CURTIME(),
 @getting_started_cat,
 'Yes',
 'No',
-'Admin'
+1
 );
 
 -- Success message
@@ -751,5 +757,5 @@ SELECT
     active,
     date
 FROM posts 
-WHERE category = @getting_started_cat
+WHERE category_id = @getting_started_cat
 ORDER BY id DESC;
