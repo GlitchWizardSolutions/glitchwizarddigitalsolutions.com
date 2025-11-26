@@ -91,6 +91,91 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Project']
 ])?>
 
+<style>
+.form-professional {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.form-professional .form {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+.form-professional label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+}
+
+.form-professional input[type="text"],
+.form-professional input[type="number"],
+.form-professional select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #6b46c1;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.form-professional input:focus,
+.form-professional select:focus {
+    outline: none;
+    border-color: #8e44ad;
+    box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.15);
+    background: #ffffff;
+}
+
+.form-professional select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b46c1' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 0;
+}
+
+.form-row .form-group {
+    margin-bottom: 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select {
+    margin-bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
 <div class="content-title">
     <div class="title">
        <i class="fa-solid fa-diagram-project"></i>
@@ -100,99 +185,86 @@ if (isset($_GET['id'])) {
         </div>
     </div>
 </div>
-<form action="" method="post">
 
+<form action="" method="post" class="form-professional">
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
         <a href="client-projects.php" class="btn alt mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this project AND it's logs?')">
+        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this project AND it\'s logs?')">
         <?php endif; ?>
         <input type="submit" name="submit" value="Save" class="btn">
     </div>
 
     <div class="content-block">
-
         <div class="form responsive-width-100">
 
-           <div class="form-control" style='width:80%'>
-                <label for="acc_id">Account</label>
-                <select name="acc_id" id="acc_id" required> 
-            
-            <?php foreach($accounts as $row) :?>
-             <?php 
-                    $selected='';
-                    $value=$row['id'];
-                    $match=$record['acc_id'];
-                    if($value==$match){
-                       $selected='selected';
-                    }
-               ?>
-             <option value='<?=$value?>'<?=$selected;?>><?=$value?>&nbsp;<?=$row['full_name'] ?></option>
-            
-            <?php endforeach ?>
-                </select>
-            </div>
-            
-         <div class="form-control" style='width:80%'>
-                <label for="domain_id">Domain</label>
-                <select name="domain_id" id="domain_id" required> 
-            
-            <?php foreach($domain as $row) :?>
-             <?php 
-                    $selected='';
-                    $value=$row['id'];
-                    $match=$record['domain_id'];
-                    if($value==$match){
-                       $selected='selected';
-                    }
-               ?>
-             <option value='<?=$value?>'<?=$selected;?>><?=$value?>&nbsp;<?=$row['domain'] ?></option>
-            
-            <?php endforeach ?>
-                </select>
-            </div>
-            
-            
-        <div class="form-control" style='width:80%'>
-                <label for="project_type_id">Project Type</label>
-                <select name="project_type_id" id="project_type_id" required> 
-            
-            <?php foreach($project_type as $row) :?>
-             <?php 
-                    $selected='';
-                    $value=$row['id'];
-                    $match=$record['project_type_id'];
-                    if($value==$match){
-                       $selected='selected';
-                    }
-               ?>
-             <option value='<?=$value?>'<?=$selected;?>><?=$value?>&nbsp;<?=$row['name'] ?></option>
-            
-            <?php endforeach ?>
-                </select>
+            <!-- Row 1: Account + Domain -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="acc_id">Account</label>
+                    <select name="acc_id" id="acc_id" required> 
+                        <option value="">Select Account</option>
+                        <?php foreach($accounts as $row): ?>
+                            <?php $selected = ($record['acc_id'] == $row['id']) ? 'selected' : ''; ?>
+                            <option value="<?=$row['id']?>" <?=$selected?>><?=$row['full_name']?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="domain_id">Domain</label>
+                    <select name="domain_id" id="domain_id" required> 
+                        <option value="">Select Domain</option>
+                        <?php foreach($domain as $row): ?>
+                            <?php $selected = ($record['domain_id'] == $row['id']) ? 'selected' : ''; ?>
+                            <option value="<?=$row['id']?>" <?=$selected?>><?=$row['domain']?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
             </div>
 
-            <label for="subject"><i class="required">*</i> Project Name</label>
-            <input id="subject" type="text" name="subject" placeholder="Name of Project" value="<?=htmlspecialchars($record['subject'], ENT_QUOTES)?>" required>
+            <!-- Row 2: Project Name + Project Type -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="subject">Project Name</label>
+                    <input type="text" name="subject" id="subject" placeholder="Name of Project" value="<?=htmlspecialchars($record['subject']??'', ENT_QUOTES)?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="project_type_id">Project Type</label>
+                    <select name="project_type_id" id="project_type_id" required> 
+                        <option value="">Select Type</option>
+                        <?php foreach($project_type as $row): ?>
+                            <?php $selected = ($record['project_type_id'] == $row['id']) ? 'selected' : ''; ?>
+                            <option value="<?=$row['id']?>" <?=$selected?>><?=$row['name']?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
 
-            <label for="client_quote"><i class="required">*</i> Client Quote</label>
-            <input id="client_quote" type="text" name="client_quote" placeholder="Client Quote" value="<?=htmlspecialchars($record['client_quote'], ENT_QUOTES)?>" required>
-    
-            <label for="dev_comment"> Dev Comment</label>
-            <input id="dev_comment" type="text" name="dev_comment" placeholder="Dev Comment" value="<?=htmlspecialchars($record['dev_comment'], ENT_QUOTES)?>">
+            <!-- Row 3: Client Quote + Dev Comment -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="client_quote">Client Quote</label>
+                    <input type="text" name="client_quote" id="client_quote" placeholder="Client Quote" value="<?=htmlspecialchars($record['client_quote']??'', ENT_QUOTES)?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dev_comment">Dev Comment</label>
+                    <input type="text" name="dev_comment" id="dev_comment" placeholder="Dev Comment" value="<?=htmlspecialchars($record['dev_comment']??'', ENT_QUOTES)?>">
+                </div>
+            </div>
 
         </div>
-
     </div>
 
     <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="client-projects.php" class="btn btn-secondary mar-right-2">Cancel</a>
+        <a href="client-projects.php" class="btn alt mar-right-2">Cancel</a>
         <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this project AND it\'s logs?')">
+        <input type="submit" name="delete" value="Delete" class="btn red mar-right-2" onclick="return confirm('Are you sure you want to delete this project AND it\'s logs?')">
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn btn-success">
+        <input type="submit" name="submit" value="Save" class="btn">
     </div>
-
 </form>
 
 <script src="assets/js/resource-system-script.js"></script>
