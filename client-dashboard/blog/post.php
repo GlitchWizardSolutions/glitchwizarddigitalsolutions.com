@@ -87,7 +87,7 @@ $post_slug = $row['slug'];
 // Check if user is logged in and get their info
 $logged_in = isset($_SESSION['loggedin']) || isset($_SESSION['bloggedin']);
 $current_username = '';
-$current_avatar = '/public_html/assets/img/avatar.png'; // Default avatar with full path
+$current_avatar = '/assets/img/avatar.png'; // Default avatar
 
 if (isset($_SESSION['loggedin']) && isset($_SESSION['name'])) {
     // Portal user - session uses 'name' not 'username'
@@ -186,17 +186,17 @@ if (isset($_SESSION['loggedin']) && isset($_SESSION['name'])) {
                                     
                                     if ($user) {
                                         $author = $user['username'];
-                                        $avatar = !empty($user['avatar']) ? $user['avatar'] : '/public_html/assets/img/avatar.png';
+                                        $avatar = !empty($user['avatar']) ? $user['avatar'] : '/assets/img/avatar.png';
                                         $badge = '<span class="badge bg-primary">Member</span>';
                                     } else {
                                         $author = 'Unknown User';
-                                        $avatar = '/public_html/assets/img/avatar.png';
+                                        $avatar = '/assets/img/avatar.png';
                                         $badge = '<span class="badge bg-secondary">Guest</span>';
                                     }
                                 } else {
                                     // Guest or blog user
                                     $author = 'Guest';
-                                    $avatar = '/public_html/assets/img/avatar.png';
+                                    $avatar = '/assets/img/avatar.png';
                                     $badge = '<span class="badge bg-secondary">Guest</span>';
                                 }
                         ?>
