@@ -77,7 +77,7 @@ $url = 'tickets.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' 
 ?>
 <?=template_admin_header('Tickets', 'tickets', 'view')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-ticket"></i>
         <div class="txt">

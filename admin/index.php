@@ -235,7 +235,7 @@ $media_awaiting_approval = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <?=template_admin_header('Dashboard', 'dashboard')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="icon alt"><?=svg_icon_dashboard()?></div>
     <div class="txt">
         <h2>Admin Dashboard</h2>

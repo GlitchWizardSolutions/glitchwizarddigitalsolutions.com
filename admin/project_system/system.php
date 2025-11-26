@@ -83,7 +83,7 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <?=template_admin_header('Dashboard', 'dashboard')?>
 <!--commenting out some, trying to get a better dashboard overview of what's important only.  Can always see individual dashboards later -->
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-gauge-high"></i>
         <div class="txt">
@@ -231,7 +231,7 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-ticket alt"></i>
         <div class="txt">
@@ -286,7 +286,7 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <h2>Active Campaigns</h2>
 </div>
 
@@ -398,7 +398,7 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <br><br>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <h2>New Subscribers</h2>
 </div>
 
@@ -566,7 +566,7 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-photo-film alt"></i>
         <div class="txt">
@@ -576,7 +576,7 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fas fa-user-plus alt"></i>
         <div class="txt">

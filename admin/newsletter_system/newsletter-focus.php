@@ -34,7 +34,7 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
     ['label' => 'Newsletter Overview']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="icon alt"><?=svg_icon_newsletter()?></div>
     <div class="txt">
         <h2 class="responsive-width-100">Newsletter System</h2>
@@ -87,7 +87,7 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <h2>Active Campaigns</h2>
 </div>
 
@@ -199,7 +199,7 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <br><br>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <h2>New Subscribers</h2>
 </div>
 

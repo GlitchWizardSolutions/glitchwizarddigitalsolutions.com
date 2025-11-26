@@ -35,7 +35,7 @@ $resolved_tickets_total = $stmt->fetchColumn();
 ?>
 <?=template_admin_header('Manage Project Tickets', 'ticketing', 'projects')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <h2>Project System</h2>
 </div>
 

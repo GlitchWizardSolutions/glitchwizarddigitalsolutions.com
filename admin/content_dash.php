@@ -88,7 +88,7 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
     ['label' => 'Content Dashboard']
 ])?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="icon alt"><?=svg_icon_content()?></div>
     <div class="txt">
         <h2>Client Content Dashboard</h2>
@@ -142,7 +142,7 @@ $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <div class="txt">
             <h2>Today's Media</h2>

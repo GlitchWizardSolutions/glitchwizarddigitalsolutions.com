@@ -60,7 +60,7 @@ $url = 'comments.php?search=' . $search;
 ?>
 <?=template_admin_header('Comments', 'comments')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-comments"></i>
         <div class="txt">

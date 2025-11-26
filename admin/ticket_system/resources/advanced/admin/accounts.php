@@ -48,7 +48,7 @@ $url = 'accounts.php?search=' . $search;
 ?>
 <?=template_admin_header('Accounts', 'accounts', 'view')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-users"></i>
         <div class="txt">

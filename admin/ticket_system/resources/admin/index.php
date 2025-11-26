@@ -27,7 +27,7 @@ $resolved_tickets_total = $stmt->fetchColumn();
 ?>
 <?=template_admin_header('Dashboard', 'dashboard')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-gauge-high"></i>
         <div class="txt">
@@ -83,7 +83,7 @@ $resolved_tickets_total = $stmt->fetchColumn();
     </div>
 </div>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
         <i class="fa-solid fa-ticket alt"></i>
         <div class="txt">

@@ -82,7 +82,7 @@ if (isset($_GET['id'])) {
 ?>
 <?=template_admin_header($page . ' Project Ticket', 'projects', 'manage')?>
 
-<div class="content-title">
+<div class="content-title mb-3">
     <div class="title">
     <i class="fa-solid fa-person-through-window  fa-lg"></i>
         <div class="txt">
