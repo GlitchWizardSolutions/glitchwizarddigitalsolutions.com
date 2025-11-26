@@ -47,6 +47,11 @@ if ($notifications) {
             $amount = $matches[2];
             $new_message = "NEW - Invoice #{$invoice_num} - Amount due: $$amount";
         }
+        // Update "NEW - Invoice #XXX - Amount due: $YYY" (already has prefix, just keep it)
+        elseif (preg_match('/NEW - Invoice #(.+) - Amount due: \$(.+)/', $old_message, $matches)) {
+            // Already in correct format, skip
+            $new_message = $old_message;
+        }
         // Update "Payment of $XXX received for Invoice #YYY. Invoice is now fully paid."
         elseif (preg_match('/Payment of \$([^\s]+) received for Invoice #([^\.]+)\. Invoice is now fully paid\./', $old_message, $matches)) {
             $amount = $matches[1];
@@ -73,11 +78,18 @@ if ($notifications) {
             $balance = $matches[3];
             $new_message = "PARTIAL - Invoice #{$invoice_num}<br><div style='display:flex;justify-content:space-between;max-width:200px'><span>Received:</span><span>$$amount</span></div><div style='display:flex;justify-content:space-between;max-width:200px'><span>Balance:</span><span>$$balance</span></div>";
         }
-        // Update newer PAID format to add line breaks
-        elseif (preg_match('/PAID - Invoice #([^\s]+) - Payment of \$([^\s]+) received\. Fully paid\./', $old_message, $matches)) {
+        // Update format: "PAID - Invoice #XXX - Payment of $YYY received. Fully paid."
+        elseif (preg_match('/PAID - Invoice #([^\s-]+)\s*-\s*Payment of \$([^\s]+) received\. Fully paid\./', $old_message, $matches)) {
             $invoice_num = $matches[1];
             $amount = $matches[2];
             $new_message = "PAID - Invoice #{$invoice_num}<br><div style='display:flex;justify-content:space-between;max-width:200px'><span>Received:</span><span>$$amount</span></div>";
+        }
+        // Update format: "PARTIAL - Invoice #XXX - Payment of $YYY received. Balance: $ZZZ"
+        elseif (preg_match('/PARTIAL - Invoice #([^\s-]+)\s*-\s*Payment of \$([^\s]+) received\. Balance: \$(.+)/', $old_message, $matches)) {
+            $invoice_num = $matches[1];
+            $amount = $matches[2];
+            $balance = $matches[3];
+            $new_message = "PARTIAL - Invoice #{$invoice_num}<br><div style='display:flex;justify-content:space-between;max-width:200px'><span>Received:</span><span>$$amount</span></div><div style='display:flex;justify-content:space-between;max-width:200px'><span>Balance:</span><span>$$balance</span></div>";
         }
         // Update current PAID format: "PAID - Invoice #XXX Received: $YYY" (no br tags yet)
         elseif (preg_match('/PAID - Invoice #([^\s]+)\s+Received: \$(.+)/', $old_message, $matches)) {
@@ -90,13 +102,6 @@ if ($notifications) {
             $invoice_num = $matches[1];
             $amount = $matches[2];
             $new_message = "PAID - Invoice #{$invoice_num}<br><div style='display:flex;justify-content:space-between;max-width:200px'><span>Received:</span><span>$$amount</span></div>";
-        }
-        // Update newer PARTIAL format to add line breaks
-        elseif (preg_match('/PARTIAL - Invoice #([^\s]+) - Payment of \$([^\s]+) received\. Balance: \$(.+)/', $old_message, $matches)) {
-            $invoice_num = $matches[1];
-            $amount = $matches[2];
-            $balance = $matches[3];
-            $new_message = "PARTIAL - Invoice #{$invoice_num}<br><div style='display:flex;justify-content:space-between;max-width:200px'><span>Received:</span><span>$$amount</span></div><div style='display:flex;justify-content:space-between;max-width:200px'><span>Balance:</span><span>$$balance</span></div>";
         }
         // Update current PARTIAL format: "PARTIAL - Invoice #XXX Received: $YYY Balance: $ZZZ" (no br tags yet)
         elseif (preg_match('/PARTIAL - Invoice #([^\s]+)\s+Received: \$([^\s]+)\s+Balance: \$(.+)/', $old_message, $matches)) {
