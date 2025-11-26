@@ -94,107 +94,98 @@ if (isset($_GET['id'])) {
         </div>
     </div>
 </div>
-<br><br>
+
 <form action="" method="post" enctype="multipart/form-data">
-   <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="tickets.php" class="btn btn-secondary mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this ticket?')">
-        <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn btn-success">
-    </div>
-
-    <div class="content-block">
-        <div class="form-professional">
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Ticket Information</h3>
             
-            <div class="form-section">
-                <h3 class="section-title">Ticket Information</h3>
-                
-                <div class="form-group">
-                    <label for="title"><i class="required">*</i> Title</label>
-                    <input id="title" type="text" name="title" placeholder="Enter ticket title" value="<?=htmlspecialchars($ticket['title'], ENT_QUOTES)?>" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="msg"><i class="required">*</i> Message</label>
-                    <textarea id="msg" name="msg" placeholder="Describe the ticket details..." required><?=htmlspecialchars($ticket['msg'], ENT_QUOTES)?></textarea>
-                </div>
+            <div class="form-group">
+                <label for="title">Title <span class="required">*</span></label>
+                <input id="title" type="text" name="title" placeholder="Enter ticket title" value="<?=htmlspecialchars($ticket['title'], ENT_QUOTES)?>" required>
             </div>
 
-            <div class="form-section">
-                <h3 class="section-title">Ticket Settings</h3>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="ticket_status"><i class="required">*</i> Status</label>
-                        <select id="ticket_status" name="ticket_status" required>
-                            <option value="new"<?=$ticket['ticket_status']=='new'?' selected':''?>>New</option>
-                            <option value="open"<?=$ticket['ticket_status']=='open'?' selected':''?>>Open</option>
-                            <option value="paused"<?=$ticket['ticket_status']=='paused'?' selected':''?>>Paused</option>
-                            <option value="closed"<?=$ticket['ticket_status']=='closed'?' selected':''?>>Closed</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="priority"><i class="required">*</i> Priority</label>
-                        <select id="priority" name="priority" required>
-                            <option value="low"<?=$ticket['priority']=='low'?' selected':''?>>Low</option>
-                            <option value="medium"<?=$ticket['priority']=='medium'?' selected':''?>>Medium</option>
-                            <option value="high"<?=$ticket['priority']=='high'?' selected':''?>>High</option>
-                            <option value="critical"<?=$ticket['priority']=='critical'?' selected':''?>>Critical</option>
-                            <option value="paused"<?=$ticket['priority']=='paused'?' selected':''?>>Paused</option>
-                            <option value="closed"<?=$ticket['priority']=='closed'?' selected':''?>>Closed</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="category_id"><i class="required">*</i> Category</label>
-                        <select id="category_id" name="category_id" required>
-                            <?php foreach ($categories as $category): ?>
-                            <option value="<?=$category['id']?>"<?=$ticket['category_id']==$category['id']?' selected':''?>><?=$category['title']?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="reminder_date"><i class="required">*</i> Review Date</label>
-                        <?php 
-                        if($ticket['reminder_date']){
-                            $value=$ticket['reminder_date'];
-                        }else{
-                            $td= new DateTime();
-                            $td->modify('+1 year');
-                            $value=$td->format('Y-m-d');
-                        }?>
-                        <input id="reminder_date" type="date" name="reminder_date" value="<?=$value?>" required>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label for="msg">Message <span class="required">*</span></label>
+                <textarea id="msg" name="msg" rows="6" placeholder="Describe the ticket details..." required><?=htmlspecialchars($ticket['msg'], ENT_QUOTES)?></textarea>
             </div>
-
-            <?php if (attachments && $page == 'Create'): ?>
-            <div class="form-section">
-                <h3 class="section-title">Attachments</h3>
-                
-                <div class="form-group">
-                    <label for="attachments">Upload Files</label>
-                    <div class="file-upload-wrapper">
-                        <input type="file" name="attachments[]" id="attachments" accept=".<?=str_replace(',', ',.', attachments_allowed)?>" multiple>
-                        <span class="file-upload-hint">Accepted formats: <?=str_replace(',', ', ', attachments_allowed)?></span>
-                    </div>
-                </div>
-            </div>
-            <?php endif; ?>
-
         </div>
-    </div>
-  <div class="content-title responsive-flex-wrap responsive-pad-bot-3">
-        <a href="tickets.php" class="btn btn-secondary mar-right-2">Cancel</a>
-        <?php if ($page == 'Edit'): ?>
-        <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-2" onclick="return confirm('Are you sure you want to delete this ticket?')">
+
+        <div class="form-section">
+            <h3 class="section-title">Ticket Settings</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="ticket_status">Status <span class="required">*</span></label>
+                    <select id="ticket_status" name="ticket_status" required>
+                        <option value="new"<?=$ticket['ticket_status']=='new'?' selected':''?>>New</option>
+                        <option value="open"<?=$ticket['ticket_status']=='open'?' selected':''?>>Open</option>
+                        <option value="paused"<?=$ticket['ticket_status']=='paused'?' selected':''?>>Paused</option>
+                        <option value="closed"<?=$ticket['ticket_status']=='closed'?' selected':''?>>Closed</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="priority">Priority <span class="required">*</span></label>
+                    <select id="priority" name="priority" required>
+                        <option value="low"<?=$ticket['priority']=='low'?' selected':''?>>Low</option>
+                        <option value="medium"<?=$ticket['priority']=='medium'?' selected':''?>>Medium</option>
+                        <option value="high"<?=$ticket['priority']=='high'?' selected':''?>>High</option>
+                        <option value="critical"<?=$ticket['priority']=='critical'?' selected':''?>>Critical</option>
+                        <option value="paused"<?=$ticket['priority']=='paused'?' selected':''?>>Paused</option>
+                        <option value="closed"<?=$ticket['priority']=='closed'?' selected':''?>>Closed</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="category_id">Category <span class="required">*</span></label>
+                    <select id="category_id" name="category_id" required>
+                        <?php foreach ($categories as $category): ?>
+                        <option value="<?=$category['id']?>"<?=$ticket['category_id']==$category['id']?' selected':''?>><?=$category['title']?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reminder_date">Review Date <span class="required">*</span></label>
+                    <?php 
+                    if($ticket['reminder_date']){
+                        $value=$ticket['reminder_date'];
+                    }else{
+                        $td= new DateTime();
+                        $td->modify('+1 year');
+                        $value=$td->format('Y-m-d');
+                    }?>
+                    <input id="reminder_date" type="date" name="reminder_date" value="<?=$value?>" required>
+                </div>
+            </div>
+        </div>
+
+        <?php if (attachments && $page == 'Create'): ?>
+        <div class="form-section">
+            <h3 class="section-title">Attachments</h3>
+            
+            <div class="form-group">
+                <label for="attachments">Upload Files</label>
+                <div class="file-upload-wrapper">
+                    <input type="file" name="attachments[]" id="attachments" accept=".<?=str_replace(',', ',.', attachments_allowed)?>" multiple>
+                    <span class="file-upload-hint">Accepted formats: <?=str_replace(',', ', ', attachments_allowed)?></span>
+                </div>
+            </div>
+        </div>
         <?php endif; ?>
-        <input type="submit" name="submit" value="Save" class="btn btn-success">
+        
+        <div class="form-actions">
+            <a href="tickets.php" class="btn btn-secondary">Cancel</a>
+            <?php if ($page == 'Edit'): ?>
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this ticket?')">
+            <?php endif; ?>
+            <input type="submit" name="submit" value="Save" class="btn btn-success">
+        </div>
+
     </div>
 </form>
 

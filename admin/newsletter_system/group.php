@@ -46,39 +46,45 @@ if (isset($_GET['id'])) {
     ['label' => $page . ' Group']
 ])?>
 
-<form method="post" class="form-professional">
+<div class="content-title mb-3">
+    <div class="icon alt"><?=svg_icon_newsletter()?></div>
+    <div class="txt">
+        <h2><?=$page?> Group</h2>
+        <p class="subtitle"><?=$page == 'Edit' ? 'Modify subscriber group' : 'Create new subscriber group'?></p>
+    </div>
+</div>
 
-    <div class="content-title mb-3">
-        <div class="icon alt"><?=svg_icon_newsletter()?></div>
-        <div class="txt">
-            <h2><?=$page?> Group</h2>
-            <p class="subtitle"><?=$page == 'Edit' ? 'Modify subscriber group' : 'Create new subscriber group'?></p>
+<form method="post">
+    <div class="form-professional">
+        
+        <div class="form-section">
+            <h3 class="section-title">Group Details</h3>
+
+            <div class="form-group">
+                <label for="title">Title <span class="required">*</span></label>
+                <input id="title" type="text" name="title" placeholder="Title" value="<?=htmlspecialchars($group['title'], ENT_QUOTES)?>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4" placeholder="Description"><?=htmlspecialchars($group['description'], ENT_QUOTES)?></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="submit_date">Submit Date</label>
+                <input id="submit_date" type="datetime-local" name="submit_date" value="<?=date('Y-m-d\TH:i', strtotime($group['submit_date']))?>">
+            </div>
         </div>
-        <div class="btns">
-            <a href="groups.php" class="btn btn-secondary mar-right-1">Cancel</a>
+        
+        <div class="form-actions">
+            <a href="groups.php" class="btn btn-secondary">Cancel</a>
             <?php if ($page == 'Edit'): ?>
-            <input type="submit" name="delete" value="Delete" class="btn btn-danger mar-right-1" onclick="return confirm('Are you sure you want to delete this group?')">
+            <input type="submit" name="delete" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this group?')">
             <?php endif; ?>
             <input type="submit" name="submit" value="Save" class="btn btn-success">
         </div>
+
     </div>
-
-    <div class="form-section">
-        <h3 class="section-title">Group Details</h3>
-
-            <label for="title"><span class="required">*</span> Title</label>
-            <input id="title" type="text" name="title" placeholder="Title" value="<?=htmlspecialchars($group['title'], ENT_QUOTES)?>" required>
-
-            <label for="description">Description</label>
-            <textarea id="description" name="description" placeholder="Description"><?=htmlspecialchars($group['description'], ENT_QUOTES)?></textarea>
-
-            <label for="submit_date">Submit Date</label>
-            <input id="submit_date" type="datetime-local" name="submit_date" value="<?=date('Y-m-d\TH:i', strtotime($group['submit_date']))?>">
-
-        </div>
-    
-    </div>
-
 </form>
 
 <?=template_admin_footer()?>
