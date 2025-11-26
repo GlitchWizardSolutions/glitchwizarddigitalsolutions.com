@@ -190,8 +190,10 @@ if (isset($_POST['subject'])) {
     $errors = [];
     
     foreach ($_POST['recipients'] as $recipient_email) {
-        // Replace placeholders in the content
+        // Replace placeholders in the content for each recipient
         $content = $_POST['content'];
+        
+        // First replace custom placeholders
         foreach ($placeholders as $placeholder) {
             $content = str_replace($placeholder['placeholder_text'], $placeholder['placeholder_value'], $content);
         }
@@ -201,17 +203,17 @@ if (isset($_POST['subject'])) {
         $stmt->execute([ $recipient_email ]);
         $subscriber = $stmt->fetch(PDO::FETCH_ASSOC);
         
+        // Use BASE_URL instead of broken website_url
+        $base_url = defined('BASE_URL') ? BASE_URL : 'https://glitchwizarddigitalsolutions.com/';
+        
         if ($subscriber) {
             // Generate unique tracking code for this subscriber
             $tracking_code = sha1($subscriber['id'] . $subscriber['email'] . time());
+            $unsubscribe_link = $base_url . 'unsubscribe.php?id=' . sha1($subscriber['id'] . $subscriber['email']);
             
-            // Use BASE_URL instead of broken website_url (which points to non-existent /newsletter/ folder)
-            $base_url = defined('BASE_URL') ? BASE_URL : 'https://glitchwizarddigitalsolutions.com/';
-            $unsubscribe_link = $base_url . 'admin/newsletter_system/unsubscribe.php?id=' . sha1($subscriber['id'] . $subscriber['email']);
-            
-            // Replace tracking placeholders with actual tracking codes
-            $content = str_replace('%open_tracking_code%', '<img src="' . $base_url . 'admin/newsletter_system/tracking.php?action=open&id=' . $tracking_code . '" width="1" height="1" alt="">', $content);
-            $content = str_replace('%click_link%', $base_url . 'admin/newsletter_system/tracking.php?action=click&id=' . $tracking_code . '&url=', $content);
+            // Replace tracking placeholders with actual tracking codes (PUBLIC URLs, not in /admin/)
+            $content = str_replace('%open_tracking_code%', '<img src="' . $base_url . 'tracking.php?action=open&id=' . $tracking_code . '" width="1" height="1" alt="">', $content);
+            $content = str_replace('%click_link%', $base_url . 'tracking.php?action=click&id=' . $tracking_code . '&url=', $content);
             $content = str_replace('%unsubscribe_link%', $unsubscribe_link, $content);
         } else {
             // For non-subscribers (custom emails), remove tracking codes
@@ -221,7 +223,6 @@ if (isset($_POST['subject'])) {
         }
         
         // Convert relative image URLs to absolute URLs for email compatibility
-        $base_url = defined('BASE_URL') ? BASE_URL : 'https://glitchwizarddigitalsolutions.com/';
         $content = preg_replace('/src="uploads\//', 'src="' . $base_url . 'admin/newsletter_system/uploads/', $content);
         $content = preg_replace('/src="\.\.\/uploads\//', 'src="' . $base_url . 'admin/newsletter_system/uploads/', $content);
         
@@ -252,12 +253,18 @@ if (isset($_POST['subject'])) {
     }
 }
 // iterate attachments and move files to the attachments directory
-if (isset($_FILES['attachments']) && is_array($_FILES['attachments'])) {
+if (isset($_FILES['attachments']) && is_array($_FILES['attachments']['name'])) {
     $attachments = [];
+    $directory = '../attachments/';
+    
+    // Create directory if it doesn't exist
+    if (!is_dir($directory)) {
+        mkdir($directory, 0755, true);
+    }
+    
     foreach ($_FILES['attachments']['name'] as $key => $name) {
-        if ($_FILES['attachments']['error'][$key] == 0) {
+        if (!empty($name) && $_FILES['attachments']['error'][$key] == 0) {
             $tmp_name = $_FILES['attachments']['tmp_name'][$key];
-            $directory = '../attachments/';
             $fileInfo = pathinfo($name);
             $filename = $fileInfo['filename'];
             $extension = isset($fileInfo['extension']) ? '.' . $fileInfo['extension'] : '';
@@ -267,8 +274,9 @@ if (isset($_FILES['attachments']) && is_array($_FILES['attachments'])) {
                 $path = $directory . $filename . '-' . $counter . $extension;
                 $counter++;
             }
-            move_uploaded_file($tmp_name, $path);
-            $attachments[] = str_replace('../', '', $path);
+            if (move_uploaded_file($tmp_name, $path)) {
+                $attachments[] = str_replace('../', '', $path);
+            }
         }
     }
     // output as json
