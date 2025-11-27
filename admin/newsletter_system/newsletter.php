@@ -59,6 +59,8 @@ if (isset($_GET['id'])) {
                     // Attempt to modify the column to LONGTEXT utf8mb4 and convert table
                     $pdo->exec("ALTER TABLE newsletters MODIFY content LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
                     $pdo->exec("ALTER TABLE newsletters CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                            // Ensure the connection is using utf8mb4 at the client level before retrying
+                            try { $pdo->exec("SET NAMES 'utf8mb4'"); } catch (Exception $e) { error_log('SET NAMES failed during retry: ' . $e->getMessage()); }
                     // Retry the update
                     $stmt = $pdo->prepare('UPDATE newsletters SET title = ?, content = ?, attachments = ? WHERE id = ?');
                     $stmt->execute([ $_POST['title'], $_POST['content'], $all_attachments, $_GET['id'] ]);
@@ -95,6 +97,8 @@ if (isset($_GET['id'])) {
                 try {
                     $pdo->exec("ALTER TABLE newsletters MODIFY content LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
                     $pdo->exec("ALTER TABLE newsletters CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                    // Ensure the connection is using utf8mb4 at the client level before retrying
+                    try { $pdo->exec("SET NAMES 'utf8mb4'"); } catch (Exception $e) { error_log('SET NAMES failed during retry: ' . $e->getMessage()); }
                     // Retry insert
                     $stmt = $pdo->prepare('INSERT INTO newsletters (title,content,attachments,submit_date) VALUES (?,?,?,?)');
                     $stmt->execute([ $_POST['title'], $_POST['content'], $all_attachments, date('Y-m-d H:i:s') ]);

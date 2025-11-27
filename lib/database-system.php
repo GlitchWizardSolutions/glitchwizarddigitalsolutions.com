@@ -41,6 +41,13 @@ class DatabasePool {
                     $pass
                 );
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                // Ensure the connection uses the configured charset at the client level
+                try {
+                    $pdo->exec("SET NAMES '" . db_charset . "'");
+                } catch (Exception $e) {
+                    // If SET NAMES fails, log and continue; some environments don't allow this command
+                    error_log('Warning: SET NAMES failed: ' . $e->getMessage());
+                }
                 self::$connections[$key] = $pdo;
             } catch (PDOException $exception) {
                 error_log("Failed to connect to database '$dbname': " . $exception->getMessage());
