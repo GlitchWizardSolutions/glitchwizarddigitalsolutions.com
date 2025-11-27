@@ -495,6 +495,13 @@ tinymce.init({
     automatic_uploads: true,
     images_upload_url: 'sendmail.php',
     
+    // Link settings - prevent protocol stripping
+    link_default_protocol: 'https',
+    link_assume_external_targets: true,
+    convert_urls: false,  // Prevent URL conversion
+    relative_urls: false,  // Use absolute URLs
+    remove_script_host: false,  // Keep the protocol and host
+    
     // Image settings for email compatibility
     image_dimensions: false,  // Hide width/height input fields
     image_class_list: [
