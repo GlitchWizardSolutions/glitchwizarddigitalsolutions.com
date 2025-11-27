@@ -181,8 +181,9 @@ if (isset($_POST['subject'])) {
     // Get attachments and convert to absolute paths
     $attachments = isset($_POST['attachments']) ? $_POST['attachments'] : [];
     $attachments = array_map(function($attachment) {
-        // Convert to absolute path from the newsletter_system directory
-        $abs_path = __DIR__ . '/' . $attachment;
+        // The attachment path is relative like "attachments/file.pdf"
+        // Convert to absolute path - go up one level from newsletter_system to admin
+        $abs_path = dirname(__DIR__) . '/' . $attachment;
         return $abs_path;
     }, $attachments);
     
@@ -497,7 +498,8 @@ tinymce.init({
     
     // Link settings - prevent protocol stripping
     link_default_protocol: 'https',
-    link_assume_external_targets: true,
+    link_assume_external_targets: false,  // Don't show external link warning
+    allow_unsafe_link_target: true,  // Allow all link targets without warning
     convert_urls: false,  // Prevent URL conversion
     relative_urls: false,  // Use absolute URLs
     remove_script_host: false,  // Keep the protocol and host
