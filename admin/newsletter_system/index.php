@@ -29,6 +29,19 @@ $campaigns = $pdo->query('SELECT
     (SELECT COUNT(*) FROM campaign_opens co WHERE co.campaign_id = c.id) AS total_opens  
     FROM campaigns c WHERE c.status = "Active"
 ')->fetchAll(PDO::FETCH_ASSOC);
+
+// Get overall totals (use try/catch to avoid warnings if tables are missing)
+try {
+    $subscribers_total = (int) $pdo->query('SELECT COUNT(*) FROM subscribers')->fetchColumn();
+} catch (Exception $e) {
+    $subscribers_total = 0;
+}
+
+try {
+    $newsletters_total = (int) $pdo->query('SELECT COUNT(*) FROM newsletters')->fetchColumn();
+} catch (Exception $e) {
+    $newsletters_total = 0;
+}
 ?>
 <?=template_admin_header('Dashboard', 'dashboard')?>
 
