@@ -46,10 +46,14 @@ if (isset($_GET['id'])) {
         $current_attachments = isset($_POST['current_attachments']) ? $_POST['current_attachments'] : [];
         $all_attachments = array_merge($current_attachments, $attachments);
         $all_attachments = $all_attachments ? implode(',', $all_attachments) : null;
-        $stmt = $pdo->prepare('UPDATE newsletters SET title = ?, content = ?, attachments = ? WHERE id = ?');
-        $stmt->execute([ $_POST['title'], $_POST['content'], $all_attachments, $_GET['id'] ]);
-        header('Location: newsletters.php?success_msg=2');
-        exit;
+        try {
+            $stmt = $pdo->prepare('UPDATE newsletters SET title = ?, content = ?, attachments = ? WHERE id = ?');
+            $stmt->execute([ $_POST['title'], $_POST['content'], $all_attachments, $_GET['id'] ]);
+            header('Location: newsletters.php?success_msg=2');
+            exit;
+        } catch (PDOException $e) {
+            $error_msg = 'Database error: ' . $e->getMessage();
+        }
     }
     if (isset($_POST['delete'])) {
         // Delete the newsletter
@@ -63,10 +67,14 @@ if (isset($_GET['id'])) {
         $current_attachments = isset($_POST['current_attachments']) ? $_POST['current_attachments'] : [];
         $all_attachments = array_merge($current_attachments, $attachments);
         $all_attachments = $all_attachments ? implode(',', $all_attachments) : null;
-        $stmt = $pdo->prepare('INSERT INTO newsletters (title,content,attachments,submit_date) VALUES (?,?,?,?)');
-        $stmt->execute([ $_POST['title'], $_POST['content'], $all_attachments, date('Y-m-d H:i:s') ]);
-        header('Location: newsletters.php?success_msg=1');
-        exit;
+        try {
+            $stmt = $pdo->prepare('INSERT INTO newsletters (title,content,attachments,submit_date) VALUES (?,?,?,?)');
+            $stmt->execute([ $_POST['title'], $_POST['content'], $all_attachments, date('Y-m-d H:i:s') ]);
+            header('Location: newsletters.php?success_msg=1');
+            exit;
+        } catch (PDOException $e) {
+            $error_msg = 'Database error: ' . $e->getMessage();
+        }
     }
 }
 // If copying an existing newsletter
@@ -88,6 +96,12 @@ if (isset($_GET['copy'])) {
     ['label' => 'Newsletters', 'url' => 'newsletters.php'],
     ['label' => $page . ' Newsletter']
 ])?>
+
+<?php if (!empty($error_msg)): ?>
+    <div style="margin:12px 0;padding:12px;border-radius:6px;background:#fff3e0;color:#c46200;">
+        <strong>Error:</strong> <?=htmlspecialchars($error_msg, ENT_QUOTES)?>
+    </div>
+<?php endif; ?>
 
 <div class="content-title mb-3">
     <div class="title">
