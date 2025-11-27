@@ -28,20 +28,13 @@ if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
     require_once __DIR__ . '/phpmailer/SMTP.php';
 }
 
-// Load OAuth2 library if it exists (for Microsoft 365 OAuth2 authentication)
-if (file_exists(__DIR__ . '/vendor/autoload.php')) {
-    require_once __DIR__ . '/vendor/autoload.php';
-}
-
 // Namespaces
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\OAuth;
-use League\OAuth2\Client\Provider\GenericProvider;
 
 /**
  * Configure PHPMailer instance with SMTP settings
- * Handles both password and OAuth2 authentication
+ * Uses password authentication
  * 
  * @param PHPMailer $mail PHPMailer instance to configure
  * @return void
@@ -49,80 +42,6 @@ use League\OAuth2\Client\Provider\GenericProvider;
 function configure_smtp_mail($mail) {
     // Only configure if SMTP is enabled
     if (SMTP == true) {
-        // Use OAuth2 if enabled, otherwise use password authentication
-        if (defined('use_oauth2') && use_oauth2) {
-            configure_oauth2_mail($mail);
-        } else {
-            $mail->isSMTP();
-            $mail->Host = smtp_host;
-            $mail->SMTPAuth = true;
-            $mail->Username = smtp_user;
-            $mail->Password = smtp_pass;
-            $mail->SMTPSecure = smtp_secure == 'tls' ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
-            $mail->Port = smtp_port;
-        }
-    }
-}
-
-/**
- * Configure PHPMailer with OAuth2 for Microsoft 365
- * @param PHPMailer $mail PHPMailer instance to configure
- * @return void
- */
-function configure_oauth2_mail($mail) {
-    // Check if OAuth2 library is available
-    if (!class_exists('League\OAuth2\Client\Provider\GenericProvider')) {
-        error_log("OAuth2 library not available, falling back to password authentication");
-        // Fallback to regular SMTP
-        $mail->isSMTP();
-        $mail->Host = smtp_host;
-        $mail->SMTPAuth = true;
-        $mail->Username = smtp_user;
-        $mail->Password = smtp_pass;
-        $mail->SMTPSecure = smtp_secure == 'tls' ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
-        $mail->Port = smtp_port;
-        return;
-    }
-    
-    error_log("Starting OAuth2 configuration...");
-    
-    // Create OAuth2 provider for Microsoft 365
-    $provider = new GenericProvider([
-        'clientId'                => oauth_client_id,
-        'clientSecret'            => oauth_client_secret,
-        'urlAuthorize'            => 'https://login.microsoftonline.com/' . oauth_tenant_id . '/oauth2/v2.0/authorize',
-        'urlAccessToken'          => 'https://login.microsoftonline.com/' . oauth_tenant_id . '/oauth2/v2.0/token',
-        'urlResourceOwnerDetails' => '',
-        'scopes'                  => 'https://outlook.office365.com/.default'
-    ]);
-    
-    // Get access token using client credentials grant
-    try {
-        $accessToken = $provider->getAccessToken('client_credentials', [
-            'scope' => 'https://outlook.office365.com/.default'
-        ]);
-        
-        // Configure SMTP with OAuth2
-        $mail->isSMTP();
-        $mail->Host = smtp_host;
-        $mail->Port = smtp_port;
-        $mail->SMTPSecure = smtp_secure;
-        $mail->SMTPAuth = true;
-        $mail->AuthType = 'XOAUTH2';
-        
-        // Set OAuth2 token
-        $mail->setOAuth(
-            new OAuth([
-                'provider' => $provider,
-                'clientId' => oauth_client_id,
-                'clientSecret' => oauth_client_secret,
-                'refreshToken' => $accessToken->getRefreshToken() ?? '',
-                'userName' => smtp_user,
-            ])
-        );
-    } catch (Exception $e) {
-        error_log('OAuth2 configuration failed: ' . $e->getMessage());
-        // Fall back to password authentication
         $mail->isSMTP();
         $mail->Host = smtp_host;
         $mail->SMTPAuth = true;
