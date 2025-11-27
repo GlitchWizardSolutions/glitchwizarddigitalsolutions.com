@@ -178,10 +178,12 @@ if (isset($_POST['subject'])) {
         exit('Error: No recipients selected');
     }
     
-    // Get attachments
+    // Get attachments and convert to absolute paths
     $attachments = isset($_POST['attachments']) ? $_POST['attachments'] : [];
     $attachments = array_map(function($attachment) {
-        return '../' . $attachment;
+        // Convert to absolute path from the newsletter_system directory
+        $abs_path = __DIR__ . '/' . $attachment;
+        return $abs_path;
     }, $attachments);
     
     // Send email to each recipient
@@ -216,10 +218,11 @@ if (isset($_POST['subject'])) {
             $content = str_replace('%click_link%', $base_url . 'tracking.php?action=click&id=' . $tracking_code . '&url=', $content);
             $content = str_replace('%unsubscribe_link%', $unsubscribe_link, $content);
         } else {
-            // For non-subscribers (custom emails), remove tracking codes
+            // For non-subscribers (custom emails), just convert click links to regular links without tracking
             $content = str_replace('%open_tracking_code%', '', $content);
+            // Replace %click_link% with nothing so the URL becomes a normal link
             $content = str_replace('%click_link%', '', $content);
-            $content = str_replace('%unsubscribe_link%', '', $content);
+            $content = str_replace('%unsubscribe_link%', '#', $content);
         }
         
         // Convert relative image URLs to absolute URLs for email compatibility
