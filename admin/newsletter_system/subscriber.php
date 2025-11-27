@@ -11,6 +11,16 @@ $subscriber = [
 ];
 // Get groups
 $groups = $pdo->query('SELECT * FROM `groups` ORDER BY title ASC')->fetchAll();
+
+// Handle adding a new group
+if (isset($_POST['add_new_group']) && !empty($_POST['new_group_name'])) {
+    $stmt = $pdo->prepare('INSERT INTO `groups` (title) VALUES (?)');
+    $stmt->execute([ trim($_POST['new_group_name']) ]);
+    // Refresh groups list
+    $groups = $pdo->query('SELECT * FROM `groups` ORDER BY title ASC')->fetchAll();
+    $success_msg = 'Group "' . htmlspecialchars($_POST['new_group_name']) . '" added successfully!';
+}
+
 // Add subscriber groups to the database
 function addSubscriberGroups($pdo, $subscriber_id) {
     if (isset($_POST['groups']) && is_array($_POST['groups']) && count($_POST['groups']) > 0) {
@@ -151,18 +161,38 @@ if (isset($_GET['id'])) {
 
             <div class="form-group">
                 <label for="groups">Groups</label>
-                <div class="multiselect" data-name="groups[]">
-                    <?php foreach ($subscriber['groups'] as $group): ?>
-                    <span class="item" data-value="<?=$group['id']?>">
-                        <i class="remove">&times;</i><?=$group['title']?>
-                        <input type="hidden" name="groups[]" value="<?=$group['id']?>">
-                    </span>
-                    <?php endforeach; ?>
-                    <input type="text" class="search" id="group" placeholder="Groups">
-                    <div class="list">
-                        <?php foreach ($groups as $group): ?>
-                        <span data-value="<?=$group['id']?>"><?=$group['title']?></span>
+                <div class="groups-container" style="border: 1px solid #ddd; padding: 15px; border-radius: 4px; background: #f9f9f9;">
+                    <?php if (count($groups) > 0): ?>
+                        <?php 
+                        $subscriber_group_ids = array_column($subscriber['groups'], 'id');
+                        foreach ($groups as $group): 
+                        ?>
+                        <div style="margin-bottom: 8px;">
+                            <label style="display: flex; align-items: center; cursor: pointer; font-weight: normal;">
+                                <input type="checkbox" name="groups[]" value="<?=$group['id']?>" 
+                                    <?=in_array($group['id'], $subscriber_group_ids) ? 'checked' : ''?>
+                                    style="margin-right: 8px;">
+                                <span><?=htmlspecialchars($group['title'], ENT_QUOTES)?></span>
+                            </label>
+                        </div>
                         <?php endforeach; ?>
+                    <?php else: ?>
+                        <p style="color: #999; margin: 0;">No groups available. Add one below.</p>
+                    <?php endif; ?>
+                    
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                        <button type="button" class="btn btn-sm" onclick="document.getElementById('new-group-form').style.display='block'; this.style.display='none';" style="background: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer;">
+                            + Add New Group
+                        </button>
+                        <div id="new-group-form" style="display: none; margin-top: 10px;">
+                            <input type="text" id="new_group_name" name="new_group_name" placeholder="Enter new group name" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 3px; margin-bottom: 8px;">
+                            <button type="submit" name="add_new_group" class="btn btn-sm" style="background: #2196F3; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; margin-right: 5px;">
+                                Create Group
+                            </button>
+                            <button type="button" class="btn btn-sm" onclick="document.getElementById('new-group-form').style.display='none'; document.getElementById('new_group_name').value=''; this.parentElement.previousElementSibling.style.display='block';" style="background: #999; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer;">
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

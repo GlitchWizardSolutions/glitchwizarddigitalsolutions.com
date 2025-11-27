@@ -247,7 +247,7 @@ $url = 'subscribers.php?search_query=' . $search . (isset($_GET['status']) ? '&s
                     </td>
                     <td><?=htmlspecialchars($subscriber['email'], ENT_QUOTES)?></td>
                     <td class="responsive-hidden">
-                        <?php foreach (array_filter(explode(',', $subscriber['groups'])) as $group): ?>
+                        <?php foreach (array_filter(explode(',', $subscriber['groups'] ?? '')) as $group): ?>
                         <span class="grey"><?=htmlspecialchars($group, ENT_QUOTES)?></span>
                         <?php endforeach; ?>
                     </td>
