@@ -558,7 +558,7 @@ if ($settings['layout'] == 'Wide') {
 ?></b></span>
 			</a>
 			
-			<form class="col-12 col-lg-auto mb-3 mb-lg-0" action="search" method="GET">
+			<form class="col-12 col-lg-auto mb-3 mb-lg-0" action="search.php" method="GET">
 				<div class="input-group">
 					<input type="search" class="form-control" placeholder="Search" name="q" value="<?php
 if (isset($_GET['q'])) {
