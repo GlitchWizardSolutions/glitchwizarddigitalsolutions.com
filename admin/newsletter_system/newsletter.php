@@ -242,6 +242,141 @@ tinymce.init({
     promotion: false,
     automatic_uploads: true,
     images_upload_url: 'sendmail.php',
+    // Image upload handler (match sendmail editor behaviour)
+    images_upload_handler: function (blobInfo, progress) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'sendmail.php', true);
+
+            const formData = new FormData();
+            formData.append('newsletter_image', blobInfo.blob(), blobInfo.filename());
+
+            xhr.upload.onprogress = (e) => {
+                progress(e.loaded / e.total * 100);
+            };
+
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    try {
+                        const json = JSON.parse(xhr.responseText);
+                        if (json.error) {
+                            reject(json.error);
+                        } else {
+                            resolve(json.location);
+                        }
+                    } catch (err) {
+                        reject('Invalid JSON response from server');
+                    }
+                } else {
+                    reject('HTTP Error: ' + xhr.status);
+                }
+            };
+
+            xhr.onerror = () => {
+                reject('Image upload failed');
+            };
+
+            xhr.send(formData);
+        });
+    },
+    file_picker_callback: function(callback, value, meta) {
+        if (meta.filetype === 'image') {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+
+            input.onchange = function() {
+                const file = this.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function() {
+                    const formData = new FormData();
+                    formData.append('newsletter_image', file);
+
+                    fetch('sendmail.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                        } else {
+                            callback(data.location, { 
+                                alt: file.name.replace(/\.[^/.]+$/, ''),
+                                class: 'responsive-image'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        alert('Upload failed: ' + error);
+                    });
+                };
+
+                reader.readAsDataURL(file);
+            };
+
+            if (confirm('Click OK to upload a new image, or Cancel to browse existing images')) {
+                input.click();
+            } else {
+                fetch('sendmail.php?list_images=1')
+                    .then(response => response.json())
+                    .then(images => {
+                        if (images.length === 0) {
+                            alert('No images uploaded yet. Please upload an image first.');
+                            input.click();
+                            return;
+                        }
+
+                        let html = '<div style="padding: 20px; max-height: 400px; overflow-y: auto;">';
+                        html += '<h3 style="margin-top: 0;">Select an Image</h3>';
+                        html += '<p style="color: #666; font-size: 13px; margin-bottom: 15px;">Images will automatically be responsive in email templates</p>';
+                        html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">';
+
+                        images.forEach((img) => {
+                            html += `
+                                <div style="border: 2px solid #ddd; border-radius: 8px; padding: 10px; cursor: pointer; text-align: center;" 
+                                     onclick="selectImage('${img.value}', '${img.title}')" 
+                                     onmouseover="this.style.borderColor='#6b46c1'" 
+                                     onmouseout="this.style.borderColor='#ddd'">
+                                    <img src="${img.value}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 4px;">
+                                    <div style="margin-top: 5px; font-size: 11px; color: #666; overflow: hidden; text-overflow: ellipsis;">${img.title}</div>
+                                </div>
+                            `;
+                        });
+
+                        html += '</div>';
+                        html += '<div style="margin-top: 20px; text-align: center;">';
+                        html += '<button onclick="closeImageBrowser()" style="padding: 8px 20px; background: #6b46c1; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>';
+                        html += '</div>';
+                        html += '</div>';
+
+                        const modal = document.createElement('div');
+                        modal.id = 'image-browser-modal';
+                        modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+
+                        const content = document.createElement('div');
+                        content.style.cssText = 'background: white; border-radius: 8px; max-width: 800px; width: 90%; max-height: 80vh; overflow: hidden;';
+                        content.innerHTML = html;
+
+                        modal.appendChild(content);
+                        document.body.appendChild(modal);
+
+                        window.selectImage = function(src, alt) {
+                            callback(src, { 
+                                alt: alt.replace(/\.[^/.]+$/, ''),
+                                class: 'responsive-image'
+                            });
+                            closeImageBrowser();
+                        };
+
+                        window.closeImageBrowser = function() {
+                            document.getElementById('image-browser-modal').remove();
+                        };
+                    });
+            }
+        }
+    },
     // Link settings - preserve full URLs and avoid protocol stripping
     link_default_protocol: 'https',
     link_assume_external_targets: false,

@@ -39,16 +39,16 @@
        	<link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/responsive.css?key=<?php echo time(); ?>">
 
   <!-- Vendor CSS Files -->
-  <link href="<?php public_path ?>client-dashboard/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?php public_path ?>client-dashboard/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?php public_path ?>client-dashboard/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="<?php public_path ?>client-dashboard/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="<?php public_path ?>client-dashboard/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="<?php public_path ?>client-dashboard/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="<?php public_path ?>client-dashboard/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?php echo site_menu_base ?>client-dashboard/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?php echo site_menu_base ?>client-dashboard/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?php echo site_menu_base ?>client-dashboard/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?php echo site_menu_base ?>client-dashboard/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?php echo site_menu_base ?>client-dashboard/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?php echo site_menu_base ?>client-dashboard/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?php echo site_menu_base ?>client-dashboard/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
-  <!-- Template Main CSS File -->  
-  <link href="<?php public_path ?>client-dashboard/dist/css/navik-all.min.css"  rel="stylesheet">
-  <link href="<?php public_path ?>client-dashboard/assets/css/style.css" rel="stylesheet">
-  <script src="<?php public_path ?>client-dashboard/assets/js/jquery-3.7.1.min.js"></script>
+    <!-- Template Main CSS File -->  
+    <link href="<?php echo site_menu_base ?>client-dashboard/dist/css/navik-all.min.css"  rel="stylesheet">
+    <link href="<?php echo site_menu_base ?>client-dashboard/assets/css/style.css" rel="stylesheet">
+    <script src="<?php echo site_menu_base ?>client-dashboard/assets/js/jquery-3.7.1.min.js"></script>
 <?php $debug=0?>

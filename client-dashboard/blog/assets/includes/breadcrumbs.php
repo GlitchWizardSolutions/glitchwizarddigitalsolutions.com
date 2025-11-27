@@ -13,7 +13,7 @@ if ($pageName=='template.php'){
 
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href=public_path . "client-dashboard/index.php">Home</a></li>
+          <li class="breadcrumb-item"><a href="<?php echo site_menu_base ?>client-dashboard/index.php">Home</a></li>
          <?php if ($pageName=='template.php'): ?>
          <li class="breadcrumb-item active">Template</li>
 
