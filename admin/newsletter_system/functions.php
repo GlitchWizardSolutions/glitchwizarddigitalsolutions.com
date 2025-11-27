@@ -84,11 +84,32 @@ function base_template($content, $title = 'Newsletter') {
 }
 // Replace placeholders function
 function replace_placeholders($content) {
+    // Basic time/placeholders
     $content = str_replace(
-        ['%year%', '%month%', '%day%', '%date%', '%time%', '%website_url%'], 
-        [date('Y'), date('m'), date('d'), date('Y-m-d'), date('H:i:s'), website_url], 
+        ['%year%', '%month%', '%day%', '%date%', '%time%', '%website_url%', '%company_name%'], 
+        [date('Y'), date('m'), date('d'), date('Y-m-d'), date('H:i:s'), website_url, defined('company_name') ? company_name : ''], 
         $content
     );
+
+    // Replace any custom placeholders defined in the admin UI (table: custom_placeholders)
+    // Use the global $pdo connection if available
+    global $pdo;
+    if (isset($pdo)) {
+        try {
+            $placeholders = $pdo->query('SELECT placeholder_text, placeholder_value FROM custom_placeholders')->fetchAll(PDO::FETCH_ASSOC);
+            if ($placeholders) {
+                foreach ($placeholders as $ph) {
+                    if (!empty($ph['placeholder_text'])) {
+                        $content = str_replace($ph['placeholder_text'], $ph['placeholder_value'], $content);
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            // If the table doesn't exist or query fails, silently continue (non-fatal)
+            error_log('replace_placeholders: could not load custom_placeholders - ' . $e->getMessage());
+        }
+    }
+
     return $content;
 }
 ?>
