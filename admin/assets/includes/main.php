@@ -7,7 +7,8 @@ EDIT:     2025-01-04 Bug Identified: Closing toggle aside.
 EDIT:     2025-02-11 Bug Identified: elipses dropdown not opening.
 EDIT:     2025-06-19 Integrated Blog System
 */
-error_log('Loading Page admin/assets/includes/main: ');
+// Comment removed for performance - this was writing to wtfh_log on every admin page load
+// error_log('Loading Page admin/assets/includes/main: ');
 include public_path .'/client-invoices/defines.php'; 
 
 /**
@@ -223,7 +224,7 @@ function template_admin_header($title, $selected = 'dashboard', $selected_child 
            <a href= "' . $base_url . '/budget_system/mom_report/"' . ($selected == 'budget' && $selected_child == 'mom' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span><strong>Bill Schedule</strong></a>
          </div>
 <!--Return to Home-->        
-   <a href= "' . $outside_url . '/client-dashboard/index.php"' . ($selected == 'home' ? '      class="selected"' : '') . ' title="Return to Home">
+   <a href= "' . $outside_url . 'client-dashboard/index.php"' . ($selected == 'home' ? '      class="selected"' : '') . ' title="Return to Home">
             <span class="icon"><svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 2H2V17H4V4H17V2M21 22L18.5 20.32L16 22L13.5 20.32L11 22L8.5 20.32L6 22V6H21V22M10 10V12H17V10H10M15 14H10V16H15V14Z" /></svg></span>
             <span class="txt"> Return to Home</span>
             </a>     
@@ -248,12 +249,12 @@ echo '<!DOCTYPE html>
         <meta name="viewport" content="width=device-width,minimum-scale=1">
         <title>' . $title . '</title>
         <!--<script src="https://cdn.tiny.cloud/1/clsvhjw7tz9roxwuptbq27vjj5em0lyxkitpdd1p2xed6jpx/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>-->
-        <link rel="icon" type="image/png" <a href= "' . $outside_url . '/assets/imgs/purple-logo-sm.png">
-        <link href= "' . $outside_url . '/assets/css/css_handler/invoice-system-admin.css?v=' . time() . '" rel="stylesheet" type="text/css">
+        <link rel="icon" type="image/png" <a href= "' . $outside_url . 'assets/imgs/purple-logo-sm.png">
+        <link href= "' . $outside_url . 'assets/css/css_handler/invoice-system-admin.css" rel="stylesheet" type="text/css">
         <!-- Removed missing files: mdb.min.css and styles.css -->
         <!-- <link rel="stylesheet" href= "' . $base_url. '/cms/assets/css/mdb.min.css" /> -->
         <!-- <link rel="stylesheet" href= "' . $base_url. '/cms/assets/css/styles.css" /> -->
-        <link href= "' . $base_url. '/assets/css/admin.css?v=' . time() . '" rel="stylesheet" type="text/css"> 
+        <link href= "' . $base_url. '/assets/css/admin.css" rel="stylesheet" type="text/css"> 
         <!--Upgraded to 3.7.1 6-19-25 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">--> 
            <!-- Bootstrap 5 -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -278,7 +279,7 @@ echo '<!DOCTYPE html>
             </h1>
             ' . $admin_links . '
             <div class="footer">
-                Admin Dashboard by <a href= "' . $outside_url . '/" target="_blank">GlitchWizard Solutions, LLC</a>
+                Admin Dashboard by <a href= "' . $outside_url . '" target="_blank">GlitchWizard Solutions, LLC</a>
                 Version 3.0.1
             </div>
         </aside>
@@ -302,7 +303,7 @@ echo '<!DOCTYPE html>
                     ' . $profile_img . '
                     <div class="list">
                         <a  href= "' . $base_url . '/client_accounts/account.php?id=' . $_SESSION['id'] . '">Edit Profile</a>
-                        <a  href= "' . $outside_url . '/logout.php">Logout</a>
+                        <a  href= "' . $outside_url . 'logout.php">Logout</a>
                     </div>
                 </div>
             </header>';
@@ -328,8 +329,8 @@ echo '  </main>
         const ajax_interval = ' . $ajax_interval . ';
         </script>
        <!-- Removed missing file: mdb.min.js -->
-       <!-- <script src="' . $outside_url . '/admin/cms/assets/js/mdb.min.js"></script> -->   
-       <script src= "' . $outside_url . '/assets/js/js_handler/invoice-system-admin.js"></script>
+       <!-- <script src="' . $outside_url . 'admin/cms/assets/js/mdb.min.js"></script> -->   
+       <script src= "' . $outside_url . 'assets/js/js_handler/invoice-system-admin.js"></script>
         ' . $footer_code . '
         
     </body>

@@ -302,9 +302,9 @@ echo '<!DOCTYPE html>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width,minimum-scale=1">
         <title>' . $title . '</title>
-        <link rel="icon" type="image/png" <a href= "' . $outside_url . '/assets/imgs/purple-logo-sm.png">
-        <link rel="stylesheet" type="text/css" href= "' . $base_url. '/assets/css/admin.css?key=time();">
-        <link rel="stylesheet" type="text/css" href= "' . $base_url. '/assets/css/css_handler/invoice-system-admin.css?key=time();">
+        <link rel="icon" type="image/png" <a href= "' . $outside_url . 'assets/imgs/purple-logo-sm.png">
+        <link rel="stylesheet" type="text/css" href= "' . $base_url. '/assets/css/admin.css">
+        <link rel="stylesheet" type="text/css" href= "' . $base_url. '/assets/css/css_handler/invoice-system-admin.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
     </script>
     </head>
@@ -316,7 +316,7 @@ echo '<!DOCTYPE html>
             </h1>
             ' . $admin_links . '
             <div class="footer">
-                Admin Dashboard by <a href= "' . $outside_url . '/" target="_blank">GlitchWizard Solutions, LLC</a>
+                Admin Dashboard by <a href= "' . $outside_url . '" target="_blank">GlitchWizard Solutions, LLC</a>
                 Version 3.0.1
             </div>
         </aside>
