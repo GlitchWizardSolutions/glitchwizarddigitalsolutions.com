@@ -103,11 +103,7 @@ $where .= $search ? 'WHERE (i.invoice_number LIKE :search OR CONCAT(c.first_name
 // Add filters
 // Unsent emails filter
 if (isset($_GET['filter']) && $_GET['filter'] == 'unsent') {
-    // Check if email_sent column exists
-    $stmt = $pdo->query("SHOW COLUMNS FROM invoices LIKE 'email_sent'");
-    if ($stmt->rowCount() > 0) {
-        $where .= ($where ? 'AND ' : 'WHERE ') . 'i.email_sent = 0 AND i.payment_status != "Paid" ';
-    }
+    $where .= ($where ? 'AND ' : 'WHERE ') . 'i.email_sent = 0 AND i.payment_status != "Paid" ';
 }
 // Date start filter
 if ($datestart) {

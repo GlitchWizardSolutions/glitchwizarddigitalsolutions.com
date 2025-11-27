@@ -50,16 +50,13 @@ $admin_notification_bell = $stmt->fetchColumn();
 // Get count of unsent invoice emails for admin notification bell
 $unsent_invoices_count = 0;
 try {
-    $stmt = $pdo->query("SHOW COLUMNS FROM invoices LIKE 'email_sent'");
-    if ($stmt->rowCount() > 0) {
-        $stmt = $pdo->query("
-            SELECT COUNT(*) as count
-            FROM invoices 
-            WHERE email_sent = 0
-            AND payment_status != 'Paid'
-        ");
-        $unsent_invoices_count = $stmt->fetchColumn();
-    }
+    $stmt = $pdo->query("
+        SELECT COUNT(*) as count
+        FROM invoices 
+        WHERE email_sent = 0
+        AND payment_status != 'Paid'
+    ");
+    $unsent_invoices_count = $stmt->fetchColumn();
 } catch (Exception $e) {
     $unsent_invoices_count = 0;
 }

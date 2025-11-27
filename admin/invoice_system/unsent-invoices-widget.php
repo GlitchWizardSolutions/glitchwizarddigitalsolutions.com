@@ -8,22 +8,18 @@
  * Usage: include 'unsent-invoices-widget.php';
  */
 
-// Check if email_sent column exists first
+// Get count of unsent invoices
 $unsent_count = 0;
 try {
-    $stmt = $pdo->query("SHOW COLUMNS FROM invoices LIKE 'email_sent'");
-    if ($stmt->rowCount() > 0) {
-        // Get count of invoices where email_sent = 0
-        $stmt = $pdo->query("
-            SELECT COUNT(*) as count
-            FROM invoices 
-            WHERE email_sent = 0
-            AND payment_status != 'Paid'
-        ");
-        $unsent_count = $stmt->fetchColumn();
-    }
+    $stmt = $pdo->query("
+        SELECT COUNT(*) as count
+        FROM invoices 
+        WHERE email_sent = 0
+        AND payment_status != 'Paid'
+    ");
+    $unsent_count = $stmt->fetchColumn();
 } catch (Exception $e) {
-    // Column doesn't exist yet, don't show widget
+    // Query failed, don't show widget
     $unsent_count = 0;
 }
 

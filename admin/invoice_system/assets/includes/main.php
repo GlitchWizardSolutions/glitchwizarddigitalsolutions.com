@@ -39,21 +39,17 @@ function template_admin_header($title, $selected = 'dashboard', $selected_child 
     global $accounts_total, $invoices_total, $clients_total, $pdo;
     
     // Get count of unsent invoices for admin notification bell
-    // Check if email_sent column exists first
     $unsent_invoices_count = 0;
     try {
-        $stmt = $pdo->query("SHOW COLUMNS FROM invoices LIKE 'email_sent'");
-        if ($stmt->rowCount() > 0) {
-            $stmt = $pdo->query("
-                SELECT COUNT(*) as count
-                FROM invoices 
-                WHERE email_sent = 0
-                AND payment_status != 'Paid'
-            ");
-            $unsent_invoices_count = $stmt->fetchColumn();
-        }
+        $stmt = $pdo->query("
+            SELECT COUNT(*) as count
+            FROM invoices 
+            WHERE email_sent = 0
+            AND payment_status != 'Paid'
+        ");
+        $unsent_invoices_count = $stmt->fetchColumn();
     } catch (Exception $e) {
-        // Column doesn't exist yet, skip notification
+        // Query failed, skip notification
         $unsent_invoices_count = 0;
     }
     
