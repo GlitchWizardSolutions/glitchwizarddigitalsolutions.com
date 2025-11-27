@@ -180,12 +180,24 @@ if (isset($_POST['subject'])) {
     
     // Get attachments and convert to absolute paths
     $attachments = isset($_POST['attachments']) ? $_POST['attachments'] : [];
-    $attachments = array_map(function($attachment) {
+    $attachment_errors = [];
+    $attachments = array_map(function($attachment) use (&$attachment_errors) {
         // The attachment path is relative like "attachments/file.pdf"
         // Convert to absolute path - go up one level from newsletter_system to admin
         $abs_path = dirname(__DIR__) . '/' . $attachment;
+        
+        // Debug: Check if file exists
+        if (!file_exists($abs_path)) {
+            $attachment_errors[] = "File not found: $abs_path";
+        }
+        
         return $abs_path;
     }, $attachments);
+    
+    // If there are attachment errors, log them but continue
+    if (!empty($attachment_errors)) {
+        error_log("Newsletter attachment errors: " . implode(", ", $attachment_errors));
+    }
     
     // Send email to each recipient
     $success_count = 0;
@@ -410,9 +422,10 @@ $newsletters = $pdo->query('SELECT id, title FROM newsletters ORDER BY title ASC
                         <label class="attachment">
                             <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M384 480l48 0c11.4 0 21.9-6 27.6-15.9l112-192c5.8-9.9 5.8-22.1 .1-32.1S555.5 224 544 224l-400 0c-11.4 0-21.9 6-27.6 15.9L48 357.1 48 96c0-8.8 7.2-16 16-16l117.5 0c4.2 0 8.3 1.7 11.3 4.7l26.5 26.5c21 21 49.5 32.8 79.2 32.8L416 144c8.8 0 16 7.2 16 16l0 32 48 0 0-32c0-35.3-28.7-64-64-64L298.5 96c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7L64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l23.7 0L384 480z"/></svg>
                             <span>Select File</span>
-                            <input type="file" name="attachments[]">
+                            <input type="file" name="attachments[]" id="attachment-input" multiple>
                         </label>
                     </div>
+                    <div id="attachment-list" style="margin-top: 10px;"></div>
                 </div>
             </div>
 
@@ -1047,6 +1060,59 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize count
     updateSelectedCount();
     
+    // Handle attachment uploads
+    let uploadedAttachments = [];
+    const attachmentInput = document.getElementById('attachment-input');
+    const attachmentList = document.getElementById('attachment-list');
+    
+    if (attachmentInput) {
+        attachmentInput.addEventListener('change', async function(e) {
+            const files = e.target.files;
+            if (files.length === 0) return;
+            
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('attachments[]', files[i]);
+            }
+            
+            try {
+                const response = await fetch('sendmail.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const paths = await response.json();
+                uploadedAttachments = uploadedAttachments.concat(paths);
+                
+                // Display uploaded files
+                attachmentList.innerHTML = '';
+                uploadedAttachments.forEach((path, index) => {
+                    const fileName = path.split('/').pop();
+                    const fileDiv = document.createElement('div');
+                    fileDiv.style.cssText = 'padding: 8px; background: #f0f0f0; margin: 5px 0; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;';
+                    fileDiv.innerHTML = `
+                        <span>📎 ${fileName}</span>
+                        <button type="button" onclick="removeAttachment(${index})" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer;">Remove</button>
+                    `;
+                    attachmentList.appendChild(fileDiv);
+                });
+                
+                // Clear file input
+                attachmentInput.value = '';
+                
+            } catch (error) {
+                alert('Error uploading attachments: ' + error.message);
+            }
+        });
+    }
+    
+    // Global function to remove attachment
+    window.removeAttachment = function(index) {
+        uploadedAttachments.splice(index, 1);
+        // Refresh display
+        attachmentInput.dispatchEvent(new Event('change'));
+    };
+    
     // Handle form submission
     const form = document.getElementById('send-newsletter-form');
     const submitButton = form.querySelector('input[type="submit"]');
@@ -1073,6 +1139,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Submit form via AJAX
         const formData = new FormData(form);
+        
+        // Add uploaded attachments to form data
+        uploadedAttachments.forEach(attachment => {
+            formData.append('attachments[]', attachment);
+        });
         
         fetch('sendmail.php', {
             method: 'POST',
