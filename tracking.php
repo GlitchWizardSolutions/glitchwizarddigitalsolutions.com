@@ -35,20 +35,6 @@ if ($action && $id) {
         
         if ($action == 'open') {
             // Track email open
-            // Create tracking table if it doesn't exist
-            $pdo->exec('CREATE TABLE IF NOT EXISTS newsletter_tracking (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                tracking_code VARCHAR(255) NOT NULL,
-                action VARCHAR(50) NOT NULL,
-                url TEXT NULL,
-                ip_address VARCHAR(45) NULL,
-                user_agent TEXT NULL,
-                tracked_at DATETIME NOT NULL,
-                INDEX idx_tracking_code (tracking_code),
-                INDEX idx_action (action),
-                INDEX idx_tracked_at (tracked_at)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
-            
             // Insert tracking record
             $stmt = $pdo->prepare('INSERT INTO newsletter_tracking (tracking_code, action, ip_address, user_agent, tracked_at) 
                                    VALUES (?, ?, ?, ?, NOW())');
@@ -84,20 +70,6 @@ if ($action && $id) {
                         $url = 'https://' . $url;
                     }
                 }
-                
-                // Create tracking table if it doesn't exist
-                $pdo->exec('CREATE TABLE IF NOT EXISTS newsletter_tracking (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    tracking_code VARCHAR(255) NOT NULL,
-                    action VARCHAR(50) NOT NULL,
-                    url TEXT NULL,
-                    ip_address VARCHAR(45) NULL,
-                    user_agent TEXT NULL,
-                    tracked_at DATETIME NOT NULL,
-                    INDEX idx_tracking_code (tracking_code),
-                    INDEX idx_action (action),
-                    INDEX idx_tracked_at (tracked_at)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
                 
                 // Insert tracking record
                 $stmt = $pdo->prepare('INSERT INTO newsletter_tracking (tracking_code, action, url, ip_address, user_agent, tracked_at) 

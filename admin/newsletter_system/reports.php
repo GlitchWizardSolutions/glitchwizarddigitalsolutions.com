@@ -3,27 +3,6 @@ require 'assets/includes/admin_config.php';
 include_once '../assets/includes/components.php';
 template_admin_header('Newsletter', 'reports', 'fa-chart-line');
 
-// Create newsletter_tracking table if it doesn't exist
-try {
-    $pdo->exec('CREATE TABLE IF NOT EXISTS newsletter_tracking (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        tracking_code VARCHAR(255) NOT NULL,
-        action VARCHAR(50) NOT NULL,
-        url TEXT NULL,
-        ip_address VARCHAR(45) NULL,
-        user_agent TEXT NULL,
-        tracked_at DATETIME NOT NULL,
-        INDEX idx_tracking_code (tracking_code),
-        INDEX idx_action (action),
-        INDEX idx_tracked_at (tracked_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
-} catch (PDOException $e) {
-    // Table creation failed
-    echo '<div style="padding: 20px; background: #ffebee; color: #c62828; border-radius: 4px; margin: 20px;">
-        <strong>Database Error:</strong> ' . htmlspecialchars($e->getMessage()) . '
-    </div>';
-}
-
 // Get tracking stats
 $stmt = $pdo->query('SELECT 
     COUNT(*) as total_events,
