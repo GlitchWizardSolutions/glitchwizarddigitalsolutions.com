@@ -43,15 +43,15 @@ $base_url = defined('base_url') ? base_url : (defined('BASE_URL') ? BASE_URL : '
 	    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Fira+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i"><!-- Google fonts -->
 	    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i"><!-- Google fonts -->
 	   	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" Content-Type="font/woff2">
-        <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/reset.css?key=<?php echo time(); ?>">
-        <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/nav.css?key=<?php echo time(); ?>">
-        <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/directory.css?key=<?php echo time(); ?>">
-        <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/login.css?key=<?php echo time(); ?>">
-	  	<link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/brand.css?key=<?php echo time(); ?>">
-        <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/form.css?key=<?php echo time(); ?>">
+        <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/reset.css">
+        <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/nav.css">
+        <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/directory.css">
+        <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/login.css">
+	  	<link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/brand.css">
+        <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/form.css">
         <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/newsletter.css">
-        <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/accessible.css?key=<?php echo time(); ?>">
-      	<link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/responsive.css?key=<?php echo time(); ?>"> 
+        <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/accessible.css">
+      	<link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/responsive.css"> 
 
         <link href="<?php echo $base_url; ?>client-dashboard/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
         <link href="<?php echo $base_url; ?>client-dashboard/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -61,7 +61,7 @@ $base_url = defined('base_url') ? base_url : (defined('BASE_URL') ? BASE_URL : '
         <link href="<?php echo $base_url; ?>client-dashboard/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
         <link href="<?php echo $base_url; ?>client-dashboard/assets/vendor/simple-datatables/style.css" rel="stylesheet">
         <link href="<?php echo $base_url; ?>client-dashboard/dist/css/navik-all.min.css" rel="stylesheet">
-        <link href="<?php echo $base_url; ?>client-dashboard/assets/css/style.css?key=<?php echo time(); ?>" rel='stylesheet'>
+        <link href="<?php echo $base_url; ?>client-dashboard/assets/css/style.css" rel='stylesheet'>
 
         <script src="<?php echo $base_url; ?>client-dashboard/assets/js/jquery-3.7.1.min.js"></script>
         <?php $debug=0;?>
