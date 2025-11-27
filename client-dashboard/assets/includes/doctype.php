@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang='en' class='no-js'>
 	<head>
+<?php 
+// Define base_url as a variable for this template
+$base_url = defined('base_url') ? base_url : (defined('BASE_URL') ? BASE_URL : '/');
+?>
  <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BKC5SC2YPX"></script>
 <script>

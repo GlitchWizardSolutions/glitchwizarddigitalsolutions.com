@@ -35,8 +35,7 @@ $stats = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Get recent tracking events
 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
-$stmt = $pdo->prepare('SELECT * FROM newsletter_tracking ORDER BY tracked_at DESC LIMIT ?');
-$stmt->execute([$limit]);
+$stmt = $pdo->query('SELECT * FROM newsletter_tracking ORDER BY tracked_at DESC LIMIT ' . $limit);
 $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Get click-through data grouped by URL

@@ -1,6 +1,9 @@
 <?php
 include 'assets/includes/process-config.php';
 
+// Get IP address
+$ip = $_SERVER['REMOTE_ADDR'] ?? '';
+
 // Check if IP is blocked from too many failed attempts
 if (!can_attempt_login($pdo)) {
 	exit('You cannot login right now! Please try again later!');
