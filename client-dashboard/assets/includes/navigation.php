@@ -66,12 +66,12 @@
         </a>
         <ul id="blog-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li id='blog-home'>
-            <a href="<?php echo $base_url; ?>/blog/index.php">
+            <a href="<?php echo $base_url; ?>blog/index.php">
               <i class="bi bi-circle"></i><span>All Articles</span>
             </a>
           </li>
           <li id='blog-search'>
-            <a href="<?php echo $base_url; ?>/blog/search.php">
+            <a href="<?php echo $base_url; ?>blog/search.php">
               <i class="bi bi-circle"></i><span>Search</span>
             </a>
           </li>
