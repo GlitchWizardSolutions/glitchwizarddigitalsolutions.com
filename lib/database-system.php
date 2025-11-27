@@ -28,6 +28,7 @@ class DatabasePool {
      * @param string $user Database user (optional, uses db_user if not provided)
      * @param string $pass Database password (optional, uses db_pass if not provided)
      * @return PDO Database connection
+     * @throws Exception If connection fails
      */
     public static function getConnection($key, $dbname, $user = null, $pass = null) {
         if (!isset(self::$connections[$key])) {
@@ -55,6 +56,7 @@ class DatabasePool {
             }
         }
         
+        // Connection must exist at this point (either pre-existing or just created)
         return self::$connections[$key];
     }
     
