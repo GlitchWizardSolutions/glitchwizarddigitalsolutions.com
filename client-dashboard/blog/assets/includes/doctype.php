@@ -42,15 +42,15 @@ echo '<!--DOCTYPE: client-dashboard/assets/includes/doctype.php-->';?>
         <link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/accessible.css?key=<?php echo time(); ?>">
       	<link rel="stylesheet" type="text/css" href="<?php echo site_menu_base ?>assets/css/css_handler/responsive.css?key=<?php echo time(); ?>"> 
 
-        <link href="<?php echo $base_url; ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-        <link href="<?php echo $base_url; ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-        <link href="<?php echo $base_url; ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-        <link href="<?php echo $base_url; ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-        <link href="<?php echo $base_url; ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-        <link href="<?php echo $base_url; ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-        <link href="<?php echo $base_url; ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
-        <link href="<?php echo $base_url; ?>/dist/css/navik-all.min.css" rel="stylesheet">
-        <link href="<?php echo $base_url; ?>/assets/css/style.css?key=<?php echo time(); ?>" rel='stylesheet'>
+        <link href="<?php echo $base_url; ?>client-dashboard/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <link href="<?php echo $base_url; ?>client-dashboard/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+        <link href="<?php echo $base_url; ?>client-dashboard/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+        <link href="<?php echo $base_url; ?>client-dashboard/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+        <link href="<?php echo $base_url; ?>client-dashboard/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+        <link href="<?php echo $base_url; ?>client-dashboard/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+        <link href="<?php echo $base_url; ?>client-dashboard/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+        <link href="<?php echo $base_url; ?>client-dashboard/dist/css/navik-all.min.css" rel="stylesheet">
+        <link href="<?php echo $base_url; ?>client-dashboard/assets/css/style.css?key=<?php echo time(); ?>" rel='stylesheet'>
 
-        <script src="<?php echo $base_url; ?>/assets/js/jquery-3.7.1.min.js"></script>
+        <script src="<?php echo $base_url; ?>client-dashboard/assets/js/jquery-3.7.1.min.js"></script>
         <?php $debug=0;?>

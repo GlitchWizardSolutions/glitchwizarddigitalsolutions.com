@@ -5,11 +5,13 @@ require 'assets/includes/admin_config.php';
 $success_message = '';
 $error_message = '';
 if (isset($_GET['delete_bgrimg'])) {
-	unlink(blog_site_url . $settings['background_image']);
+	if (file_exists(blog_path . $settings['background_image'])) {
+		unlink(blog_path . $settings['background_image']);
+	}
 	
     $settings['background_image'] = '';
 	
-	file_put_contents(blog_site_url .'config_settings.php', '<?php $settings = ' . var_export($settings, true) . '; ?>');
+	file_put_contents(blog_path . 'config_settings.php', '<?php $settings = ' . var_export($settings, true) . '; ?>');
 	echo '<meta http-equiv="refresh" content="0;url=settings.php">';
 }
 
@@ -17,7 +19,7 @@ if (isset($_GET['delete_bgrimg'])) {
 if (isset($_POST['save'])) {
 
 	if (@$_FILES['background_image']['name'] != '') {
-        $target_dir    = blog_site_url .'uploads/other/';
+        $target_dir    = blog_uploads_path . 'other/';
         $target_file   = $target_dir . basename($_FILES["background_image"]["name"]);
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         
@@ -41,9 +43,10 @@ if (isset($_POST['save'])) {
         if ($uploadOk == 1) {
             $string     = "0123456789wsderfgtyhjuk";
             $new_string = str_shuffle($string);
-            $location   = blog_site_url .'uploads/other/bgr_$new_string.$imageFileType';
+            $location   = blog_uploads_path . 'other/bgr_' . $new_string . '.' . $imageFileType;
             move_uploaded_file($_FILES["background_image"]["tmp_name"], $location);
-            $image = blog_site_url .'uploads/other/bgr_' . $new_string . '.' . $imageFileType . '';
+            // Store relative path for URLs
+            $image = 'uploads/other/bgr_' . $new_string . '.' . $imageFileType;
         }
     } else {
 		$image = $settings['background_image'];	
@@ -70,7 +73,7 @@ if (isset($_POST['save'])) {
     $settings['theme']              = addslashes($_POST['theme']);
 	$settings['background_image']   = $image;
 	
-	file_put_contents(blog_site_url .'config_settings.php', '<?php $settings = ' . var_export($settings, true) . '; ?>');
+	file_put_contents(blog_path . 'config_settings.php', '<?php $settings = ' . var_export($settings, true) . '; ?>');
 	header('Location: settings.php');
 	exit;
 }
