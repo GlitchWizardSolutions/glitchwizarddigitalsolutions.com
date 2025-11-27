@@ -52,7 +52,24 @@ if (isset($_GET['id'])) {
             header('Location: newsletters.php?success_msg=2');
             exit;
         } catch (PDOException $e) {
-            $error_msg = 'Database error: ' . $e->getMessage();
+            $msg = $e->getMessage();
+            // If error caused by 4-byte characters (emoji), try to convert column to utf8mb4 and retry
+            if (stripos($msg, 'Incorrect string value') !== false || stripos($msg, '1366') !== false) {
+                try {
+                    // Attempt to modify the column to LONGTEXT utf8mb4 and convert table
+                    $pdo->exec("ALTER TABLE newsletters MODIFY content LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                    $pdo->exec("ALTER TABLE newsletters CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                    // Retry the update
+                    $stmt = $pdo->prepare('UPDATE newsletters SET title = ?, content = ?, attachments = ? WHERE id = ?');
+                    $stmt->execute([ $_POST['title'], $_POST['content'], $all_attachments, $_GET['id'] ]);
+                    header('Location: newsletters.php?success_msg=2');
+                    exit;
+                } catch (PDOException $e2) {
+                    $error_msg = 'Database error after attempting charset conversion: ' . $e2->getMessage();
+                }
+            } else {
+                $error_msg = 'Database error: ' . $msg;
+            }
         }
     }
     if (isset($_POST['delete'])) {
@@ -73,7 +90,22 @@ if (isset($_GET['id'])) {
             header('Location: newsletters.php?success_msg=1');
             exit;
         } catch (PDOException $e) {
-            $error_msg = 'Database error: ' . $e->getMessage();
+            $msg = $e->getMessage();
+            if (stripos($msg, 'Incorrect string value') !== false || stripos($msg, '1366') !== false) {
+                try {
+                    $pdo->exec("ALTER TABLE newsletters MODIFY content LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                    $pdo->exec("ALTER TABLE newsletters CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                    // Retry insert
+                    $stmt = $pdo->prepare('INSERT INTO newsletters (title,content,attachments,submit_date) VALUES (?,?,?,?)');
+                    $stmt->execute([ $_POST['title'], $_POST['content'], $all_attachments, date('Y-m-d H:i:s') ]);
+                    header('Location: newsletters.php?success_msg=1');
+                    exit;
+                } catch (PDOException $e2) {
+                    $error_msg = 'Database error after attempting charset conversion: ' . $e2->getMessage();
+                }
+            } else {
+                $error_msg = 'Database error: ' . $msg;
+            }
         }
     }
 }
