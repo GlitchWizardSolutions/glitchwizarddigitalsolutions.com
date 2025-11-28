@@ -39,17 +39,6 @@ try {
 	exit('Failed to connect to error handling database! ' . $exception->getMessage());
 }
 
-// Handle clear all errors action
-if (isset($_GET['clear_errors']) && $_GET['clear_errors'] == '1') {
-	try {
-		$error_db->exec('TRUNCATE TABLE error_handling');
-		header('Location: index.php?cleared=1');
-		exit;
-	} catch (PDOException $exception) {
-		exit('Failed to clear error logs: ' . $exception->getMessage());
-	}
-}
-
 // Handle debug logging toggle
 if (isset($_POST['toggle_debug_logging'])) {
 	try {
@@ -216,9 +205,6 @@ try {
             <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center; justify-content: space-between;">
                 <div style="display: flex; gap: 10px; align-items: center;">
                     <a href="error-logs.php" style="color: #333; text-decoration: none; opacity: 0.8;">View All →</a>
-                    <?php if ($error_logs_total > 0): ?>
-                    <a href="?clear_errors=1" onclick="return confirm('Are you sure you want to delete ALL error logs? This cannot be undone.')" style="font-size: 12px; padding: 5px 10px; background: rgba(220,53,69,0.8); color: white; border-radius: 4px; text-decoration: none;">Clear All</a>
-                    <?php endif; ?>
                 </div>
                 <form method="post" style="margin: 0;">
                     <button type="submit" name="toggle_debug_logging" style="font-size: 12px; padding: 5px 10px; background: <?=$debug_logging_enabled ? 'rgba(220,53,69,0.8)' : 'rgba(40,167,69,0.8)'?>; color: white; border: none; border-radius: 4px; cursor: pointer;">
