@@ -71,6 +71,16 @@ notimportant.php
 testshell.php
 phpinfo.php
 
+# Database Testing and Verification Scripts
+test-*.php
+**/test-*.php
+verify-*.php
+**/verify-*.php
+check-*.php
+**/check-*.php
+debug-*.php
+**/debug-*.php
+
 # Old/Duplicate Systems - To Be Evaluated for Removal
 redo-invoicing/
 sandbox/
