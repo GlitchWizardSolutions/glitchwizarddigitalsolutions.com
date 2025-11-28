@@ -20,6 +20,7 @@ require 'assets/includes/admin_config.php';
                 <div class="card-body">
                   <div class="d-flex flex-wrap gap-2 justify-content-center">
                     <a href="add_post.php" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i> Write Post</a>
+                    <a href="blog_templates.php" class="btn btn-success btn-sm"><i class="fa fa-file-alt"></i> Templates</a>
                     <a href="settings.php" class="btn btn-primary btn-sm"><i class="fa fa-cogs"></i> Settings</a>
 					<a href="messages.php" class="btn btn-primary btn-sm"><i class="fa fa-envelope"></i> Messages</a>
 					<a href="menu_editor.php" class="btn btn-primary btn-sm"><i class="fa fa-bars"></i> Menu Editor</a>
