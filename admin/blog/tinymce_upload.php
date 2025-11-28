@@ -7,6 +7,38 @@ header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
+// Get list of uploaded images for the image browser
+if (isset($_GET['list_images'])) {
+    $upload_dir = '../../client-dashboard/blog/uploads/images/';
+    $images = [];
+    
+    if (is_dir($upload_dir)) {
+        $files = scandir($upload_dir);
+        $base_url = 'https://glitchwizarddigitalsolutions.com';
+        
+        foreach ($files as $file) {
+            if ($file !== '.' && $file !== '..') {
+                $filepath = $upload_dir . $file;
+                if (is_file($filepath) && preg_match('/\.(jpg|jpeg|png|gif|webp|svg)$/i', $file)) {
+                    $images[] = [
+                        'title' => $file,
+                        'value' => $base_url . '/client-dashboard/blog/uploads/images/' . $file,
+                        'modified' => filemtime($filepath)
+                    ];
+                }
+            }
+        }
+        
+        // Sort by modification time (newest first)
+        usort($images, function($a, $b) {
+            return $b['modified'] - $a['modified'];
+        });
+    }
+    
+    echo json_encode($images);
+    exit;
+}
+
 // Check if file was uploaded
 if (!isset($_FILES['file']) && !isset($_FILES['newsletter_image'])) {
     echo json_encode(['error' => 'No file uploaded']);

@@ -1,6 +1,13 @@
 <?php
 require 'assets/includes/admin_config.php';
 
+// Get username from main admin session
+$uname = $_SESSION['name'] ?? '';
+if (empty($uname)) {
+    // Fallback: try to get from account data if session is not set
+    $uname = $account['username'] ?? '';
+}
+
 if (isset($_POST['add'])) {
     $title = trim($_POST['title']);
     $content = $_POST['content'];
@@ -133,45 +140,132 @@ tinymce.init({
     },
     file_picker_callback: function(callback, value, meta) {
         if (meta.filetype === "image") {
-            const input = document.createElement("input");
-            input.setAttribute("type", "file");
-            input.setAttribute("accept", "image/*");
+            if (confirm(\'Click OK to upload a new image, or Cancel to browse existing images\')) {
+                const input = document.createElement("input");
+                input.setAttribute("type", "file");
+                input.setAttribute("accept", "image/*");
 
-            input.onchange = function() {
-                const file = this.files[0];
-                if (file) {
-                    const formData = new FormData();
-                    formData.append("file", file);
+                input.onchange = function() {
+                    const file = this.files[0];
+                    if (file) {
+                        const formData = new FormData();
+                        formData.append("file", file);
 
-                    fetch("tinymce_upload.php", {
-                        method: "POST",
-                        body: formData
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(\'HTTP error! status: \' + response.status);
+                        fetch("tinymce_upload.php", {
+                            method: "POST",
+                            body: formData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(\'HTTP error! status: \' + response.status);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.error) {
+                                alert("Upload error: " + data.error);
+                            } else {
+                                // Properly set the image source and alt text
+                                callback(data.location, {
+                                    alt: file.name.replace(/\.[^/.]+$/, ""),
+                                    class: "responsive-image"
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Upload failed:", error);
+                            alert("Upload failed: " + error.message);
+                        });
+                    }
+                };
+
+                input.click();
+            } else {
+                fetch(\'tinymce_upload.php?list_images=1\')
+                    .then(response => response.json())
+                    .then(images => {
+                        if (images.length === 0) {
+                            alert(\'No images uploaded yet. Please upload an image first.\');
+                            // Re-trigger the file picker for upload
+                            const input = document.createElement("input");
+                            input.setAttribute("type", "file");
+                            input.setAttribute("accept", "image/*");
+                            input.onchange = function() {
+                                const file = this.files[0];
+                                if (file) {
+                                    const formData = new FormData();
+                                    formData.append("file", file);
+                                    fetch("tinymce_upload.php", {
+                                        method: "POST",
+                                        body: formData
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.error) {
+                                            alert("Upload error: " + data.error);
+                                        } else {
+                                            callback(data.location, {
+                                                alt: file.name.replace(/\.[^/.]+$/, ""),
+                                                class: "responsive-image"
+                                            });
+                                        }
+                                    })
+                                    .catch(error => {
+                                        alert("Upload failed: " + error);
+                                    });
+                                }
+                            };
+                            input.click();
+                            return;
                         }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.error) {
-                            alert("Upload error: " + data.error);
-                        } else {
-                            // Properly set the image source and alt text
-                            callback(data.location, {
-                                alt: file.name.replace(/\.[^/.]+$/, ""),
-                                class: "responsive-image"
+
+                        let html = \'<div style="padding: 20px; max-height: 400px; overflow-y: auto;">\';
+                        html += \'<h3 style="margin-top: 0;">Select an Image</h3>\';
+                        html += \'<p style="color: #666; font-size: 13px; margin-bottom: 15px;">Images will automatically be responsive in blog templates</p>\';
+                        html += \'<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">\';
+
+                        images.forEach((img) => {
+                            html += \`
+                                <div style="border: 2px solid #ddd; border-radius: 8px; padding: 10px; cursor: pointer; text-align: center;" 
+                                     onclick="selectImage(\'${img.value}\', \'${img.title}\')" 
+                                     onmouseover="this.style.borderColor=\'#6b46c1\'" 
+                                     onmouseout="this.style.borderColor=\'#ddd\'">
+                                    <img src="${img.value}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 4px;">
+                                    <div style="margin-top: 5px; font-size: 11px; color: #666; overflow: hidden; text-overflow: ellipsis;">${img.title}</div>
+                                </div>
+                            \`;
+                        });
+
+                        html += \'</div>\';
+                        html += \'<div style="margin-top: 20px; text-align: center;">\';
+                        html += \'<button onclick="closeImageBrowser()" style="padding: 8px 20px; background: #6b46c1; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>\';
+                        html += \'</div>\';
+                        html += \'</div>\';
+
+                        const modal = document.createElement(\'div\');
+                        modal.id = \'image-browser-modal\';
+                        modal.style.cssText = \'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center;\';
+
+                        const content = document.createElement(\'div\');
+                        content.style.cssText = \'background: white; border-radius: 8px; max-width: 800px; width: 90%; max-height: 80vh; overflow: hidden;\';
+                        content.innerHTML = html;
+
+                        modal.appendChild(content);
+                        document.body.appendChild(modal);
+
+                        window.selectImage = function(src, alt) {
+                            callback(src, { 
+                                alt: alt.replace(/\.[^/.]+$/, \'\'),
+                                class: \'responsive-image\'
                             });
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Upload failed:", error);
-                        alert("Upload failed: " + error.message);
-                    });
-                }
-            };
+                            closeImageBrowser();
+                        };
 
-            input.click();
+                        window.closeImageBrowser = function() {
+                            document.getElementById(\'image-browser-modal\').remove();
+                        };
+                    });
+            }
         }
     },
     link_default_protocol: "https",

@@ -1,6 +1,13 @@
 <?php
 require 'assets/includes/admin_config.php';
 
+// Get username from main admin session
+$uname = $_SESSION['name'] ?? '';
+if (empty($uname)) {
+    // Fallback: try to get from account data if session is not set
+    $uname = $account['username'] ?? '';
+}
+
 if (isset($_POST['add'])) {
     $title = trim($_POST['title']);
 	$slug = generateSeoURL($title);
