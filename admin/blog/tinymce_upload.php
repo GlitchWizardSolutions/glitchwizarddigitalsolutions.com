@@ -43,8 +43,8 @@ $filepath = $upload_dir . $filename;
 
 // Move uploaded file
 if (move_uploaded_file($file['tmp_name'], $filepath)) {
-    // Return the location for TinyMCE
-    $location = '../../client-dashboard/blog/uploads/images/' . $filename;
+    // Return the absolute URL for TinyMCE
+    $location = 'https://glitchwizarddigitalsolutions.com/client-dashboard/blog/uploads/images/' . $filename;
     echo json_encode(['location' => $location]);
 } else {
     echo json_encode(['error' => 'Failed to save file']);

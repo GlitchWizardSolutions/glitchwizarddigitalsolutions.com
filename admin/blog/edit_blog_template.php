@@ -219,4 +219,19 @@ tinymce.init({
     }
 });
 </script>
+
+<script>
+// Ensure form validation works with TinyMCE
+document.addEventListener(\'DOMContentLoaded\', function() {
+    const form = document.querySelector(\'form\');
+    if (form) {
+        form.addEventListener(\'submit\', function(e) {
+            // Ensure TinyMCE content is saved to textarea before form submission
+            if (typeof tinymce !== \'undefined\') {
+                tinymce.triggerSave();
+            }
+        });
+    }
+});
+</script>
 ')?>

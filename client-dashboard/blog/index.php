@@ -40,7 +40,7 @@ include '../assets/includes/page-setup.php';
                 <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
                     <?php if ($post['image']): ?>
                     <a href="post.php?name=<?= $post['slug'] ?>">
-                        <img src="/public_html<?= $post['image'] ?>" alt="<?= htmlspecialchars($post['title']) ?>" 
+                        <img src="/public_html/<?= $post['image'] ?>" alt="<?= htmlspecialchars($post['title']) ?>" 
                              class="d-block w-100" style="height: 400px; object-fit: contain; background-color: #f8f9fa;">
                     </a>
                     <?php else: ?>
@@ -88,7 +88,7 @@ include '../assets/includes/page-setup.php';
                 <div class="card h-100">
                     <?php if ($post['image']): ?>
                     <a href="post.php?name=<?= $post['slug'] ?>">
-                        <img src="/public_html<?= $post['image'] ?>" alt="<?= htmlspecialchars($post['title']) ?>" 
+                        <img src="/public_html/<?= $post['image'] ?>" alt="<?= htmlspecialchars($post['title']) ?>" 
                              class="card-img-top" style="height: 200px; object-fit: contain; background-color: #f8f9fa;">
                     </a>
                     <?php else: ?>

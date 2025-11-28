@@ -168,6 +168,7 @@ tinymce.init({
                         if (data.error) {
                             alert(data.error);
                         } else {
+                            // Properly set the image source and alt text
                             callback(data.location, { 
                                 alt: file.name.replace(/\.[^/.]+$/, ""),
                                 class: "responsive-image"
@@ -217,6 +218,21 @@ tinymce.init({
                         });
                         callback(items);
                     });
+            }
+        });
+    }
+});
+</script>
+
+<script>
+// Ensure form validation works with TinyMCE
+document.addEventListener(\'DOMContentLoaded\', function() {
+    const form = document.querySelector(\'form\');
+    if (form) {
+        form.addEventListener(\'submit\', function(e) {
+            // Ensure TinyMCE content is saved to textarea before form submission
+            if (typeof tinymce !== \'undefined\') {
+                tinymce.triggerSave();
             }
         });
     }
