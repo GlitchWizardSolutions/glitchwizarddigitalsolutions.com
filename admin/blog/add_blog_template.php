@@ -1,20 +1,6 @@
 <?php
 require 'assets/includes/admin_config.php';
 
-// User authentication for blog admin
-if (isset($_SESSION['sec-username'])) {
-    $uname = $_SESSION['sec-username'];
-    $stmt = $blog_pdo->prepare("SELECT * FROM `users` WHERE username = ? AND (role = 'Admin' OR role = 'Editor')");
-    $stmt->execute([$uname]);
-    if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
-        header('Location: ../../blog/login');
-        exit;
-    }
-} else {
-    header('Location: ../../blog/login');
-    exit;
-}
-
 if (isset($_POST['add'])) {
     $title = trim($_POST['title']);
     $content = $_POST['content'];
