@@ -68,7 +68,7 @@ while ($rw = $stmt->fetch(PDO::FETCH_ASSOC)) {
         </p>
         <p>
             <label>Content</label>
-            <textarea class="form-control" id="content" rows="12" name="content" required><?=$template['content']?></textarea>
+            <textarea class="form-control" id="content" rows="12" name="content"><?=$template['content']?></textarea>
         </p>
 
         <input type="submit" name="submit" class="btn btn-primary col-12" value="Update Template" />
@@ -218,6 +218,14 @@ document.addEventListener(\'DOMContentLoaded\', function() {
             // Ensure TinyMCE content is saved to textarea before form submission
             if (typeof tinymce !== \'undefined\') {
                 tinymce.triggerSave();
+            }
+            
+            // Check if content is empty
+            const contentTextarea = document.getElementById(\'content\');
+            if (!contentTextarea || !contentTextarea.value.trim()) {
+                e.preventDefault();
+                alert(\'Please enter some content for the template.\');
+                return false;
             }
         });
     }
