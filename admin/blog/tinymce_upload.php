@@ -3,6 +3,10 @@ require 'assets/includes/admin_config.php';
 
 header('Content-Type: application/json');
 
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+
 // Check if file was uploaded
 if (!isset($_FILES['file']) && !isset($_FILES['newsletter_image'])) {
     echo json_encode(['error' => 'No file uploaded']);
@@ -31,7 +35,7 @@ if ($file['size'] > 5 * 1024 * 1024) {
 }
 
 // Create upload directory if it doesn't exist
-$upload_dir = 'uploads/images/';
+$upload_dir = '../../client-dashboard/blog/uploads/images/';
 if (!is_dir($upload_dir)) {
     mkdir($upload_dir, 0755, true);
 }
@@ -44,9 +48,14 @@ $filepath = $upload_dir . $filename;
 // Move uploaded file
 if (move_uploaded_file($file['tmp_name'], $filepath)) {
     // Return the absolute URL for TinyMCE
-    $location = 'https://glitchwizarddigitalsolutions.com/client-dashboard/blog/uploads/images/' . $filename;
+    $base_url = 'https://glitchwizarddigitalsolutions.com';
+    $location = $base_url . '/client-dashboard/blog/uploads/images/' . $filename;
+
+    // Make sure we only output JSON
+    if (ob_get_length()) ob_clean();
     echo json_encode(['location' => $location]);
 } else {
+    if (ob_get_length()) ob_clean();
     echo json_encode(['error' => 'Failed to save file']);
 }
 ?>

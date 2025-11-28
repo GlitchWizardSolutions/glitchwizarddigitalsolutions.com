@@ -153,9 +153,7 @@ tinymce.init({
 
             input.onchange = function() {
                 const file = this.files[0];
-                const reader = new FileReader();
-
-                reader.onload = function() {
+                if (file) {
                     const formData = new FormData();
                     formData.append("file", file);
 
@@ -163,24 +161,28 @@ tinymce.init({
                         method: "POST",
                         body: formData
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(\'HTTP error! status: \' + response.status);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.error) {
-                            alert(data.error);
+                            alert("Upload error: " + data.error);
                         } else {
                             // Properly set the image source and alt text
-                            callback(data.location, { 
+                            callback(data.location, {
                                 alt: file.name.replace(/\.[^/.]+$/, ""),
                                 class: "responsive-image"
                             });
                         }
                     })
                     .catch(error => {
-                        alert("Upload failed: " + error);
+                        console.error("Upload failed:", error);
+                        alert("Upload failed: " + error.message);
                     });
-                };
-
-                reader.readAsDataURL(file);
+                }
             };
 
             input.click();
