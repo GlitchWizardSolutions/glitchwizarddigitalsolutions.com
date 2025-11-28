@@ -192,11 +192,11 @@ try {
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <!-- Custom Check Engine Icon -->
                     <?php if ($critical_errors_today > 0): ?>
-                        <img src="../assets/img/icons/redCheckEngine.svg" alt="Critical Errors" style="width: 48px; height: 48px;">
+                        <img src="../assets/img/icons/redCheckEngine.svg" alt="Critical Errors" style="width: 56px; height: 56px; opacity: 0.9;">
                     <?php elseif ($error_logs_24h > 0): ?>
-                        <img src="../assets/img/icons/goldCheckEngine.svg" alt="Errors Detected" style="width: 48px; height: 48px;">
+                        <img src="../assets/img/icons/goldCheckEngine.svg" alt="Errors Detected" style="width: 56px; height: 56px; opacity: 0.9;">
                     <?php else: ?>
-                        <img src="../assets/img/icons/greyCheckEngine.svg" alt="No Errors" style="width: 48px; height: 48px;">
+                        <img src="../assets/img/icons/greyCheckEngine.svg" alt="No Errors" style="width: 56px; height: 56px; opacity: 0.9;">
                     <?php endif; ?>
                 </div>
             </div>
