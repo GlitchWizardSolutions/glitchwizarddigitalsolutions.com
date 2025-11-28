@@ -97,7 +97,7 @@ if (isset($_GET['edit-id'])) {
               <h3>All Comments</h3>
               <div class="table">         
 
-            <table id="dt-basic" width="100%">
+            <table width="100%">
                 <thead>
 				<tr>
                     <td colspan="2">Author</td>
@@ -174,21 +174,4 @@ echo '</tbody></table>';
               </div>
               </div>
 
-<?=template_admin_footer('
-<script>
-$(document).ready(function() {
-	if (typeof $.fn.dataTable !== "undefined") {
-		$("#dt-basic").dataTable({
-			"responsive": true,
-			"order": [[ 1, "desc" ]],
-			"language": {
-				"paginate": {
-				  "previous": "<i class=\"fa fa-angle-left\"></i>",
-				  "next": "<i class=\"fa fa-angle-right\"></i>"
-				}
-			}
-		});
-	}
-});
-</script>
-')?>
+<?=template_admin_footer()?>

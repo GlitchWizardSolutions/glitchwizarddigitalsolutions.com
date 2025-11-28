@@ -153,7 +153,7 @@ if (isset($_GET['edit-id'])) {
                   <div class="card-body">
 				  <a href="add_image.php" class="btn btn-primary col-12"><i class="fa fa-edit"></i> Add Image</a><br /><br />
 
-            <table class="table table-border table-hover" id="dt-basic" width="100%">
+            <table class="table table-border table-hover" width="100%">
                 <thead>
 				<tr>
                     <th>Image</th>
@@ -193,18 +193,6 @@ echo '</table>';
 <?=template_admin_footer('
 <script>
 $(document).ready(function() {
-	
-	$("#dt-basic").dataTable( {
-		"responsive": true,
-		"order": [[ 1, "asc" ]],
-		"language": {
-			"paginate": {
-			  "previous": "<i class=\"fa fa-angle-left\"></i>",
-			  "next": "<i class=\"fa fa-angle-right\"></i>"
-			}
-		}
-	} );
-	
 	$("#summernote").summernote({height: 350});
 	
 	var noteBar = $(".note-toolbar");

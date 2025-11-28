@@ -82,7 +82,7 @@ if (isset($_GET['edit-id'])) {
 			  <a href="add_category.php" class="btn btn-primary" style="margin-bottom: 1rem;"><i class="fa fa-plus"></i> Add Category</a>
               <div class="table">
 
-            <table id="dt-basic" width="100%">
+            <table width="100%">
                 <thead>
 				<tr>
                     <td>Category</td>
@@ -130,21 +130,4 @@ foreach ($categories as $row) {
               </div>
               </div>
 
-<?=template_admin_footer('
-<script>
-$(document).ready(function() {
-	if (typeof $.fn.dataTable !== "undefined") {
-		$("#dt-basic").dataTable({
-			"responsive": true,
-			"order": [[ 0, "asc" ]],
-			"language": {
-				"paginate": {
-				  "previous": "<i class=\"fa fa-angle-left\"></i>",
-				  "next": "<i class=\"fa fa-angle-right\"></i>"
-				}
-			}
-		});
-	}
-});
-</script>
-')?>
+<?=template_admin_footer()?>

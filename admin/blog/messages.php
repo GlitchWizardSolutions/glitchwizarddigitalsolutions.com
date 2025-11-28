@@ -30,7 +30,7 @@ if (isset($_GET['id'])) {
             <div class="card">
               <h6 class="card-header">Messages</h6>         
                   <div class="card-body">
-                    <table class="table table-border table-hover" id="dt-basic" width="100%">
+                    <table class="table table-border table-hover" width="100%">
                           <thead>
                               <tr>
                                   <th>Name</th>
@@ -70,19 +70,5 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                   </div>
             </div>
 
-<script>
-$(document).ready(function() {
 
-	$('#dt-basic').dataTable( {
-		"responsive": true,
-		"order": [[ 2, "desc" ]],
-		"language": {
-			"paginate": {
-			  "previous": '<i class="fa fa-angle-left"></i>',
-			  "next": '<i class="fa fa-angle-right"></i>'
-			}
-		}
-	} );
-} );
-</script>
  

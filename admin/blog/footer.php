@@ -1,8 +1,6 @@
   </div>
 </div>
 
-    <!--DataTables-->
-    <script src="https://cdn.datatables.net/v/bs5/dt-2.1.8/r-3.0.3/datatables.min.js"></script>
 	
 	<script>
 		function countText() {

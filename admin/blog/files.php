@@ -53,7 +53,7 @@ if (isset($_GET['delete-id'])) {
 							<i class="fas fa-upload"></i> Upload File
 						</a><br /><br />
 
-            <table id="dt-basic" class="table table-border table-hover" width="100%">
+            <table class="table table-border table-hover" width="100%">
                 <thead>
 				<tr>
                     <th>File Name</th>
@@ -103,18 +103,4 @@ while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
 				</div>
             </div>
 
-<script>
-$(document).ready(function() {
-	$('#dt-basic').dataTable( {
-        "order": [[ 3, "desc" ]],
-		"responsive": true,
-		"language": {
-			"paginate": {
-			  "previous": '<i class="fa fa-angle-left"></i>',
-			  "next": '<i class="fa fa-angle-right"></i>'
-			}
-		}
-	} );
-} );
-</script>
 <?=template_admin_footer()?>

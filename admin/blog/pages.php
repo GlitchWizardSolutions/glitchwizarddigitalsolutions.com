@@ -109,7 +109,7 @@ if (isset($_GET['edit-id'])) {
                   <div class="card-body">
 				  <a href="add_page.php" class="btn btn-primary col-12"><i class="fa fa-edit"></i> Add Page</a><br /><br />
 
-            <table id="dt-basic" class="table table-border table-hover">
+            <table class="table table-border table-hover">
                 <thead>
 				<tr>
                     <th>Title</th>
@@ -138,17 +138,6 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 <?=template_admin_footer('
 <script>
 $(document).ready(function() {
-
-	$("#dt-basic").dataTable( {
-		"responsive": true,
-		"language": {
-			"paginate": {
-			  "previous": "<i class=\"fa fa-angle-left\"></i>",
-			  "next": "<i class=\"fa fa-angle-right\"></i>"
-			}
-		}
-	} );
-	
 	$("#summernote").summernote({height: 350});
 	
 	var noteBar = $(".note-toolbar");

@@ -105,7 +105,7 @@ if (isset($_GET['edit-id'])) {
 			<div class="card">
               <h6 class="card-header">Users</h6>         
                   <div class="card-body">
-                    <table id="dt-basic" class="table table-border table-hover bootstrap-datatable" width="100%">
+                    <table class="table table-border table-hover" width="100%">
                           <thead>
                               <tr>
 								  <th>Username</th>
@@ -156,19 +156,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                   </div>
             </div>
 			
-<script>
-$(document).ready(function() {
-	$('#dt-basic').dataTable( {
-		"responsive": true,
-		"language": {
-			"paginate": {
-			  "previous": '<i class="fas fa-angle-left"></i>',
-			  "next": '<i class="fas fa-angle-right"></i>'
-			}
-		}
-	} );
-} );
-</script>
 <?php
 include "footer.php";
 ?>

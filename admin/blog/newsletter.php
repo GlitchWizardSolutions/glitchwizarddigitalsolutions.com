@@ -93,7 +93,7 @@ if (isset($_POST['send_mass_message'])) {
 			<div class="card">
               <h6 class="card-header">Subscribers</h6>         
                   <div class="card-body">
-                    <table class="table table-border table-hover" id="dt-basic" width="100%">
+                    <table class="table table-border table-hover" width="100%">
                           <thead>
                               <tr>
                                   <th>E-Mail</th>
@@ -122,18 +122,6 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 <?=template_admin_footer('
 <script>
 $(document).ready(function() {
-
-	$("#dt-basic").dataTable( {
-		"responsive": true,
-		"order": [[ 0, "asc" ]],
-		"language": {
-			"paginate": {
-			  "previous": "<i class=\"fa fa-angle-left\"></i>",
-			  "next": "<i class=\"fa fa-angle-right\"></i>"
-			}
-		}
-	} );
-	
 	$("#summernote").summernote({height: 350});
 	
 	var noteBar = $(".note-toolbar");
