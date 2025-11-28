@@ -169,9 +169,7 @@ while ($rw = $stmt->fetch(PDO::FETCH_ASSOC)) {
     </div>
 </div>
 
-<?=template_admin_footer('
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.3.0/tinymce.min.js" integrity="sha512-RUZ2d69UiTI+LdjfDCxqJh5HfjmOcouct56utQNVRjr90Ea8uHQa+gCxvxDTC9fFvIGP+t4TDDJWNTRV48tBpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script>
 tinymce.init({
     selector: "#content",
     plugins: "image table lists media link code",
@@ -314,4 +312,5 @@ document.addEventListener(\'DOMContentLoaded\', function() {
     }
 });
 </script>
-')?>
+
+<?=template_admin_footer()?>

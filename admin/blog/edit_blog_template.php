@@ -75,9 +75,7 @@ while ($rw = $stmt->fetch(PDO::FETCH_ASSOC)) {
     </form>
 </div>
 
-<?=template_admin_footer('
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.3.0/tinymce.min.js" integrity="sha512-RUZ2d69UiTI+LdjfDCxqJh5HfjmOcouct56utQNVRjr90Ea8uHQa+gCxvxDTC9fFvIGP+t4TDDJWNTRV48tBpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script>
 tinymce.init({
     selector: "#content",
     plugins: "image table lists media link code",
@@ -318,4 +316,28 @@ document.addEventListener(\'DOMContentLoaded\', function() {
     }
 });
 </script>
-')?>
+
+<?=template_admin_footer()?>
+
+<script>
+// Ensure form validation works with TinyMCE
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Ensure TinyMCE content is saved to textarea before form submission
+            if (typeof tinymce !== 'undefined') {
+                tinymce.triggerSave();
+            }
+            
+            // Check if content is empty
+            const contentTextarea = document.getElementById('content');
+            if (!contentTextarea || !contentTextarea.value.trim()) {
+                e.preventDefault();
+                alert('Please enter some content for the template.');
+                return false;
+            }
+        });
+    }
+});
+</script>
