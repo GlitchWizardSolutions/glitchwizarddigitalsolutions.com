@@ -192,119 +192,16 @@ try {
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <!-- Custom Check Engine Icon -->
                     <?php if ($critical_errors_today > 0): ?>
-                        <img src="assets/img/icons/redCheckEngine.svg" alt="Critical Errors" style="width: 40px; height: 40px;">
+                        <img src="../assets/img/icons/redCheckEngine.svg" alt="Critical Errors" style="width: 48px; height: 48px;">
                     <?php elseif ($error_logs_24h > 0): ?>
-                        <img src="assets/img/icons/goldCheckEngine.svg" alt="Errors Detected" style="width: 40px; height: 40px;">
+                        <img src="../assets/img/icons/goldCheckEngine.svg" alt="Errors Detected" style="width: 48px; height: 48px;">
                     <?php else: ?>
-                        <img src="assets/img/icons/greyCheckEngine.svg" alt="No Errors" style="width: 40px; height: 40px;">
+                        <img src="../assets/img/icons/greyCheckEngine.svg" alt="No Errors" style="width: 48px; height: 48px;">
                     <?php endif; ?>
-                    <i class="fa-solid fa-triangle-exclamation fa-2x" style="opacity: 0.6;"></i>
                 </div>
             </div>
 
-            <!-- Check Engine Icon Options -->
-            <div style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                <div style="font-size: 12px; margin-bottom: 8px; color: #666;">Choose Check Engine Icon:</div>
-                <div style="display: flex; gap: 15px; justify-content: center;">
-                    <!-- Option 1: Classic Dashboard Light -->
-                    <div style="text-align: center;">
-                        <div style="font-size: 10px; margin-bottom: 3px; color: #666;">Classic</div>
-                        <div style="width: 32px; height: 32px; display: inline-block;">
-                            <?php if ($critical_errors_today > 0): ?>
-                                <svg viewBox="0 0 32 32" style="width: 100%; height: 100%;">
-                                    <rect x="2" y="2" width="28" height="28" rx="4" ry="4" fill="#dc3545" stroke="#b02a37" stroke-width="1"/>
-                                    <text x="16" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="white">ENGINE</text>
-                                </svg>
-                            <?php elseif ($error_logs_24h > 0): ?>
-                                <svg viewBox="0 0 32 32" style="width: 100%; height: 100%;">
-                                    <rect x="2" y="2" width="28" height="28" rx="4" ry="4" fill="#ffc107" stroke="#d39e00" stroke-width="1"/>
-                                    <text x="16" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="black">ENGINE</text>
-                                </svg>
-                            <?php else: ?>
-                                <svg viewBox="0 0 32 32" style="width: 100%; height: 100%;">
-                                    <rect x="2" y="2" width="28" height="28" rx="4" ry="4" fill="#6c757d" stroke="#495057" stroke-width="1"/>
-                                    <text x="16" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="white">ENGINE</text>
-                                </svg>
-                            <?php endif; ?>
-                        </div>
-                    </div>
 
-                    <!-- Option 2: Modern Dashboard Light -->
-                    <div style="text-align: center;">
-                        <div style="font-size: 10px; margin-bottom: 3px; color: #666;">Modern</div>
-                        <div style="width: 32px; height: 32px; display: inline-block;">
-                            <?php if ($critical_errors_today > 0): ?>
-                                <svg viewBox="0 0 32 32" style="width: 100%; height: 100%;">
-                                    <rect x="1" y="1" width="30" height="30" rx="15" ry="15" fill="#dc3545" stroke="#b02a37" stroke-width="2"/>
-                                    <circle cx="16" cy="16" r="12" fill="none" stroke="white" stroke-width="1"/>
-                                    <text x="16" y="12" text-anchor="middle" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="white">CHECK</text>
-                                    <text x="16" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="white">ENGINE</text>
-                                </svg>
-                            <?php elseif ($error_logs_24h > 0): ?>
-                                <svg viewBox="0 0 32 32" style="width: 100%; height: 100%;">
-                                    <rect x="1" y="1" width="30" height="30" rx="15" ry="15" fill="#ffc107" stroke="#d39e00" stroke-width="2"/>
-                                    <circle cx="16" cy="16" r="12" fill="none" stroke="black" stroke-width="1"/>
-                                    <text x="16" y="12" text-anchor="middle" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="black">CHECK</text>
-                                    <text x="16" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="black">ENGINE</text>
-                                </svg>
-                            <?php else: ?>
-                                <svg viewBox="0 0 32 32" style="width: 100%; height: 100%;">
-                                    <rect x="1" y="1" width="30" height="30" rx="15" ry="15" fill="#6c757d" stroke="#495057" stroke-width="2"/>
-                                    <circle cx="16" cy="16" r="12" fill="none" stroke="white" stroke-width="1"/>
-                                    <text x="16" y="12" text-anchor="middle" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="white">CHECK</text>
-                                    <text x="16" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="white">ENGINE</text>
-                                </svg>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-
-                    <!-- Option 3: Simple Warning Light -->
-                    <div style="text-align: center;">
-                        <div style="font-size: 10px; margin-bottom: 3px; color: #666;">Warning</div>
-                        <div style="width: 32px; height: 32px; display: inline-block;">
-                            <?php if ($critical_errors_today > 0): ?>
-                                <svg viewBox="0 0 32 32" style="width: 100%; height: 100%;">
-                                    <rect x="4" y="4" width="24" height="24" rx="2" ry="2" fill="#dc3545" stroke="#b02a37" stroke-width="1"/>
-                                    <text x="16" y="16" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">!</text>
-                                    <text x="16" y="26" text-anchor="middle" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="white">ENGINE</text>
-                                </svg>
-                            <?php elseif ($error_logs_24h > 0): ?>
-                                <svg viewBox="0 0 32 32" style="width: 100%; height: 100%;">
-                                    <rect x="4" y="4" width="24" height="24" rx="2" ry="2" fill="#ffc107" stroke="#d39e00" stroke-width="1"/>
-                                    <text x="16" y="16" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="black">!</text>
-                                    <text x="16" y="26" text-anchor="middle" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="black">ENGINE</text>
-                                </svg>
-                            <?php else: ?>
-                                <svg viewBox="0 0 32 32" style="width: 100%; height: 100%;">
-                                    <rect x="4" y="4" width="24" height="24" rx="2" ry="2" fill="#6c757d" stroke="#495057" stroke-width="1"/>
-                                    <text x="16" y="16" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">!</text>
-                                    <text x="16" y="26" text-anchor="middle" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="white">ENGINE</text>
-                                </svg>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-
-                    <!-- Option 4: Engine Block (Original) -->
-                    <div style="text-align: center;">
-                        <div style="font-size: 10px; margin-bottom: 3px; color: #666;">Engine</div>
-                        <div style="width: 32px; height: 32px; display: inline-block;">
-                            <?php if ($critical_errors_today > 0): ?>
-                                <svg viewBox="0 0 24 24" style="width: 100%; height: 100%; fill: #dc3545;">
-                                    <path d="M8 2C6.89 2 6 2.89 6 4V6H4C2.89 6 2 6.89 2 8V10C2 11.11 2.89 12 4 12H6V14H4C2.89 14 2 14.89 2 16V18C2 19.11 2.89 20 4 20H6V22H8V20H10V22H12V20H14V22H16V20H18C19.11 20 20 19.11 20 18V16C20 14.89 19.11 14 18 14H16V12H18C19.11 12 20 11.11 20 10V8C20 6.89 19.11 6 18 6H16V4C16 2.89 15.11 2 14 2H8Z"/>
-                                </svg>
-                            <?php elseif ($error_logs_24h > 0): ?>
-                                <svg viewBox="0 0 24 24" style="width: 100%; height: 100%; fill: #ffc107;">
-                                    <path d="M8 2C6.89 2 6 2.89 6 4V6H4C2.89 6 2 6.89 2 8V10C2 11.11 2.89 12 4 12H6V14H4C2.89 14 2 14.89 2 16V18C2 19.11 2.89 20 4 20H6V22H8V20H10V22H12V20H14V22H16V20H18C19.11 20 20 19.11 20 18V16C20 14.89 19.11 14 18 14H16V12H18C19.11 12 20 11.11 20 10V8C20 6.89 19.11 6 18 6H16V4C16 2.89 15.11 2 14 2H8Z"/>
-                                </svg>
-                            <?php else: ?>
-                                <svg viewBox="0 0 24 24" style="width: 100%; height: 100%; fill: #6c757d;">
-                                    <path d="M8 2C6.89 2 6 2.89 6 4V6H4C2.89 6 2 6.89 2 8V10C2 11.11 2.89 12 4 12H6V14H4C2.89 14 2 14.89 2 16V18C2 19.11 2.89 20 4 20H6V22H8V20H10V22H12V20H14V22H16V20H18C19.11 20 20 19.11 20 18V16C20 14.89 19.11 14 18 14H16V12H18C19.11 12 20 11.11 20 10V8C20 6.89 19.11 6 18 6H16V4C16 2.89 15.11 2 14 2H8Z"/>
-                                </svg>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div style="font-size: 36px; font-weight: bold; margin-bottom: 10px;"><?=$error_logs_total?></div>
             <?php if ($error_logs_24h > 0): ?>
