@@ -153,7 +153,7 @@ while ($rw = $stmt->fetch(PDO::FETCH_ASSOC)) {
 					</p>
 					<p>
 						<label>Content</label>
-						<textarea class="form-control" id="summernote" rows="8" name="content" required></textarea>
+						<textarea class="form-control" id="content" rows="8" name="content" required></textarea>
 					</p>
 								
 					<input type="submit" name="add" class="btn btn-primary col-12" value="Add" />
@@ -163,14 +163,133 @@ while ($rw = $stmt->fetch(PDO::FETCH_ASSOC)) {
 </div>
 
 <?=template_admin_footer('
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.3.0/tinymce.min.js" integrity="sha512-RUZ2d69UiTI+LdjfDCxqJh5HfjmOcouct56utQNVRjr90Ea8uHQa+gCxvxDTC9fFvIGP+t4TDDJWNTRV48tBpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-$(document).ready(function() {
-	$("#summernote").summernote({height: 350});
-	
-	var noteBar = $(".note-toolbar");
-		noteBar.find("[data-toggle]").each(function() {
-		$(this).attr("data-bs-toggle", $(this).attr("data-toggle")).removeAttr("data-toggle");
-	});
+tinymce.init({
+    selector: "#content",
+    plugins: "image table lists media link code",
+    toolbar: "undo redo | insert_template | blocks | formatselect | bold italic forecolor | align | outdent indent | numlist bullist | table image link | code",
+    menubar: "edit view insert format tools table",
+    valid_elements: "*[*]",
+    extended_valid_elements: "*[*]",
+    valid_children: "+body[style]",
+    content_css: false,
+    height: 350,
+    branding: false,
+    promotion: false,
+    automatic_uploads: true,
+    images_upload_url: "tinymce_upload.php",
+    images_upload_handler: function (blobInfo, progress) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "ajax_upload.php", true);
+
+            const formData = new FormData();
+            formData.append("file", blobInfo.blob(), blobInfo.filename());
+
+            xhr.upload.onprogress = (e) => {
+                progress(e.loaded / e.total * 100);
+            };
+
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    try {
+                        const json = JSON.parse(xhr.responseText);
+                        if (json.error) {
+                            reject(json.error);
+                        } else {
+                            resolve(json.location);
+                        }
+                    } catch (err) {
+                        reject("Invalid JSON response from server");
+                    }
+                } else {
+                    reject("HTTP Error: " + xhr.status);
+                }
+            };
+
+            xhr.onerror = () => {
+                reject("Image upload failed");
+            };
+
+            xhr.send(formData);
+        });
+    },
+    file_picker_callback: function(callback, value, meta) {
+        if (meta.filetype === "image") {
+            const input = document.createElement("input");
+            input.setAttribute("type", "file");
+            input.setAttribute("accept", "image/*");
+
+            input.onchange = function() {
+                const file = this.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function() {
+                    const formData = new FormData();
+                    formData.append("file", file);
+
+                    fetch("tinymce_upload.php", {
+                        method: "POST",
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                        } else {
+                            callback(data.location, { 
+                                alt: file.name.replace(/\.[^/.]+$/, ""),
+                                class: "responsive-image"
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        alert("Upload failed: " + error);
+                    });
+                };
+
+                reader.readAsDataURL(file);
+            };
+
+            input.click();
+        }
+    },
+    link_default_protocol: "https",
+    link_assume_external_targets: false,
+    allow_unsafe_link_target: true,
+    convert_urls: false,
+    relative_urls: false,
+    remove_script_host: false,
+    image_title: true,
+    image_description: true,
+    license_key: "gpl",
+    setup: function (editor) {
+        editor.ui.registry.addMenuButton("insert_template", {
+            icon: "template",
+            tooltip: "Use Existing Template",
+            fetch: function (callback) {
+                fetch("get_blog_template.php?list=1")
+                    .then(response => response.json())
+                    .then(templates => {
+                        const items = templates.map(function(template) {
+                            return {
+                                type: "menuitem",
+                                text: template.title,
+                                onAction: function () {
+                                    fetch("get_blog_template.php?id=" + template.id)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            editor.setContent(data.content);
+                                        });
+                                }
+                            };
+                        });
+                        callback(items);
+                    });
+            }
+        });
+    }
 });
 </script>
 ')?>
