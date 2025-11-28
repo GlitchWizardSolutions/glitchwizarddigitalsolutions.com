@@ -1,6 +1,20 @@
 <?php
 require 'assets/includes/admin_config.php';
 
+// User authentication for blog admin
+if (isset($_SESSION['sec-username'])) {
+    $uname = $_SESSION['sec-username'];
+    $stmt = $blog_pdo->prepare("SELECT * FROM `users` WHERE username = ? AND (role = 'Admin' OR role = 'Editor')");
+    $stmt->execute([$uname]);
+    if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
+        header('Location: ../../blog/login');
+        exit;
+    }
+} else {
+    header('Location: ../../blog/login');
+    exit;
+}
+
 if (isset($_POST['add'])) {
     $title = trim($_POST['title']);
     $content = $_POST['content'];
@@ -10,12 +24,19 @@ if (isset($_POST['add'])) {
     $created_date = date('Y-m-d');
     $created_time = date('H:i:s');
 
-    // Get current user ID
-    $author = $uname;
+    // Get current user ID from blog users table
     $stmt = $blog_pdo->prepare("SELECT id FROM `users` WHERE username = ? LIMIT 1");
-    $stmt->execute([$author]);
+    $stmt->execute([$uname]);
     $auth = $stmt->fetch(PDO::FETCH_ASSOC);
-    $created_by = $auth ? $auth['id'] : 0;
+    
+    if (!$auth) {
+        // User doesn't exist in blog database, create them
+        $stmt = $blog_pdo->prepare("INSERT INTO users (username, role) VALUES (?, 'Admin')");
+        $stmt->execute([$uname]);
+        $created_by = $blog_pdo->lastInsertId();
+    } else {
+        $created_by = $auth['id'];
+    }
 
     $stmt = $blog_pdo->prepare("INSERT INTO `blog_templates` (title, content, category_id, created_by, created_date, created_time, active)
                                VALUES (?, ?, ?, ?, ?, ?, ?)");
