@@ -62,11 +62,11 @@ function log_error($application, $pagename, $section, $error_message, $severity 
             INSERT INTO error_handling (
                 application, pagename, path, section, error_type, severity,
                 thrown, inputs, user_id, session_id, ip_address, user_agent,
-                request_method, request_uri, referer, timestamp
+                request_method, request_uri, referer, environment, timestamp
             ) VALUES (
                 :application, :pagename, :path, :section, :error_type, :severity,
                 :thrown, :inputs, :user_id, :session_id, :ip_address, :user_agent,
-                :request_method, :request_uri, :referer, NOW()
+                :request_method, :request_uri, :referer, :environment, NOW()
             )
         ');
         
@@ -85,7 +85,8 @@ function log_error($application, $pagename, $section, $error_message, $severity 
             'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null,
             'request_method' => $_SERVER['REQUEST_METHOD'] ?? null,
             'request_uri' => $_SERVER['REQUEST_URI'] ?? null,
-            'referer' => $_SERVER['HTTP_REFERER'] ?? null
+            'referer' => $_SERVER['HTTP_REFERER'] ?? null,
+            'environment' => defined('ENVIRONMENT') ? ENVIRONMENT : 'unknown'
         ]);
         
         return true;
@@ -139,11 +140,11 @@ function log_error_detailed($data) {
             INSERT INTO error_handling (
                 application, pagename, path, section, error_type, severity, error_code,
                 thrown, inputs, outputs, user_id, session_id, ip_address, user_agent,
-                request_method, request_uri, referer, noted, timestamp
+                request_method, request_uri, referer, noted, environment, timestamp
             ) VALUES (
                 :application, :pagename, :path, :section, :error_type, :severity, :error_code,
                 :thrown, :inputs, :outputs, :user_id, :session_id, :ip_address, :user_agent,
-                :request_method, :request_uri, :referer, :noted, NOW()
+                :request_method, :request_uri, :referer, :noted, :environment, NOW()
             )
         ');
         
@@ -165,7 +166,8 @@ function log_error_detailed($data) {
             'request_method' => $_SERVER['REQUEST_METHOD'] ?? null,
             'request_uri' => $_SERVER['REQUEST_URI'] ?? null,
             'referer' => $_SERVER['HTTP_REFERER'] ?? null,
-            'noted' => $data['noted'] ?? null
+            'noted' => $data['noted'] ?? null,
+            'environment' => defined('ENVIRONMENT') ? ENVIRONMENT : 'unknown'
         ]);
         
         return true;
@@ -269,4 +271,65 @@ function enable_global_error_logging($application_name = 'Unknown Application') 
     set_exception_handler(function($exception) use ($application_name) {
         log_exception($exception, $application_name, basename($exception->getFile()));
     });
+}
+
+/**
+ * Critical error logging - ALWAYS logs regardless of environment or toggle
+ * Used for system failures, database connection errors, critical config issues
+ *
+ * @param string $application Application/system name
+ * @param string $pagename Page filename
+ * @param string $section Section/function where error occurred
+ * @param string $error_message Error message
+ * @param string $severity Severity level (Critical, Error, Warning, Notice, Info)
+ * @param array $additional_data Additional data to log (optional)
+ * @return bool True on success, false on failure
+ */
+function critical_log($application, $pagename, $section, $error_message, $severity = 'Critical', $additional_data = []) {
+    return log_error($application, $pagename, $section, $error_message, $severity, $additional_data);
+}
+
+/**
+ * Debug logging - Conditional based on environment and toggle state
+ * Development: Always logs
+ * Production: Only logs if debug_logging_enabled = TRUE
+ *
+ * @param string $application Application/system name
+ * @param string $pagename Page filename
+ * @param string $section Section/function where error occurred
+ * @param string $error_message Error message
+ * @param string $severity Severity level (Critical, Error, Warning, Notice, Info)
+ * @param array $additional_data Additional data to log (optional)
+ * @return bool True on success, false on failure
+ */
+function debug_log($application, $pagename, $section, $error_message, $severity = 'Info', $additional_data = []) {
+    // Include environment detection
+    require_once '../private/config.php';
+
+    // Always log in development
+    if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
+        return log_error($application, $pagename, $section, $error_message, $severity, $additional_data);
+    }
+
+    // In production, check toggle state
+    if (defined('ENVIRONMENT') && ENVIRONMENT === 'production') {
+        $error_db = get_error_db();
+        if ($error_db) {
+            try {
+                $stmt = $error_db->prepare("SELECT debug_logging_enabled FROM logging_settings WHERE id = 1");
+                $stmt->execute();
+                $enabled = $stmt->fetchColumn();
+
+                if ($enabled) {
+                    return log_error($application, $pagename, $section, $error_message, $severity, $additional_data);
+                }
+            } catch (PDOException $e) {
+                // If we can't check the toggle, don't log debug messages
+                return false;
+            }
+        }
+    }
+
+    // Default: don't log
+    return false;
 }

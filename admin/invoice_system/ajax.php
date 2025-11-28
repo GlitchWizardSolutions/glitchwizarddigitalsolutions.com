@@ -1,13 +1,13 @@
 <?php
 // 2024-12-09 Production.
 // 2025-06-15 Reworked. Not able to verify yet. This may just be for modals.
-error_log('Located ajax.php');
+debug_log('Invoice System', 'ajax.php', 'Page Load', 'Located ajax.php');
 include_once 'assets/includes/admin_config.php';
 // Output JSON
 header('Content-Type: application/json; charset=utf-8');
 // Digital Downloads Endpoint
 if (isset($_GET['action']) && $_GET['action'] == 'add_client') {
-    error_log('GET action = add_client in ajax.php');
+    debug_log('Invoice System', 'ajax.php', 'Client Creation', 'GET action = add_client in ajax.php');
     // Validation
     if (empty($_POST['first_name']) || empty($_POST['email'])) {
         echo '{"status":"error","message":"The first name and email fields are required!"}';

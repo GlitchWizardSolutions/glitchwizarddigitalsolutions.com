@@ -47,11 +47,11 @@ class DatabasePool {
                     $pdo->exec("SET NAMES '" . db_charset . "'");
                 } catch (Exception $e) {
                     // If SET NAMES fails, log and continue; some environments don't allow this command
-                    error_log('Warning: SET NAMES failed: ' . $e->getMessage());
+                    critical_log('Database System', 'database-system.php', 'Connection Setup', 'Warning: SET NAMES failed: ' . $e->getMessage());
                 }
                 self::$connections[$key] = $pdo;
             } catch (PDOException $exception) {
-                error_log("Failed to connect to database '$dbname': " . $exception->getMessage());
+                critical_log('Database System', 'database-system.php', 'Connection Setup', "Failed to connect to database '$dbname': " . $exception->getMessage());
                 throw new Exception("Database connection failed. Please try again later.");
             }
         }
@@ -246,7 +246,7 @@ function pdo_connect_budget_db($host = null, $dbname = null, $user = null, $pass
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $pdo;
         } catch (PDOException $exception) {
-            error_log("Failed to connect to budget database: " . $exception->getMessage());
+            critical_log('Database System', 'database-system.php', 'Budget Database Connection', "Failed to connect to budget database: " . $exception->getMessage());
             exit('Failed to connect to database!' . $exception->getMessage());
         }
     }
