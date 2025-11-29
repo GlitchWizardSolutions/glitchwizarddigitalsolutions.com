@@ -23,12 +23,16 @@ include_once 'assets/includes/public-config.php';
 $msg = '';
 // Now we check if the data from the login form was submitted, isset() will check if the data exists.
 if (isset($_POST['email'])) {
-    // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
-    $stmt = $pdo->prepare('SELECT * FROM accounts WHERE email = ?');
-    $stmt->execute([ $_POST['email'] ]);
-    $account = $stmt->fetch(PDO::FETCH_ASSOC);
-    // If the account exists with the email
-    if ($account) {
+    // Validate CSRF token
+    if (!validate_csrf_token()) {
+        $msg = 'Security validation failed. Please try again.';
+    } else {
+        // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
+        $stmt = $pdo->prepare('SELECT * FROM accounts WHERE email = ?');
+        $stmt->execute([ $_POST['email'] ]);
+        $account = $stmt->fetch(PDO::FETCH_ASSOC);
+        // If the account exists with the email
+        if ($account) {
         // Account exist
         // Update the reset code in the database
 		$uniqid = uniqid();
@@ -38,6 +42,7 @@ if (isset($_POST['email'])) {
         $msg = '<div style="color:green"> Reset password link has been sent to your email!</div>';
     } else {
         $msg = 'We do not have an account with that email!';
+    }
     }
 }
 
@@ -49,6 +54,7 @@ if (isset($_POST['email'])) {
 					<i class="fas fa-envelope"></i>
 				</label>
 				<input type="email" name="email" placeholder="Your Email" id="email" required>
+				<?php csrf_token_field(); ?>
 				<div class="msg"><?=$msg?></div>
 				<input type="submit" value="Submit">
 			</form>

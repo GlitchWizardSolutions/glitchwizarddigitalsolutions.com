@@ -16,14 +16,18 @@ $stmt->execute([ $_SESSION['id'] ]);
 $account = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (isset($_POST['username'], $_POST['email'], $_POST['first_name'])) {
-	// Make sure the submitted values are not empty.
-	if (empty($_POST['username']) || empty($_POST['first_name']) || empty($_POST['last_name']) || empty($_POST['email'])) {
-		$error_msg = 'The input fields must not be empty!';
-	} else if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-		$error_msg = 'Please provide a valid email address!';
-	} else if (!preg_match('/^[a-zA-Z0-9]+$/', $_POST['username'])) {
-	    $error_msg = 'Login User Name must contain only letters and numbers!';
-	} //end of the data validation on form.
+    // Validate CSRF token
+    if (!validate_csrf_token()) {
+        $error_msg = 'Security validation failed. Please try again.';
+    } else {
+        // Make sure the submitted values are not empty.
+        if (empty($_POST['username']) || empty($_POST['first_name']) || empty($_POST['last_name']) || empty($_POST['email'])) {
+            $error_msg = 'The input fields must not be empty!';
+        } else if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+            $error_msg = 'Please provide a valid email address!';
+        } else if (!preg_match('/^[a-zA-Z0-9]+$/', $_POST['username'])) {
+            $error_msg = 'Login User Name must contain only letters and numbers!';
+        } //end of the data validation on form.
 	
 	// Handle avatar upload
 	// Upload directory: /public_html/media/avatars/
@@ -105,6 +109,7 @@ if (isset($_POST['username'], $_POST['email'], $_POST['first_name'])) {
 			    exit;
 		}
 	}
+    }
 }
 }
 include includes_path . 'page-setup.php';
@@ -243,6 +248,7 @@ include includes_path . 'page-setup.php';
                 </div>
             <div class="text-center"><strong><p style='color:red'><?=$error_msg?></p></strong>
 			<div class="mar-bot-2">
+			<?php csrf_token_field(); ?>
 			<button class="btn btn-success mar-top-1 mar-right-1" type="submit">Save Changes</button>
 			<a href="index.php" class="btn alt mar-top-1">Cancel</a>
 		    </div>

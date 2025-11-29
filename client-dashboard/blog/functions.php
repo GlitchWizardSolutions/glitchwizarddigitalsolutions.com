@@ -562,7 +562,7 @@ if ($settings['layout'] == 'Wide') {
 				<div class="input-group">
 					<input type="search" class="form-control" placeholder="Search" name="q" value="<?php
 if (isset($_GET['q'])) {
-	echo $_GET['q'];
+	echo htmlspecialchars($_GET['q'], ENT_QUOTES);
 }
 ?>" required />
 					<span class="input-group-btn">

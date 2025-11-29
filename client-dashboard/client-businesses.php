@@ -11,13 +11,18 @@ include 'assets/includes/user-config.php';
 ;
 // Handle edit business profile
 if (isset($_POST['invoice_client_id'])) {
-			// Update the session variables
-			$_SESSION['invoice_client_id'] = $_POST['invoice_client_id'];
-			$business_id = $_POST['invoice_client_id'];
-           //redirect the user to the edit business profile page.
-				header("Location: {$base_url}/client-business-edit.php?business_id=" . $business_id);
-				exit;
-			}
+    // Validate CSRF token
+    if (!validate_csrf_token()) {
+        die('Security validation failed. Please try again.');
+    }
+
+    // Update the session variables
+    $_SESSION['invoice_client_id'] = $_POST['invoice_client_id'];
+    $business_id = $_POST['invoice_client_id'];
+    //redirect the user to the edit business profile page.
+    header("Location: {$base_url}/client-business-edit.php?business_id=" . $business_id);
+    exit;
+}
 			
 // output message (errors, etc)
 $msg = '';
@@ -115,10 +120,11 @@ include includes_path . 'page-setup.php';
       <div class="card-body"  id='4'>
         <div class="block tickets"  id='5'> 
 	     <div class="tickets-list"  id='6'>
-          <form action="" id='businesses-form' style="width:100%" class='form' method="post"> 
+          <form action="" id='businesses-form' style="width:100%" class='form' method="post">
               <input name="invoice_client_id" type="hidden" id="invoice_client_id" value="<?=htmlspecialchars($invoice_complete['id']?? '', ENT_QUOTES)?>">
-              <button class="btn btn-sm btn-success" style='width:75px' type="submit">Edit</button>  
-          </form> 
+              <?php csrf_token_field(); ?>
+              <button class="btn btn-sm btn-success" style='width:75px' type="submit">Edit</button>
+          </form>
           <div class="row ticket col-12">
                <h5>
 			      <strong><?=htmlspecialchars($invoice_complete['business_name'] ?? '', ENT_QUOTES)?></strong>
@@ -158,10 +164,11 @@ include includes_path . 'page-setup.php';
       <div class="card-body"  id='4'>
         <div class="block tickets"  id='5'> 
 	     <div class="tickets-list"  id='6'>
-          <form action="" id='businesses-form' style="width:100%" class='form' method="post"> 
+          <form action="" id='businesses-form' style="width:100%" class='form' method="post">
               <input name="invoice_client_id" type="hidden" id="invoice_client_id" value="<?=htmlspecialchars($invoice_incomplete['id']?? '', ENT_QUOTES)?>">
-              <button class="btn btn-sm btn-success" style='width:75px' type="submit">Edit</button>  
-          </form> 
+              <?php csrf_token_field(); ?>
+              <button class="btn btn-sm btn-success" style='width:75px' type="submit">Edit</button>
+          </form>
           <div class="row ticket col-12">
                <h5>
 			      <strong><?=htmlspecialchars($invoice_incomplete['business_name'] ?? '', ENT_QUOTES)?></strong>
@@ -201,10 +208,11 @@ include includes_path . 'page-setup.php';
       <div class="card-body"  id='4'>
         <div class="block tickets"  id='5'> 
 	     <div class="tickets-list"  id='6'>
-          <form action="" id='businesses-form' style="width:100%" class='form' method="post"> 
+          <form action="" id='businesses-form' style="width:100%" class='form' method="post">
               <input name="invoice_client_id" type="hidden" id="invoice_client_id" value="<?=htmlspecialchars($invoice_invalid['id']?? '', ENT_QUOTES)?>">
-              <button class="btn btn-sm btn-success" style='width:75px' type="submit">Edit</button>  
-          </form> 
+              <?php csrf_token_field(); ?>
+              <button class="btn btn-sm btn-success" style='width:75px' type="submit">Edit</button>
+          </form>
           <div class="row ticket col-12">
                <h5>
 			      <strong><?=htmlspecialchars($invoice_invalid['business_name'] ?? '', ENT_QUOTES)?></strong>

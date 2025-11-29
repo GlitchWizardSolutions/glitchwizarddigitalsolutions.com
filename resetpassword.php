@@ -27,14 +27,18 @@ if (isset($_GET['email'], $_GET['code']) && !empty($_GET['code'])) {
     // If the account exists with the email and code
     if ($account) {
         if (isset($_POST['npassword'], $_POST['cpassword'])) {
-             $pwdLength=strlen($_POST['npassword']);
-            if ($_POST['npassword'] != $_POST['cpassword']) {
-                $msg = 'Passwords must match!';
-            }else if (strlen($_POST['npassword']) > 20 || strlen($_POST['npassword']) < 6) {
-            	$msg = 'Password must be between 8 and 20 characters long!';
-            }else if (strlen($_POST['npassword']) > 20 || strlen($_POST['npassword']) < 5) {
-            	$msg = 'Password must be between 6 and 20 characters long!';
+            // Validate CSRF token
+            if (!validate_csrf_token()) {
+                $msg = 'Security validation failed. Please try again.';
             } else {
+                $pwdLength=strlen($_POST['npassword']);
+                if ($_POST['npassword'] != $_POST['cpassword']) {
+                    $msg = 'Passwords must match!';
+                }else if (strlen($_POST['npassword']) > 20 || strlen($_POST['npassword']) < 6) {
+                    $msg = 'Password must be between 8 and 20 characters long!';
+                }else if (strlen($_POST['npassword']) > 20 || strlen($_POST['npassword']) < 5) {
+                    $msg = 'Password must be between 6 and 20 characters long!';
+                } else {
                 $stmt = $pdo->prepare('UPDATE accounts SET password = ?, reset_code = "" WHERE email = ?');
             	// We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
             	$password = password_hash($_POST['npassword'], PASSWORD_DEFAULT);
@@ -42,6 +46,7 @@ if (isset($_GET['email'], $_GET['code']) && !empty($_GET['code'])) {
                 $msg = 'Password has been reset!<br>
                         <i class="fa-solid fa-check fa-fade"></i>&nbsp;You can now &nbsp;<a class="btn btn-sm" style="background-color:#4b3969; color:#f5f5f5" href="index.php">LOG IN</a>';
             }//end password input validation
+            }
         }//end check if it is even set
     } else {
         $msg='Incorrect email and/or code. <strong><a href="forgotpassword.php">Try Again Here</a></strong>';
@@ -65,6 +70,7 @@ include includes_path . 'public-page-setup.php';
 					<i class="fas fa-lock"></i>
 				</label>
 				<input type="password" name="cpassword" placeholder="Confirm Password" id="cpassword" required>
+				<?php csrf_token_field(); ?>
 				<div class="msg"><?=$msg?></div>
 				<input type="submit" value="Submit">
 			</form>

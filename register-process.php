@@ -16,9 +16,12 @@ LOG NOTE: PRODUCTION 2024-19-19 - Not in use, would need upgraded to match our s
 include 'assets/includes/public-config.php';
 include_once includes_path . 'main.php';
 // Unified email system already loaded by public-config.php
-if (!isset($_POST['token']) || $_POST['token'] != $_SESSION['token']) {
-	exit('Incorrect token provided!');
+
+// Validate CSRF token
+if (!validate_csrf_token()) {
+	exit('Security validation failed!');
 }
+
 // Now we check if the data was submitted, isset() function will check if the data exists.
 if (!isset($_POST['full_name'], $_POST['username'], $_POST['password'], $_POST['cpassword'], $_POST['email'])) {
 	// Could not get the data that should have been sent.

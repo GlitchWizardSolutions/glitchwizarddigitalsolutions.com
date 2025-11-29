@@ -6,12 +6,17 @@ include 'assets/includes/user-config.php';
 include process_path . 'review-response-process.php';
 // Handle respond to ticket post data
 if (isset($_POST['respond_ticket_id'])) {
-			// Update the session variables
-			$_SESSION['ticket_id'] = $_POST['respond_ticket_id'];
-           //redirect the user to the view-ticket page.
-				header("Location: {$base_url}/communication/ticket-view.php");
-				exit;
-			}
+    // Validate CSRF token
+    if (!validate_csrf_token()) {
+        die('Security validation failed. Please try again.');
+    }
+
+    // Update the session variables
+    $_SESSION['ticket_id'] = $_POST['respond_ticket_id'];
+    //redirect the user to the view-ticket page.
+    header("Location: {$base_url}/communication/ticket-view.php");
+    exit;
+}
 include includes_path . 'page-setup.php';
 ?>
 <main id="main" class="main">
@@ -58,10 +63,11 @@ include includes_path . 'page-setup.php';
       <div class="card-body"  id='4'>
         <div class="block tickets"  id='5'> 
 	     <div class="tickets-list"  id='6'>
-          <form action="" id='ticket-id-form' style="width:100%" class='form' method="post"> 
+          <form action="" id='ticket-id-form' style="width:100%" class='form' method="post">
               <input name="respond_ticket_id" type="hidden" id="respond_ticket_id" value="<?=htmlspecialchars($ar_ticket['id']?? '', ENT_QUOTES)?>">
-              <button class="btn btn-sm btn-warning" style='width:75px' type="submit">Respond</button>  
-          </form> 
+              <?php csrf_token_field(); ?>
+              <button class="btn btn-sm btn-warning" style='width:75px' type="submit">Respond</button>
+          </form>
           <div class="row ticket col-12">
                <h5><span class='fs-6'>
 			  <?php if ($ar_ticket['ticket_status'] == 'open'): ?><i ></i>

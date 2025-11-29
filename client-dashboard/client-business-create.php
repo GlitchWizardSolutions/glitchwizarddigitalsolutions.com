@@ -12,13 +12,17 @@ $account = $stmt->fetch(PDO::FETCH_ASSOC);
  
 // FORM SUBMITTED
 if (isset($_POST['business_name'], $_POST['business_email'], $_POST['first_name'], $_POST['last_name'])) {
-	// Make sure the submitted values are not empty.
-	if (empty($_POST['business_name']) || empty($_POST['business_email']) || empty($_POST['first_name']) || empty($_POST['last_name'])) {
-		$msg = 'Business name, email, first name, and last name are required!';
-	} else if (empty($_POST['business_phone'])) {
-		$msg = 'Business phone is required!';
-	} else if (empty($_POST['business_address_street']) || empty($_POST['business_address_city']) || empty($_POST['business_address_state']) || empty($_POST['business_address_zip'])) {
-		$msg = 'Complete address (street, city, state, zip) is required!';
+    // Validate CSRF token first
+    if (!validate_csrf_token()) {
+        $msg = 'Security validation failed. Please try again.';
+    } else {
+        // Make sure the submitted values are not empty.
+        if (empty($_POST['business_name']) || empty($_POST['business_email']) || empty($_POST['first_name']) || empty($_POST['last_name'])) {
+            $msg = 'Business name, email, first name, and last name are required!';
+        } else if (empty($_POST['business_phone'])) {
+            $msg = 'Business phone is required!';
+        } else if (empty($_POST['business_address_street']) || empty($_POST['business_address_city']) || empty($_POST['business_address_state']) || empty($_POST['business_address_zip'])) {
+            $msg = 'Complete address (street, city, state, zip) is required!';
 	} else if (!filter_var($_POST['business_email'], FILTER_VALIDATE_EMAIL)) {
 		$msg = 'Please provide a valid email address!';
 	} else if (!preg_match('/^[a-zA-Z0-9 ]+$/', $_POST['first_name'])) {
@@ -77,6 +81,7 @@ if (isset($_POST['business_name'], $_POST['business_email'], $_POST['first_name'
 			exit;
 	 }// end insert */
     }
+}
 //END FORM SUBMITTED
  
 include includes_path . 'page-setup.php';
@@ -217,6 +222,7 @@ include includes_path . 'page-setup.php';
                     </div>
                    <div class="text-center"><strong><p style='color:red'><?=$msg?></p></strong>
 			<div class="mar-bot-2">
+			<?php csrf_token_field(); ?>
 			<button class="btn btn-success mar-top-1 mar-right-1" type="submit">Save Changes</button>
 				<a href="index.php" class="btn alt mar-top-1">Cancel</a>
 		    </div>

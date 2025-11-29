@@ -123,13 +123,13 @@ if ($error == 1) {
 <?php  
             // Error display if redirected back
 if (isset($_GET['error'])) {
-  echo "<p style='color:red'>{$_GET['error']}</p>";
+  echo "<p style='color:red'>" . htmlspecialchars($_GET['error'], ENT_QUOTES) . "</p>";
 }
 ?>
 <?php
 // Success display if redirected back
 if (isset($_GET['success'])) {
-  echo "<p style='color:green'>{$_GET['success']}</p>";
+  echo "<p style='color:green'>" . htmlspecialchars($_GET['success'], ENT_QUOTES) . "</p>";
 }
 ?>        
 </div>

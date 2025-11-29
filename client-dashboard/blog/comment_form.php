@@ -155,7 +155,7 @@ $author_name = $logged_in ? $author = $rowu['id'] : "";
 <?php
 // Optional error display if redirected back
 if (isset($_GET['error'])) {
-  echo "<p style='color:red'>{$_GET['error']}</p>";
+  echo "<p style='color:red'>" . htmlspecialchars($_GET['error'], ENT_QUOTES) . "</p>";
 }
 ?>
 

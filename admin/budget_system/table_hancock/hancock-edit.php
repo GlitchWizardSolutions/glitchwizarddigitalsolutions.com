@@ -69,7 +69,6 @@ if (isset($_POST['description'])){
     } 
      // If no validation errors, proceed to insert the record(s) in the database
     if (!$error_msg) {
-        echo $_POST['bill_id'] . ' ' . $_POST['notes'];
         // Update the record
             $stmt = $budget_pdo->prepare('UPDATE hancock 
             SET

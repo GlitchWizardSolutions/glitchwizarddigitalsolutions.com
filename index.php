@@ -43,8 +43,8 @@ if (isset($_COOKIE['rememberme']) && !empty($_COOKIE['rememberme'])) {
 	}//end if account
 }//end if remember me
 
-//CSRF Protection Add on to prevent cross site request forgery attacks.  
-$_SESSION['token'] = md5(uniqid(rand(), true));
+//CSRF Protection - Now handled by security-utils.php
+//$_SESSION['token'] = md5(uniqid(rand(), true));
 
 // PHASE 3: NOW load the page HTML
 include includes_path . 'public-page-setup.php';
