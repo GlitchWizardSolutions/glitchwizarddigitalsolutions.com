@@ -232,8 +232,25 @@ function set_security_headers() {
     // Referrer policy
     header('Referrer-Policy: strict-origin-when-cross-origin');
 
-    // Content Security Policy (basic)
-    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:;");
+    // Content Security Policy - Environment-aware with optional nonce support
+    $useNonces = defined('USE_CSP_NONCES') && USE_CSP_NONCES;
+
+    if ($useNonces) {
+        // Include nonce system
+        require_once 'csp-nonces.php';
+        header(get_csp_header_with_nonce());
+    } else {
+        // Traditional CSP with report-uri
+        $reportUri = BASE_URL . 'csp-report.php';
+
+        if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
+            // More permissive CSP for development - allows external resources for easier development
+            header("Content-Security-Policy: default-src 'self' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://static.cloudflareinsights.com https://www.paypal.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; img-src 'self' data: https: http:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://www.paypal.com; frame-src 'self' https:; report-uri $reportUri;");
+        } else {
+            // Stricter CSP for production - only allow necessary external resources
+            header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com https://www.paypal.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://www.paypal.com; report-uri $reportUri;");
+        }
+    }
 
     // HSTS (HTTP Strict Transport Security) - only if HTTPS
     if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
