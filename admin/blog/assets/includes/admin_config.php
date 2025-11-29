@@ -5,11 +5,13 @@ include ('../../../private/blog_config2025.php');
 }else{
     error_log('../../../private/blog_config2025.php does not exist.');
 }
-include '../../../client-dashboard/blog/config_settings.php';
 
-// Define missing path constants
-if(!defined('admin_includes_path')) define('admin_includes_path', '../../../admin/assets/includes/');
-if(!defined('process_path')) define('process_path', '../../../client-dashboard/assets/includes/process/');
+// Use constant from config.php instead of relative path
+include public_path . 'client-dashboard/blog/config_settings.php';
+
+// Define missing path constants using public_path constant
+if(!defined('admin_includes_path')) define('admin_includes_path', public_path . 'admin/assets/includes/');
+if(!defined('process_path')) define('process_path', public_path . 'client-dashboard/assets/includes/process/');
 
 include admin_includes_path . 'main.php';
 include admin_includes_path . 'admin_page_setup.php';
