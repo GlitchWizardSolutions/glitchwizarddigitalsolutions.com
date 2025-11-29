@@ -47,10 +47,12 @@ $link .= "://";
 $link .= $_SERVER['HTTP_HOST']; 
 $link .= $_SERVER['REQUEST_URI'];
 if(!isset($_SESSION['userdata']) && !strpos($link, 'login.php')){
-	redirect('admin/login.php');
+	header('Location: admin/login.php');
+	exit;
 }
 if(isset($_SESSION['userdata']) && strpos($link, 'login.php')){
-	redirect('admin/index.php');
+	header('Location: admin/index.php');
+	exit;
 }
 $module = array('','admin','faculty','student');
 if(isset($_SESSION['userdata']) && (strpos($link, 'index.php') || strpos($link, 'admin/')) && $_SESSION['userdata']['login_type'] !=  1){

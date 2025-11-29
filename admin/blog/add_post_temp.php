@@ -10,12 +10,12 @@ $uname = $_SESSION['name'] ?? '';
 if (empty($uname)) {
     // Fallback: try to get from account data if session is not set
     $uname = $account['username'] ?? '';
-# }
+}
 
 // Debug: Check if blog_pdo is available
 if (!isset($blog_pdo)) {
     die('Database connection not available');
-# }
+}
 
 if (isset($_POST['add'])) {
     // Debug: Log all POST data
@@ -145,16 +145,16 @@ if (isset($_POST['add'])) {
             }
         }
     }
-# }
+}
 
 // Debug: Script reached template rendering
 error_log('FORM PROCESSING COMPLETE - Success: ' . (isset($success_message) ? 'yes' : 'no') . ', Error: ' . (isset($error_message) ? 'yes' : 'no'));
 if (isset($success_message)) {
     error_log('FORM PROCESSING COMPLETE - Success message: ' . $success_message);
-# }
+}
 if (isset($error_message)) {
     error_log('FORM PROCESSING COMPLETE - Error message: ' . $error_message);
-# }
+}
 
 // Use the admin template system
 ?>
