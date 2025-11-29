@@ -1,7 +1,7 @@
 <?php
 // Knowledge Base Image Upload Form
 require 'assets/includes/admin_config.php';
-include_once 'assets/includes/components.php';
+include_once admin_includes_path . 'components.php';
 
 // Define required images with descriptions
 $required_images = [

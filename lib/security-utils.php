@@ -240,15 +240,13 @@ function set_security_headers() {
         require_once 'csp-nonces.php';
         header(get_csp_header_with_nonce());
     } else {
-        // Traditional CSP with report-uri
-        $reportUri = BASE_URL . 'csp-report.php';
-
+        // Traditional CSP without reporting
         if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
             // More permissive CSP for development - allows external resources for easier development
-            header("Content-Security-Policy: default-src 'self' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://static.cloudflareinsights.com https://www.paypal.com https://cdn.jsdelivr.net https://code.jquery.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https: http:; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https://www.google-analytics.com https://www.paypal.com; frame-src 'self' https:; report-uri $reportUri;");
+            header("Content-Security-Policy: default-src 'self' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://static.cloudflareinsights.com https://www.paypal.com https://cdn.jsdelivr.net https://code.jquery.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https: http:; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://www.google-analytics.com https://www.paypal.com https://cdn.jsdelivr.net; frame-src 'self' https:;");
         } else {
             // Stricter CSP for production - only allow necessary external resources
-            header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com https://www.paypal.com https://cdn.jsdelivr.net https://code.jquery.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https://www.google-analytics.com https://www.paypal.com; report-uri $reportUri;");
+            header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com https://www.paypal.com https://cdn.jsdelivr.net https://code.jquery.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://www.google-analytics.com https://www.paypal.com https://cdn.jsdelivr.net;");
         }
     }
 
