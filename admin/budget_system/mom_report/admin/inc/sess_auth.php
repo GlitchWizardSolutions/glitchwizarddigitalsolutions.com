@@ -54,8 +54,8 @@ if(isset($_SESSION['userdata']) && strpos($link, 'login.php')){
 	header('Location: admin/index.php');
 	exit;
 }
-$module = array('','admin','faculty','student');
-if(isset($_SESSION['userdata']) && (strpos($link, 'index.php') || strpos($link, 'admin/')) && $_SESSION['userdata']['login_type'] !=  1){
-	echo "<script>alert('Access Denied!');location.replace('".base_url.$module[$_SESSION['userdata']['login_type']]."');</script>";
+// Access control - only admins (login_type = 1) can access admin pages
+if(isset($_SESSION['userdata']) && (strpos($link, 'index.php') || strpos($link, 'admin/')) && $_SESSION['userdata']['login_type'] != 1){
+	echo "<script>alert('Access Denied! You do not have permission to access the admin area.');window.location.href='" . base_url . "';</script>";
     exit;
 }

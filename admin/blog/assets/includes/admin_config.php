@@ -5,7 +5,12 @@ include ('../../../private/blog_config2025.php');
 }else{
     error_log('../../../private/blog_config2025.php does not exist.');
 }
-include '../../client-dashboard/blog/config_settings.php';
+include '../../../client-dashboard/blog/config_settings.php';
+
+// Define missing path constants
+if(!defined('admin_includes_path')) define('admin_includes_path', '../../../admin/assets/includes/');
+if(!defined('process_path')) define('process_path', '../../../client-dashboard/assets/includes/process/');
+
 include admin_includes_path . 'main.php';
 include admin_includes_path . 'admin_page_setup.php';
 include admin_includes_path . 'components.php';
