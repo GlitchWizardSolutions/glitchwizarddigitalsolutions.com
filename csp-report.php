@@ -10,6 +10,9 @@
  * Content-Type: application/csp-report
  */
 
+// Load configuration and database connections
+require_once '../private/config.php';
+
 // Include the CSP reporting system
 require_once 'lib/csp-reporting.php';
 
