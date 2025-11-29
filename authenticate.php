@@ -32,16 +32,20 @@ if ($account) {
 		 if(account_activation && $account['activation_code'] != 'activated' && $account['activation_code'] != 'deactivated') {
 			// User has not activated their account, output the message
 	       echo 'Error: Please activate your account to login! <br>Click <a href="resend-activation.php">here</a> to resend the activation email.';
+		   return;
 		} else if($account['activation_code'] == 'deactivated') {
 			echo 'Error: Your account has been deactivated!';
+			return;
 		} else if (account_approval && !$account['approved']) {
 			// The account is not approved
 			echo 'Error: Your account has not been approved yet!';
+			return;
 		} else if($_SERVER['REMOTE_ADDR'] != $account['ip']) {
 	        // Two-factor authentication required - IP address doesn't match saved IP
 			// NOTE: Currently stores only one IP per user. Future enhancement: store multiple trusted IPs
         	$_SESSION['tfa_id'] = $account['id'];
 	        echo 'tfa: twofactor.php';
+			return;
 		} else {
 			// Verification success! User has loggedin!
 			// Declare the session variables, which will basically act like cookies, but will store the data on the server as opposed to the client
@@ -75,16 +79,19 @@ if ($account) {
             $stmt->execute([ $ip ]);
 			// Output msg; do not change this line as the AJAX code depends on it
 			echo 'redirect'; 
+			return;
 		}
 
 	} else {
 		// Incorrect password
 		$attempts_left = record_login_attempt($pdo);
 		echo 'Error: Incorrect Password! <br>You have ' . $attempts_left . ' attempts remaining!';
+		return;
 	}
 } else {
 	// Incorrect username
 	$attempts_left = record_login_attempt($pdo);
 	echo 'Error: Incorrect Username!<br>You have ' . $attempts_left . ' attempts remaining!';
+	return;
 }
 ?>
