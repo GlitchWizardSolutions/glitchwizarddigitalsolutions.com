@@ -107,22 +107,30 @@ include includes_path . 'public-page-setup.php';
 		const loginForm = document.querySelector('.login-form');
 		loginForm.onsubmit = event => {
 			event.preventDefault();
-			fetch(loginForm.action, { method: 'POST', body: new FormData(loginForm), cache: 'no-store' }).then(response => response.text()).then(result => {
-				if (result.toLowerCase().includes('success:')) {
-					loginForm.querySelector('.msg').classList.remove('error','success');
-					loginForm.querySelector('.msg').classList.add('success');
-					loginForm.querySelector('.msg').innerHTML = result.replace('Success: ', '');
-				} else if (result.toLowerCase().includes('redirect')) {
-					window.location.href = '<?php echo BASE_URL; ?>client-dashboard/index.php';
-				} else if (result.includes('tfa:')) {
-                   // window.location.href = result.replace('tfa: ', '');
-                      window.location.href = 'twofactor.php';
-				} else {
+			fetch(loginForm.action, { method: 'POST', body: new FormData(loginForm), cache: 'no-store' })
+				.then(response => response.json())
+				.then(result => {
+					if (result.success) {
+						// Check if two-factor authentication is required
+						if (result.redirect === 'twofactor.php') {
+							window.location.href = 'twofactor.php';
+						} else {
+							// Successful login - redirect to dashboard
+							window.location.href = '<?php echo BASE_URL; ?>client-dashboard/index.php';
+						}
+					} else {
+						// Show error message
+						loginForm.querySelector('.msg').classList.remove('error','success');
+						loginForm.querySelector('.msg').classList.add('error');
+						loginForm.querySelector('.msg').innerHTML = result.message || 'Login failed. Please try again.';
+					}
+				})
+				.catch(error => {
+					console.error('Login error:', error);
 					loginForm.querySelector('.msg').classList.remove('error','success');
 					loginForm.querySelector('.msg').classList.add('error');
-					loginForm.querySelector('.msg').innerHTML = result.replace('Error: ', '');
-				}
-			});
+					loginForm.querySelector('.msg').innerHTML = 'A network error occurred. Please try again.';
+				});
 		};
 		</script>
 <?php include includes_path . 'site-close.php'; ?>
