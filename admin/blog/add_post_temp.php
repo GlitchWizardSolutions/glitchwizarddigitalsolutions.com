@@ -5,13 +5,17 @@ require 'assets/includes/admin_config.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Get username from main admin session
+$uname = $_SESSION['name'] ?? '';
+if (empty($uname)) {
+    // Fallback: try to get from account data if session is not set
+    $uname = $account['username'] ?? '';
+# }
+
 // Debug: Check if blog_pdo is available
 if (!isset($blog_pdo)) {
-    error_log('DATABASE DEBUG - blog_pdo is not set');
     die('Database connection not available');
-} else {
-    error_log('DATABASE DEBUG - blog_pdo is available');
-}
+# }
 
 if (isset($_POST['add'])) {
     // Debug: Log all POST data
@@ -40,9 +44,9 @@ if (isset($_POST['add'])) {
 
         // Validate content
         if (empty($content)) {
-            // For debugging, allow empty content but log it
-            $content = '<p>Post created but content was empty. This indicates TinyMCE content was not saved properly.</p>';
-            error_log('FORM SUBMITTED - WARNING: Content was empty, using placeholder content');
+            // Temporarily allow empty content for testing
+            $content = 'Test content - form submitted successfully';
+            error_log('FORM SUBMITTED - WARNING: Empty content, using test content');
         }
 
         $date = date($settings['date_format']);
@@ -147,10 +151,10 @@ if (isset($_POST['add'])) {
 error_log('FORM PROCESSING COMPLETE - Success: ' . (isset($success_message) ? 'yes' : 'no') . ', Error: ' . (isset($error_message) ? 'yes' : 'no'));
 if (isset($success_message)) {
     error_log('FORM PROCESSING COMPLETE - Success message: ' . $success_message);
-}
+# }
 if (isset($error_message)) {
     error_log('FORM PROCESSING COMPLETE - Error message: ' . $error_message);
-}
+# }
 
 // Use the admin template system
 ?>
@@ -269,7 +273,7 @@ function countText() {
     if (titleInput && charactersSpan) {
         charactersSpan.textContent = titleInput.value.length;
     }
-}
+# }
 
 // Initialize TinyMCE after page load
 window.addEventListener('load', function() {
@@ -517,7 +521,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const contentTextarea = document.getElementById('content');
             if (!contentTextarea || !contentTextarea.value.trim()) {
                 e.preventDefault();
-                alert('Please enter some content for the post.');
+                alert('Please enter some content for the post. Content value: "' + (contentTextarea ? contentTextarea.value : 'null') + '"');
 
                 // Reset button state
                 if (submitBtn) {
@@ -526,6 +530,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 return false;
             }
+
+            // Debug: Log form data before submission
+            console.log('Form data before submission:');
+            console.log('Title:', document.getElementById('title').value);
+            console.log('Content:', contentTextarea.value);
         });
     }
 });

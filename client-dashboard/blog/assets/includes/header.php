@@ -310,7 +310,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="<?php echo $base_url; ?>/users-profile-edit.php">
+              <a class="dropdown-item d-flex align-items-center" href="<?php echo $base_url; ?>users-profile-edit.php">
                 <i class="bi bi-person"></i>
                 <span>My Profile</span>
               </a>

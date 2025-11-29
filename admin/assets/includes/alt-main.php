@@ -63,11 +63,6 @@ function template_admin_header($title, $selected = 'dashboard', $selected_child 
    <a href= "' . $base_url . '/index.php"' . ($selected == 'dashboard' ? ' class="selected"' : '') . ' title="Dashboard">
             <span class="icon"><svg width="15" height="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm320 96c0-26.9-16.5-49.9-40-59.3V88c0-13.3-10.7-24-24-24s-24 10.7-24 24V292.7c-23.5 9.5-40 32.5-40 59.3c0 35.3 28.7 64 64 64s64-28.7 64-64zM144 176a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm-16 80a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm288 32a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM400 144a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg></span>
             <span class="txt">Dashboard</span></a>
- <!--Return to Home-->        
-   <a href= "' . $outside_url . '/client-dashboard/index.php"' . ($selected == 'home' ? '      class="selected"' : '') . ' title="Return to Home">
-            <span class="icon"><svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 2H2V17H4V4H17V2M21 22L18.5 20.32L16 22L13.5 20.32L11 22L8.5 20.32L6 22V6H21V22M10 10V12H17V10H10M15 14H10V16H15V14Z" /></svg></span>
-            <span class="txt"> Return to Home</span>
-            </a>           
 <!--Resource Systems-->
    <a href= "' . $base_url . '/resource_system/index.php"' . ($selected == 'resources' ? '      class="selected"' : '') . ' title="Resource System">
             <span class="icon"><svg width="15" height="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 2H2V17H4V4H17V2M21 22L18.5 20.32L16 22L13.5 20.32L11 22L8.5 20.32L6 22V6H21V22M10 10V12H17V10H10M15 14H10V16H15V14Z" /></svg></span>
@@ -288,13 +283,27 @@ function template_admin_header($title, $selected = 'dashboard', $selected_child 
             <span class="txt" style="color:red"><span class="txt" style="color:yellow"> Caution: </span> Config Settings</span>
             </a>
     ';
-    // Profile image
-    $profile_img = '
+    // Profile image - check for user avatar first
+    $pdo = pdo_connect_mysql();
+    $stmt = $pdo->prepare('SELECT avatar FROM accounts WHERE id = ?');
+    $stmt->execute([$_SESSION['id']]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!empty($user['avatar'])) {
+        $profile_img = '
+    <div class="profile-img">
+        <img src="' . $outside_url . htmlspecialchars($user['avatar']) . '" alt="Profile Avatar" style="border-radius: 50%; object-fit: cover;">
+        <i class="online"></i>
+    </div>
+    ';
+    } else {
+        $profile_img = '
     <div class="profile-img">
         <span style="background-color:' . color_from_string($_SESSION['name']) . '">' . strtoupper(substr($_SESSION['name'], 0, 1)) . '</span>
         <i class="online"></i>
     </div>
-    ';    
+    ';
+    }    
     // Indenting the below code may cause an error
 echo '<!DOCTYPE html>
 <html lang="en">
@@ -328,7 +337,8 @@ echo '<!DOCTYPE html>
                 <div class="dropdown right">
                     ' . $profile_img . '
                     <div class="list">
-                        <a  href= "' . $base_url . '/client_accounts/account.php?id=' . $_SESSION['id'] . '">Edit Profile</a>
+                        <a  href= "' . $base_url . '/client_accounts/account.php">New Lead</a>
+                        <a  href= "' . $outside_url . '/client-dashboard/index.php">Return Home</a>
                         <a  href= "' . $outside_url . '/logout.php">Logout</a>
                     </div>
                 </div>

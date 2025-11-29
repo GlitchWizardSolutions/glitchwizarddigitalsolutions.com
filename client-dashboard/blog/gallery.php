@@ -55,7 +55,7 @@ include '../assets/includes/page-setup.php';
                                     echo '
                                     <div class="col-md-4 mb-3">
                                         <div class="card shadow-sm" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#img' . $image['id'] . '">
-                                            <img src="/public_html' . htmlspecialchars($image['image']) . '" alt="' . htmlspecialchars($image['title']) . '" class="card-img-top" style="height: 180px; object-fit: cover;">
+                                            <img src="/public_html/' . htmlspecialchars($image['image']) . '" alt="' . htmlspecialchars($image['title']) . '" class="card-img-top" style="height: 180px; object-fit: cover;">
                                             <div class="card-body">
                                                 <h6 class="card-title">' . htmlspecialchars($image['title']) . '</h6>
                                                 <button type="button" class="btn btn-sm btn-outline-primary w-100">
@@ -88,7 +88,7 @@ include '../assets/includes/page-setup.php';
                                 echo '
                                 <div class="col-md-4 mb-3">
                                     <div class="card shadow-sm" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#img' . $image['id'] . '">
-                                        <img src="/public_html' . htmlspecialchars($image['image']) . '" alt="' . htmlspecialchars($image['title']) . '" class="card-img-top" style="height: 180px; object-fit: cover;">
+                                        <img src="/public_html/' . htmlspecialchars($image['image']) . '" alt="' . htmlspecialchars($image['title']) . '" class="card-img-top" style="height: 180px; object-fit: cover;">
                                         <div class="card-body">
                                             <h6 class="card-title">' . htmlspecialchars($image['title']) . '</h6>
                                             <button type="button" class="btn btn-sm btn-outline-primary w-100">
@@ -122,7 +122,7 @@ while ($image = $all_images_stmt->fetch(PDO::FETCH_ASSOC)) {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <img src="/public_html' . htmlspecialchars($image['image']) . '" class="img-fluid mb-3" alt="' . htmlspecialchars($image['title']) . '">
+                    <img src="/public_html/' . htmlspecialchars($image['image']) . '" class="img-fluid mb-3" alt="' . htmlspecialchars($image['title']) . '">
                     <div>' . html_entity_decode($image['description']) . '</div>
                 </div>
             </div>

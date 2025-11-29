@@ -177,7 +177,7 @@ include includes_path . 'page-setup.php';
                       <div class="col-lg-8 col-md-8">
                         <div class="mb-2">
                           <?php if (!empty($account['avatar'])): ?>
-                            <img src="<?=htmlspecialchars($account['avatar'])?>" alt="Avatar" class="rounded-circle" width="100" height="100" style="object-fit: cover;">
+                            <img src="<?php echo $outside_url; ?><?=htmlspecialchars($account['avatar'])?>" alt="Avatar" class="rounded-circle" width="100" height="100" style="object-fit: cover;">
                           <?php else: ?>
                             <img src="<?php echo $outside_url; ?>assets/img/avatar.png" alt="Default Avatar" class="rounded-circle" width="100" height="100" style="object-fit: cover;">
                           <?php endif; ?>

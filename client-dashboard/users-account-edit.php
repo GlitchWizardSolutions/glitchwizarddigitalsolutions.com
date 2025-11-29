@@ -7,6 +7,7 @@ include 'assets/includes/user-config.php';
 include includes_path . 'page-setup.php';
 // output message (errors, etc)
 $msg = '';
+$success = '';
 if (!empty($_GET['success'])) {
     $success = $_GET['success'];
 }

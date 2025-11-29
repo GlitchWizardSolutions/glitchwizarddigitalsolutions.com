@@ -163,7 +163,7 @@ foreach ($categories as $cat) {
 				</p>
 				<p>
 					<label>Content</label>
-					<textarea name="content" id="content" rows="8" style="width: 100%;" required><?= html_entity_decode($row['content']) ?></textarea>
+					<textarea name="content" id="content" rows="8" style="width: 100%;"><?= html_entity_decode($row['content']) ?></textarea>
 				</p>
 
 				<input type="submit" class="btn" name="submit" value="Save" />

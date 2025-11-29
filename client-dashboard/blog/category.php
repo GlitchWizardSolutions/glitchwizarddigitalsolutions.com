@@ -60,7 +60,7 @@ $category_name = $category['category'];
                     foreach ($posts as $row) {
                         $image_html = "";
                         if (!empty($row['image'])) {
-                            $image_html = '<img src="/public_html' . htmlspecialchars($row['image']) . '" alt="' . htmlspecialchars($row['title']) . '" class="rounded-start" style="width: 100%; height: 100%; object-fit: cover;">';
+                            $image_html = '<img src="/public_html/' . htmlspecialchars($row['image']) . '" alt="' . htmlspecialchars($row['title']) . '" class="rounded-start" style="width: 100%; height: 100%; object-fit: cover;">';
                         } else {
                             $image_html = '<div style="width: 100%; height: 100%; background: #55595c; display: flex; align-items: center; justify-content: center; color: #eceeef;">No Image</div>';
                         }
