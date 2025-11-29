@@ -82,3 +82,77 @@ if (!function_exists('generateSeoURL')) {
         return trim(trim($string, $separator)); 
     }
 }
+
+if (!function_exists('cleanup_unused_images')) {
+    function cleanup_unused_images($content, $featured_image = null) {
+        global $blog_pdo;
+        
+        // Extract image URLs from content
+        $images_in_content = [];
+        if (!empty($content)) {
+            // Find all img src attributes
+            preg_match_all('/<img[^>]+src=["\']([^"\']+)["\'][^>]*>/i', $content, $matches);
+            if (!empty($matches[1])) {
+                foreach ($matches[1] as $img_url) {
+                    // Extract filename from URL
+                    $filename = basename(parse_url($img_url, PHP_URL_PATH));
+                    if (!empty($filename)) {
+                        $images_in_content[] = $filename;
+                    }
+                }
+            }
+        }
+        
+        // Add featured image if provided
+        if (!empty($featured_image)) {
+            $featured_filename = basename($featured_image);
+            if (!empty($featured_filename)) {
+                $images_in_content[] = $featured_filename;
+            }
+        }
+        
+        // Remove duplicates
+        $images_in_content = array_unique($images_in_content);
+        
+        // Check each image to see if it's used elsewhere
+        foreach ($images_in_content as $image_filename) {
+            // Check if image is used in other posts
+            $stmt = $blog_pdo->prepare("
+                SELECT COUNT(*) as usage_count FROM posts 
+                WHERE (content LIKE ? OR image LIKE ?) AND id != ?
+            ");
+            $stmt->execute([
+                '%' . $image_filename . '%',
+                '%' . $image_filename . '%',
+                0 // Since we're deleting, no specific post ID to exclude
+            ]);
+            $usage = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Also check blog templates
+            $stmt = $blog_pdo->prepare("
+                SELECT COUNT(*) as template_usage FROM blog_templates 
+                WHERE content LIKE ?
+            ");
+            $stmt->execute(['%' . $image_filename . '%']);
+            $template_usage = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            $total_usage = $usage['usage_count'] + $template_usage['template_usage'];
+            
+            // If image is not used anywhere else, delete it
+            if ($total_usage == 0) {
+                // Determine which directory the image is in
+                $image_paths = [
+                    '../../client-dashboard/blog/uploads/images/' . $image_filename,
+                    '../../client-dashboard/blog/uploads/posts/' . $image_filename
+                ];
+                
+                foreach ($image_paths as $image_path) {
+                    if (file_exists($image_path)) {
+                        unlink($image_path);
+                        break; // Only delete from first matching location
+                    }
+                }
+            }
+        }
+    }
+}

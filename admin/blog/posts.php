@@ -6,10 +6,25 @@ require_once __DIR__ . '/functions.php';
 
 if (isset($_GET['delete-id'])) {
     $id = (int) $_GET["delete-id"];
-    $stmt = $blog_pdo->prepare("DELETE FROM posts WHERE id = ?");
+
+    // Get post content before deletion to check for images
+    $stmt = $blog_pdo->prepare("SELECT content, image FROM posts WHERE id = ?");
     $stmt->execute([$id]);
-    $stmt = $blog_pdo->prepare("DELETE FROM comments WHERE post_id = ?");
-    $stmt->execute([$id]);
+    $post = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($post) {
+        // Delete the post
+        $stmt = $blog_pdo->prepare("DELETE FROM posts WHERE id = ?");
+        $stmt->execute([$id]);
+
+        // Delete related comments
+        $stmt = $blog_pdo->prepare("DELETE FROM comments WHERE post_id = ?");
+        $stmt->execute([$id]);
+
+        // Clean up unused images
+        cleanup_unused_images($post['content'], $post['image']);
+    }
+
     header('Location: posts.php');
     exit;
 }
@@ -26,12 +41,18 @@ if (isset($_GET['edit-id'])) {
     }
 	
 	if (isset($_POST['submit'])) {
-        $title = $_POST['title'];
+        $title = trim($_POST['title']);
+        
+        // Validate title length
+        if (strlen($title) > 250) {
+            $title = substr($title, 0, 250);
+        }
+        
 		$slug = generateSeoURL($title);
         $image = $row['image'];
         $active = $_POST['active'];
 		$featured = $_POST['featured'];
-        $category_id = (int) $_POST['category_id'];
+        $category_id = !empty($_POST['category_id']) ? (int) $_POST['category_id'] : null;
         $content = htmlspecialchars($_POST['content']);
 		
 		$date = date($settings['date_format']);
@@ -101,7 +122,7 @@ if (isset($_GET['edit-id'])) {
 			<form name="post_form" action="" method="post" enctype="multipart/form-data" style="max-width: 900px;">
 				<p>
 					<label>Title</label>
-					<input name="title" id="title" type="text" value="<?= htmlspecialchars($row['title']) ?>" style="width: 100%;" oninput="countText()" required>
+					<input name="title" id="title" type="text" value="<?= htmlspecialchars($row['title']) ?>" style="width: 100%;" oninput="countText()" maxlength="250" required>
 					<i>For best SEO keep title under 50 characters.</i>
 					<label for="characters">Characters: </label>
 					<span id="characters"><?= strlen($row['title']) ?></span><br>
@@ -252,14 +273,9 @@ foreach ($posts as $row) {
         </div>
 	</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.3.0/tinymce.min.js" integrity="sha512-RUZ2d69UiTI+LdjfDCxqJh5HfjmOcouct56utQNVRjr90Ea8uHQa+gCxvxDTC9fFvIGP+t4TDDJWNTRV48tBpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-$(document).ready(function() {
-	window.countText = function() {
-		var text = document.getElementById("title").value;
-		document.getElementById("characters").textContent = text.length;
-	}
-});
-
+<script src="tinymce/tinymce/js/tinymce/tinymce.min.js"></script>
+<script>
+window.addEventListener('load', function() {
 tinymce.init({
     selector: "#content",
     plugins: "image table lists media link code",
@@ -269,7 +285,7 @@ tinymce.init({
     extended_valid_elements: "*[*]",
     valid_children: "+body[style]",
     content_css: false,
-    height: 350,
+    height: 400,
     branding: false,
     promotion: false,
     automatic_uploads: true,
@@ -277,7 +293,7 @@ tinymce.init({
     images_upload_handler: function (blobInfo, progress) {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            xhr.open("POST", "ajax_upload.php", true);
+            xhr.open("POST", "tinymce_upload.php", true);
 
             const formData = new FormData();
             formData.append("file", blobInfo.blob(), blobInfo.filename());
@@ -312,45 +328,132 @@ tinymce.init({
     },
     file_picker_callback: function(callback, value, meta) {
         if (meta.filetype === "image") {
-            const input = document.createElement("input");
-            input.setAttribute("type", "file");
-            input.setAttribute("accept", "image/*");
+            if (confirm('Click OK to upload a new image, or Cancel to browse existing images')) {
+                const input = document.createElement("input");
+                input.setAttribute("type", "file");
+                input.setAttribute("accept", "image/*");
 
-            input.onchange = function() {
-                const file = this.files[0];
-                if (file) {
-                    const formData = new FormData();
-                    formData.append("file", file);
+                input.onchange = function() {
+                    const file = this.files[0];
+                    if (file) {
+                        const formData = new FormData();
+                        formData.append("file", file);
 
-                    fetch("tinymce_upload.php", {
-                        method: "POST",
-                        body: formData
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(\'HTTP error! status: \' + response.status);
+                        fetch("tinymce_upload.php", {
+                            method: "POST",
+                            body: formData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('HTTP error! status: ' + response.status);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.error) {
+                                alert("Upload error: " + data.error);
+                            } else {
+                                // Properly set the image source and alt text
+                                callback(data.location, {
+                                    alt: file.name.replace(/\.[^/.]+$/, ""),
+                                    class: "responsive-image"
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Upload failed:", error);
+                            alert("Upload failed: " + error.message);
+                        });
+                    }
+                };
+
+                input.click();
+            } else {
+                fetch('tinymce_upload.php?list_images=1')
+                    .then(response => response.json())
+                    .then(images => {
+                        if (images.length === 0) {
+                            alert('No images uploaded yet. Please upload an image first.');
+                            // Re-trigger the file picker for upload
+                            const input = document.createElement("input");
+                            input.setAttribute("type", "file");
+                            input.setAttribute("accept", "image/*");
+                            input.onchange = function() {
+                                const file = this.files[0];
+                                if (file) {
+                                    const formData = new FormData();
+                                    formData.append("file", file);
+                                    fetch("tinymce_upload.php", {
+                                        method: "POST",
+                                        body: formData
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.error) {
+                                            alert("Upload error: " + data.error);
+                                        } else {
+                                            callback(data.location, {
+                                                alt: file.name.replace(/\.[^/.]+$/, ""),
+                                                class: "responsive-image"
+                                            });
+                                        }
+                                    })
+                                    .catch(error => {
+                                        alert("Upload failed: " + error);
+                                    });
+                                }
+                            };
+                            input.click();
+                            return;
                         }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.error) {
-                            alert("Upload error: " + data.error);
-                        } else {
-                            // Properly set the image source and alt text
-                            callback(data.location, { 
-                                alt: file.name.replace(/\.[^/.]+$/, ""),
-                                class: "responsive-image"
+
+                        let html = '<div style="padding: 20px; max-height: 400px; overflow-y: auto;">';
+                        html += '<h3 style="margin-top: 0;">Select an Image</h3>';
+                        html += '<p style="color: #666; font-size: 13px; margin-bottom: 15px;">Images will automatically be responsive in blog posts</p>';
+                        html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">';
+
+                        images.forEach((img) => {
+                            html += `
+                                <div style="border: 2px solid #ddd; border-radius: 8px; padding: 10px; cursor: pointer; text-align: center;" 
+                                     onclick="selectImage('${img.value}', '${img.title}')" 
+                                     onmouseover="this.style.borderColor='#6b46c1'" 
+                                     onmouseout="this.style.borderColor='#ddd'">
+                                    <img src="${img.value}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 4px;">
+                                    <div style="margin-top: 5px; font-size: 11px; color: #666; overflow: hidden; text-overflow: ellipsis;">${img.title}</div>
+                                </div>
+                            `;
+                        });
+
+                        html += '</div>';
+                        html += '<div style="margin-top: 20px; text-align: center;">';
+                        html += '<button onclick="closeImageBrowser()" style="padding: 8px 20px; background: #6b46c1; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>';
+                        html += '</div>';
+                        html += '</div>';
+
+                        const modal = document.createElement('div');
+                        modal.id = 'image-browser-modal';
+                        modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+
+                        const content = document.createElement('div');
+                        content.style.cssText = 'background: white; border-radius: 8px; max-width: 800px; width: 90%; max-height: 80vh; overflow: hidden;';
+                        content.innerHTML = html;
+
+                        modal.appendChild(content);
+                        document.body.appendChild(modal);
+
+                        window.selectImage = function(src, alt) {
+                            callback(src, { 
+                                alt: alt.replace(/\.[^/.]+$/, ''),
+                                class: 'responsive-image'
                             });
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Upload failed:", error);
-                        alert("Upload failed: " + error.message);
-                    });
-                }
-            };
+                            closeImageBrowser();
+                        };
 
-            input.click();
+                        window.closeImageBrowser = function() {
+                            document.getElementById('image-browser-modal').remove();
+                        };
+                    });
+            }
         }
     },
     link_default_protocol: "https",
@@ -389,17 +492,26 @@ tinymce.init({
         });
     }
 });
+});
 </script>
 
 <script>
 // Ensure form validation works with TinyMCE
-document.addEventListener(\'DOMContentLoaded\', function() {
-    const form = document.querySelector(\'form[name="post_form"]\');
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[name="post_form"]');
     if (form) {
-        form.addEventListener(\'submit\', function(e) {
+        form.addEventListener('submit', function(e) {
             // Ensure TinyMCE content is saved to textarea before form submission
-            if (typeof tinymce !== \'undefined\') {
+            if (typeof tinymce !== 'undefined') {
                 tinymce.triggerSave();
+            }
+            
+            // Check if content is empty
+            const contentTextarea = document.getElementById('content');
+            if (!contentTextarea || !contentTextarea.value.trim()) {
+                e.preventDefault();
+                alert('Please enter some content for the post.');
+                return false;
             }
         });
     }

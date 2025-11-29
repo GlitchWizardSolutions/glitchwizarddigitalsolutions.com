@@ -3,9 +3,20 @@ require 'assets/includes/admin_config.php';
 
 // Delete the blog template
 if (isset($_GET['delete'])) {
-    // Delete the blog template
-    $stmt = $blog_pdo->prepare('DELETE FROM blog_templates WHERE id = ?');
-    $stmt->execute([ $_GET['delete'] ]);
+    // Get template content before deletion
+    $stmt = $blog_pdo->prepare('SELECT content FROM blog_templates WHERE id = ?');
+    $stmt->execute([$_GET['delete']]);
+    $template = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($template) {
+        // Delete the blog template
+        $stmt = $blog_pdo->prepare('DELETE FROM blog_templates WHERE id = ?');
+        $stmt->execute([ $_GET['delete'] ]);
+        
+        // Clean up unused images
+        cleanup_unused_images($template['content']);
+    }
+    
     header('Location: blog_templates.php?success_msg=3');
     exit;
 }

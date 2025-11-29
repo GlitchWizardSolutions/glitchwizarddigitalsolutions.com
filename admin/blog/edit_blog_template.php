@@ -13,8 +13,14 @@ if (isset($_GET['id'])) {
     if (isset($_POST['submit'])) {
         // Update the template
         $title = trim($_POST['title']);
+        
+        // Validate title length
+        if (strlen($title) > 250) {
+            $title = substr($title, 0, 250);
+        }
+        
         $content = $_POST['content'];
-        $category_id = (int) $_POST['category_id'];
+        $category_id = !empty($_POST['category_id']) ? (int) $_POST['category_id'] : null;
         $active = $_POST['active'];
 
         $stmt = $blog_pdo->prepare('UPDATE blog_templates SET title = ?, content = ?, category_id = ?, active = ? WHERE id = ?');
@@ -42,7 +48,8 @@ if (isset($_GET['id'])) {
     <form action="" method="post">
         <p>
             <label>Title</label><br />
-            <input type="text" name="title" class="form-control" value="<?=htmlspecialchars($template['title'], ENT_QUOTES)?>" required>
+            <input type="text" name="title" class="form-control" value="<?=htmlspecialchars($template['title'], ENT_QUOTES)?>" maxlength="250" required>
+            <small class="text-muted">Maximum 250 characters</small>
         </p>
         <p>
             <label>Category (Optional)</label><br />
@@ -75,25 +82,27 @@ while ($rw = $stmt->fetch(PDO::FETCH_ASSOC)) {
     </form>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.3.0/tinymce.min.js" integrity="sha512-RUZ2d69UiTI+LdjfDCxqJh5HfjmOcouct56utQNVRjr90Ea8uHQa+gCxvxDTC9fFvIGP+t4TDDJWNTRV48tBpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-tinymce.init({
-    selector: "#content",
-    plugins: "image table lists media link code",
-    toolbar: "undo redo | insert_template | blocks | formatselect | bold italic forecolor | align | outdent indent | numlist bullist | table image link | code",
-    menubar: "edit view insert format tools table",
-    valid_elements: "*[*]",
-    extended_valid_elements: "*[*]",
-    valid_children: "+body[style]",
-    content_css: false,
-    height: 400,
-    branding: false,
-    promotion: false,
-    automatic_uploads: true,
-    images_upload_url: "tinymce_upload.php",
+<script src="tinymce/tinymce/js/tinymce/tinymce.min.js"></script>
+<script>
+window.addEventListener('load', function() {
+    tinymce.init({
+        selector: "#content",
+        plugins: "image table lists media link code",
+        toolbar: "undo redo | insert_template | blocks | formatselect | bold italic forecolor | align | outdent indent | numlist bullist | table image link | code",
+        menubar: "edit view insert format tools table",
+        valid_elements: "*[*]",
+        extended_valid_elements: "*[*]",
+        valid_children: "+body[style]",
+        content_css: false,
+        height: 400,
+        branding: false,
+        promotion: false,
+        automatic_uploads: true,
+        images_upload_url: "tinymce_upload.php",
     images_upload_handler: function (blobInfo, progress) {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            xhr.open("POST", "ajax_upload.php", true);
+            xhr.open("POST", "tinymce_upload.php", true);
 
             const formData = new FormData();
             formData.append("file", blobInfo.blob(), blobInfo.filename());
@@ -128,7 +137,7 @@ tinymce.init({
     },
     file_picker_callback: function(callback, value, meta) {
         if (meta.filetype === "image") {
-            if (confirm(\'Click OK to upload a new image, or Cancel to browse existing images\')) {
+            if (confirm('Click OK to upload a new image, or Cancel to browse existing images')) {
                 const input = document.createElement("input");
                 input.setAttribute("type", "file");
                 input.setAttribute("accept", "image/*");
@@ -145,7 +154,7 @@ tinymce.init({
                         })
                         .then(response => {
                             if (!response.ok) {
-                                throw new Error(\'HTTP error! status: \' + response.status);
+                                throw new Error('HTTP error! status: ' + response.status);
                             }
                             return response.json();
                         })
@@ -169,11 +178,11 @@ tinymce.init({
 
                 input.click();
             } else {
-                fetch(\'tinymce_upload.php?list_images=1\')
+                fetch('tinymce_upload.php?list_images=1')
                     .then(response => response.json())
                     .then(images => {
                         if (images.length === 0) {
-                            alert(\'No images uploaded yet. Please upload an image first.\');
+                            alert('No images uploaded yet. Please upload an image first.');
                             // Re-trigger the file picker for upload
                             const input = document.createElement("input");
                             input.setAttribute("type", "file");
@@ -207,35 +216,35 @@ tinymce.init({
                             return;
                         }
 
-                        let html = \'<div style="padding: 20px; max-height: 400px; overflow-y: auto;">\';
-                        html += \'<h3 style="margin-top: 0;">Select an Image</h3>\';
-                        html += \'<p style="color: #666; font-size: 13px; margin-bottom: 15px;">Images will automatically be responsive in blog templates</p>\';
-                        html += \'<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">\';
+                        let html = '<div style="padding: 20px; max-height: 400px; overflow-y: auto;">';
+                        html += '<h3 style="margin-top: 0;">Select an Image</h3>';
+                        html += '<p style="color: #666; font-size: 13px; margin-bottom: 15px;">Images will automatically be responsive in blog templates</p>';
+                        html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">';
 
                         images.forEach((img) => {
-                            html += \`
+                            html += `
                                 <div style="border: 2px solid #ddd; border-radius: 8px; padding: 10px; cursor: pointer; text-align: center;" 
-                                     onclick="selectImage(\'${img.value}\', \'${img.title}\')" 
-                                     onmouseover="this.style.borderColor=\'#6b46c1\'" 
-                                     onmouseout="this.style.borderColor=\'#ddd\'">
+                                     onclick="selectImage('${img.value}', '${img.title}')" 
+                                     onmouseover="this.style.borderColor='#6b46c1'" 
+                                     onmouseout="this.style.borderColor='#ddd'">
                                     <img src="${img.value}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 4px;">
                                     <div style="margin-top: 5px; font-size: 11px; color: #666; overflow: hidden; text-overflow: ellipsis;">${img.title}</div>
                                 </div>
-                            \`;
+                            `;
                         });
 
-                        html += \'</div>\';
-                        html += \'<div style="margin-top: 20px; text-align: center;">\';
-                        html += \'<button onclick="closeImageBrowser()" style="padding: 8px 20px; background: #6b46c1; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>\';
-                        html += \'</div>\';
-                        html += \'</div>\';
+                        html += '</div>';
+                        html += '<div style="margin-top: 20px; text-align: center;">';
+                        html += '<button onclick="closeImageBrowser()" style="padding: 8px 20px; background: #6b46c1; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>';
+                        html += '</div>';
+                        html += '</div>';
 
-                        const modal = document.createElement(\'div\');
-                        modal.id = \'image-browser-modal\';
-                        modal.style.cssText = \'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center;\';
+                        const modal = document.createElement('div');
+                        modal.id = 'image-browser-modal';
+                        modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center;';
 
-                        const content = document.createElement(\'div\');
-                        content.style.cssText = \'background: white; border-radius: 8px; max-width: 800px; width: 90%; max-height: 80vh; overflow: hidden;\';
+                        const content = document.createElement('div');
+                        content.style.cssText = 'background: white; border-radius: 8px; max-width: 800px; width: 90%; max-height: 80vh; overflow: hidden;';
                         content.innerHTML = html;
 
                         modal.appendChild(content);
@@ -243,14 +252,14 @@ tinymce.init({
 
                         window.selectImage = function(src, alt) {
                             callback(src, { 
-                                alt: alt.replace(/\.[^/.]+$/, \'\'),
-                                class: \'responsive-image\'
+                                alt: alt.replace(/\.[^/.]+$/, ''),
+                                class: 'responsive-image'
                             });
                             closeImageBrowser();
                         };
 
                         window.closeImageBrowser = function() {
-                            document.getElementById(\'image-browser-modal\').remove();
+                            document.getElementById('image-browser-modal').remove();
                         };
                     });
             }
@@ -314,6 +323,7 @@ document.addEventListener(\'DOMContentLoaded\', function() {
             }
         });
     }
+});
 });
 </script>
 
