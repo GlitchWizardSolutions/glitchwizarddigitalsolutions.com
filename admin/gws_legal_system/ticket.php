@@ -45,6 +45,43 @@ if (isset($_GET['id'])) {
     if (isset($_POST['submit'])) {
         $stmt = $pdo->prepare('INSERT INTO gws_legal (title, msg, created, ticket_status, priority, category_id, approved) VALUES (?, ?, ?, ?, ?, ?, ?)');
         $stmt->execute([ $_POST['title'], $_POST['msg'], date('Y-m-d H:i:s', strtotime($_POST['created'])), $_POST['ticket_status'], $_POST['priority'], $_POST['category_id'], 1 ]);
+        
+        // Retrieve the ticket ID
+        $ticket_id = $pdo->lastInsertId();
+        
+        // Handle the file uploads
+        if (attachments && isset($_FILES['attachments'])) {
+            // Iterate the uploaded files
+            for ($i = 0; $i < count($_FILES['attachments']['name']); $i++) {
+                // Get the file extension (png, jpg, etc)
+                $ext = strtolower(pathinfo($_FILES['attachments']['name'][$i], PATHINFO_EXTENSION));
+                // Get the original filename without extension
+                $original_name = pathinfo($_FILES['attachments']['name'][$i], PATHINFO_FILENAME);
+
+                // Generate a unique filename that preserves the original name
+                $counter = 0;
+                $filename = $original_name;
+                $upload_path = gws_legal_uploads_directory . $filename . '.' . $ext;
+
+                // Check if file exists and add numbering if needed
+                while (file_exists($upload_path)) {
+                    $counter++;
+                    $filename = $original_name . ' (' . $counter . ')';
+                    $upload_path = gws_legal_uploads_directory . $filename . '.' . $ext;
+                }
+            	// Check to make sure the file is valid
+            	if (!empty($_FILES['attachments']['tmp_name'][$i]) && in_array($ext, explode(',', attachments_allowed))) {
+            		if ($_FILES['attachments']['size'][$i] <= max_allowed_upload_file_size) {
+            			// If everything checks out, we can move the uploaded file to its final destination...
+            			move_uploaded_file($_FILES['attachments']['tmp_name'][$i], $upload_path);
+            			// Insert attachment info into the database (ticket_id, filepath)
+            			$stmt = $pdo->prepare('INSERT INTO gws_legal_uploads (ticket_id, filepath) VALUES (?, ?)');
+            	        $stmt->execute([ $ticket_id, $upload_path ]);
+            		}
+            	}
+            }
+        }
+        
         header('Location: tickets.php?success_msg=1');
         exit;
     }
@@ -64,7 +101,7 @@ if (isset($_GET['id'])) {
     </div>
 </div>
 
-<form action="" method="post">
+<form action="" method="post" enctype="multipart/form-data">
     <div class="form-professional">
         
         <!-- Document Information Section -->
@@ -123,6 +160,20 @@ if (isset($_GET['id'])) {
                 </div>
             </div>
         </div>
+
+        <?php if (attachments && $page == 'Create'): ?>
+        <div class="form-section">
+            <h3 class="section-title">Attachments</h3>
+            
+            <div class="form-group">
+                <label for="attachments">Upload Files</label>
+                <div class="file-upload-wrapper">
+                    <input type="file" name="attachments[]" id="attachments" accept=".<?=str_replace(',', ',.', attachments_allowed)?>" multiple>
+                    <span class="file-upload-hint">Accepted formats: <?=str_replace(',', ', ', attachments_allowed)?></span>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <!-- Form Actions -->
         <div class="form-actions">

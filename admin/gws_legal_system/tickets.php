@@ -16,8 +16,22 @@ DATABASE: TABLES gws_legal,gws_legal_comments,gws_legal_uploads
 LOG NOTE:  
 *******************************************************************************/
 require 'assets/includes/admin_config.php';
+$gws_legal_uploads_path = public_path . "client-dashboard/communication/gws-legal-uploads/";
 // Delete ticket
 if (isset($_GET['delete'])) {
+    // Get uploaded files before deletion
+    $stmt = $pdo->prepare('SELECT filepath FROM gws_legal_uploads WHERE ticket_id = ?');
+    $stmt->execute([ $_GET['delete'] ]);
+    $uploads = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Delete physical files from server
+    foreach ($uploads as $upload) {
+        $file_path = $gws_legal_uploads_path . $upload['filepath'];
+        if (file_exists($file_path)) {
+            unlink($file_path);
+        }
+    }
+    
     $stmt = $pdo->prepare('DELETE t, tc, tu FROM gws_legal t LEFT JOIN gws_legal_comments tc ON tc.ticket_id = t.id LEFT JOIN gws_legal_uploads tu ON tu.ticket_id = t.id WHERE t.id = ?');
     $stmt->execute([ $_GET['delete'] ]);
     header('Location: tickets.php?success_msg=3');

@@ -92,7 +92,7 @@ if (isset($_GET['success_msg'])) {
 // Determine the URL
 $url = 'client-projects.php?search=' . $search . (isset($_GET['page_id']) ? '&page_id=' . $_GET['page_id'] : '');
 ?>
-<?=template_admin_header('Client Projects', 'resources', 'projects')?>
+<?=template_admin_header('Client Projects', 'ticketing', 'projects')?>
 
 <?=generate_breadcrumbs([
     ['label' => 'Resource System', 'url' => 'index.php'],

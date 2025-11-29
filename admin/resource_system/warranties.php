@@ -1,6 +1,7 @@
 <?php
 require 'assets/includes/admin_config.php';
 include_once '../assets/includes/components.php';
+$warranty_uploads_path = public_path . "client-dashboard/communication/warranty-ticket-uploads/";
 // Connect to the login accounts Database using the PDO interface
 try {
 	$login_db = new PDO('mysql:host=' . db_host . ';dbname=' . db_name . ';charset=' . db_charset, db_user, db_pass);
@@ -19,6 +20,19 @@ try {
 }
 // Delete record
 if (isset($_GET['delete'])) {
+    // Get uploaded files before deletion
+    $stmt = $onthego_db->prepare('SELECT filepath FROM warranty_tickets_uploads WHERE ticket_id = ?');
+    $stmt->execute([ $_GET['delete'] ]);
+    $uploads = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Delete physical files from server
+    foreach ($uploads as $upload) {
+        $file_path = $warranty_uploads_path . $upload['filepath'];
+        if (file_exists($file_path)) {
+            unlink($file_path);
+        }
+    }
+    
     $stmt = $onthego_db->prepare('DELETE FROM warranty_tickets WHERE id = ?');
     $stmt->execute([ $_GET['delete'] ]);
     header('Location: warranties.php?success_msg=3');

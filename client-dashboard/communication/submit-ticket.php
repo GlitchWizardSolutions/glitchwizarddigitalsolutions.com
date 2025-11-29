@@ -73,16 +73,28 @@ if (isset($_POST['title'], $_POST['ticket-message'], $_POST['priority'], $_POST[
         if (attachments && isset($_FILES['attachments'])) {
             // Iterate the uploaded files
             for ($i = 0; $i < count($_FILES['attachments']['name']); $i++) {
-                
+
                 // Get the file extension (png, jpg, etc)
                 $ext = strtolower(pathinfo($_FILES['attachments']['name'][$i], PATHINFO_EXTENSION));
-                
-                // The file name will contain a unique code to prevent multiple files with the same name.
-            	$upload_path = uploads_directory . sha1(uniqid() . $ticket_id . $i) .  '.' . $ext;
-            	
+
+                // Get the original filename without extension
+                $original_name = pathinfo($_FILES['attachments']['name'][$i], PATHINFO_FILENAME);
+
+                // Generate a unique filename that preserves the original name
+                $counter = 0;
+                $filename = $original_name;
+                $upload_path = uploads_directory . $filename . '.' . $ext;
+
+                // Check if file exists and add numbering if needed
+                while (file_exists($upload_path)) {
+                    $counter++;
+                    $filename = $original_name . ' (' . $counter . ')';
+                    $upload_path = uploads_directory . $filename . '.' . $ext;
+                }
+
             	// Check to make sure the file is valid
             	if (!empty($_FILES['attachments']['tmp_name'][$i]) && in_array($ext, explode(',', attachments_allowed))) {
-            		if (!file_exists($upload_path) && $_FILES['attachments']['size'][$i] <= max_allowed_upload_file_size) {
+            		if ($_FILES['attachments']['size'][$i] <= max_allowed_upload_file_size) {
             			// If everything checks out, we can move the uploaded file to its final destination...
             			move_uploaded_file($_FILES['attachments']['tmp_name'][$i], $upload_path);
             			// Insert attachment info into the database (ticket_id, filepath)

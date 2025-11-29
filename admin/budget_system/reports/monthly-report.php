@@ -98,13 +98,18 @@ $records = $budget_pdo->query("SELECT r.*,c.category,c.balance from running_bala
                     }else if($record['balance_type'] == 2){
                         $expense_out-= $record['amount']; 
                     }
-                    $budget = $budget_pdo->query("SELECT SUM(amount) as total FROM running_balance where balance_type = 1 and category_id = $category_id")->fetch(PDO::FETCH_COLUMN); 
+                    $budget_stmt = $budget_pdo->prepare("SELECT SUM(amount) as total FROM running_balance where balance_type = 1 and category_id = ?");
+                    $budget_stmt->execute([$category_id]);
+                    $budget = $budget_stmt->fetch(PDO::FETCH_COLUMN);
                     if ($budget === NULL) {$budget = 0;}   $total_in +=$budget;
-                        $expense = $budget_pdo->query("SELECT SUM(amount) as total FROM running_balance where balance_type = 2 and category_id = $category_id")->fetch(PDO::FETCH_COLUMN); 
+                        $expense_stmt = $budget_pdo->prepare("SELECT SUM(amount) as total FROM running_balance where balance_type = 2 and category_id = ?");
+                        $expense_stmt->execute([$category_id]);
+                        $expense = $expense_stmt->fetch(PDO::FETCH_COLUMN);
                         if ($expense === NULL) {$expense = 0;} $total_out +=$expense;
                     $balance = $budget - $expense;
                         if ($balance === NULL) {$balance = 0;} $total_reserve = $total_in -$total_out;
-                    $update = $budget_pdo->query("UPDATE categories set `balance` = $balance where id = $category_id"); 
+                    $update_stmt = $budget_pdo->prepare("UPDATE categories set `balance` = ? where id = ?");
+                    $update_stmt->execute([$balance, $category_id]); 
                     $total=$total_in + $total_out;
                 ?>
                 <tr>
