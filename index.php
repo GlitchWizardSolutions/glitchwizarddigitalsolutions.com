@@ -46,6 +46,9 @@ if (isset($_COOKIE['rememberme']) && !empty($_COOKIE['rememberme'])) {
 //CSRF Protection - Now handled by security-utils.php
 //$_SESSION['token'] = md5(uniqid(rand(), true));
 
+// Generate CSRF token for the login form
+$csrf_token = get_csrf_token();
+
 // PHASE 3: NOW load the page HTML
 include includes_path . 'public-page-setup.php';
 ?>
@@ -72,7 +75,7 @@ include includes_path . 'public-page-setup.php';
 			    <label id="rememberme" class="rememberme">
 			    <input type="checkbox" name="rememberme"> Remember me</label>
 
-                <input type="hidden" name="token" value="<?=$_SESSION['token']?>">
+                <?php csrf_token_field(); ?>
 				<div class="msg"></div>
 
 				<input type="submit" value="Login">
