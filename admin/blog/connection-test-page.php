@@ -27,7 +27,7 @@ try {
     <div class="title">
        <i class="fa-solid fa-circle-info"></i>
         <div class="txt">
-            <h2>Envato Blog Connection Test Page</h2>
+            <h2>Blog Connection Test Page</h2>
             <p>Making this a template for the rest of the site.</p>
         </div>
     </div>

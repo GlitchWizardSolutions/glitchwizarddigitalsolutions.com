@@ -120,7 +120,7 @@ if(isset($_POST['chunk']) && isset($_POST['chunk_last']) && isset($_POST['file_n
 
     if(isset($_FILES['file']['name'])) {
         $uploadfile = getcwd().DIRECTORY_SEPARATOR.$uploaddir.DIRECTORY_SEPARATOR.$_FILES['file']['name'];
-        $filepath = 'https://burden-to-blessings.com/documents'.DIRECTORY_SEPARATOR.$_FILES['file']['name'];
+        $filepath = BASE_URL . blog_files_url . $_FILES['file']['name'];
         if(!file_exists($uploadfile)){
             $file_moved = move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile);
         } else {
