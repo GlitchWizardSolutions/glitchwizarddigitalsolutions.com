@@ -167,50 +167,16 @@ function check_bloggedin($blog_pdo, $pdo, $redirect_file =  $settings['blog_site
 		$date = date('Y-m-d\TH:i:s');
 		$stmt = $pdo->prepare('UPDATE accounts SET last_seen = ? WHERE id = ?');
 		$stmt->execute([ $date, $_SESSION['id'] ]);
-	}elseif(isset($_SESSION['bloggedin'])){ //blog user is logged in, so update their last seen date.
-	   	$date = date('Y-m-d\TH:i:s');
-		$stmt = $blog_pdo->prepare('UPDATE users SET last_seen = ? WHERE id = ?');
-		$stmt->execute([ $date, $_SESSION['id'] ]);
-    }elseif(isset($_COOKIE['rememberme']) && !empty($_COOKIE['rememberme']) && !isset($_SESSION['loggedin']) && !isset($_SESSION['loggedin'])) { //remembered cookie
-// Initialize
-        $auto_login_blog = '';
-        $auto_login_account = '';
-// If the remember me cookie matches one in the database 
-// then we can update the session variables and the user 
-// or member, will be logged-in.
-
-        //determine if someone is in the blog users table, first...
-        $stmt = $blog_pdo->prepare('SELECT * FROM users WHERE rememberme = ?');
-	    $stmt->execute([ $_COOKIE['rememberme'] ]);
-	    $auto_login_blog = $stmt->fetch(PDO::FETCH_ASSOC);
-	    
-        //determine if someone is in accounts table, next.
+    }elseif(isset($_COOKIE['rememberme']) && !empty($_COOKIE['rememberme']) && !isset($_SESSION['loggedin'])) { //remembered cookie
+        //determine if someone is in accounts table
 	    $stmt = $pdo->prepare('SELECT * FROM accounts WHERE rememberme = ?');
 	    $stmt->execute([ $_COOKIE['rememberme'] ]);
 	    $auto_login_account = $stmt->fetch(PDO::FETCH_ASSOC);
 	    
-	if ($auto_login_blog) {// Authenticates the blog user
-		session_regenerate_id();
-		$_SESSION['bloggedin'] = TRUE;//logs all into the blog area for commenting.
-		$_SESSION['sec-username'] = $auto_login_blog['username'];
-		$_SESSION['name'] = $auto_login_blog['username'];
-		$_SESSION['id'] = $auto_login_blog['id'];
-        $_SESSION['role'] = $auto_login_blog['role'];
-        $_SESSION['access_level'] = $auto_login_blog['access_level'];
-        $_SESSION['email'] = $auto_login_blog['email'];
-        $_SESSION['full_name'] = $auto_login_blog['full_name'];
-        $_SESSION['document_path'] = $auto_login_blog['document_path'];
-		// Update last seen date
-		$date = date('Y-m-d\TH:i:s');
-		$stmt = $blog_pdo->prepare('UPDATE users SET last_seen = ? WHERE id = ?');
-		$stmt->execute([ $date, $auto_login_blog['id'] ]);
-		// Redirect to blog home page
-        header('Location: /blog/');
-		exit;
-	}elseif($auto_login_account) {
+	if($auto_login_account) {
 		// Authenticate the account member
 		session_regenerate_id();
-		$_SESSION['loggedin'] = TRUE;//logs into both the blog and to the member portal.
+		$_SESSION['loggedin'] = TRUE;
 		$_SESSION['sec-username'] = $auto_login_account['username'];
 		$_SESSION['name'] = $auto_login_account['username'];
 		$_SESSION['id'] = $auto_login_account['id'];
@@ -223,16 +189,15 @@ function check_bloggedin($blog_pdo, $pdo, $redirect_file =  $settings['blog_site
 		$date = date('Y-m-d\TH:i:s');
 		$stmt = $pdo->prepare('UPDATE accounts SET last_seen = ? WHERE id = ?');
 		$stmt->execute([ $date, $auto_login_account['id'] ]);
-		// Redirect to dashboard home page
+		// Redirect to blog home page
         header('Location: /blog/');
 		exit;
-	}//end if user or account is able to be auto authenticated.
-  else { //exit account matched not remembered
+	} else { //exit account matched not remembered
     		// If the user is not remembered redirect to the login page.
     		header('Location: ' . $redirect_file);
     		exit;
     	}//remembered
-    }else if (!isset($_SESSION['bloggedin'])) {
+    } else if (!isset($_SESSION['loggedin'])) {
     	// If the user is not logged in redirect to the login page.
     	header('Location: ' . $redirect_file);
     	exit;

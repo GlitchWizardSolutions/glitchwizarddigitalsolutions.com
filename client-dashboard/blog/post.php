@@ -21,7 +21,7 @@ if (!$row) {
 
 // Handle comment submission BEFORE any output
 $cancomment = 'No';
-if (isset($_SESSION['loggedin']) || isset($_SESSION['bloggedin'])) {
+if (isset($_SESSION['loggedin'])) {
     $cancomment = 'Yes';
 } elseif ($settings['comments'] === 'guests') {
     $cancomment = 'Yes';
@@ -36,10 +36,6 @@ if ($cancomment === 'Yes' && isset($_POST['comment'])) {
         // Portal user
         $author_name = $_SESSION['name'];
         $author_id = $_SESSION['id']; // Get the actual user ID
-    } elseif (isset($_SESSION['bloggedin']) && isset($_SESSION['sec-username'])) {
-        // Blog user
-        $author_name = $_SESSION['sec-username'];
-        $author_id = 0; // Blog users don't have account ID
     } else {
         $author_name = trim($_POST['name'] ?? '');
         $author_id = 0;
@@ -85,7 +81,7 @@ $post_id = $row['id'];
 $post_slug = $row['slug'];
 
 // Check if user is logged in and get their info
-$logged_in = isset($_SESSION['loggedin']) || isset($_SESSION['bloggedin']);
+$logged_in = isset($_SESSION['loggedin']);
 $current_username = '';
 $current_avatar = '/assets/img/avatar.png'; // Default avatar
 
@@ -93,15 +89,6 @@ if (isset($_SESSION['loggedin']) && isset($_SESSION['name'])) {
     // Portal user - session uses 'name' not 'username'
     $current_username = $_SESSION['name'];
     $stmt = $pdo->prepare('SELECT avatar FROM accounts WHERE username = ? LIMIT 1');
-    $stmt->execute([$current_username]);
-    $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($user_data && !empty($user_data['avatar'])) {
-        $current_avatar = $user_data['avatar'];
-    }
-} elseif (isset($_SESSION['bloggedin']) && isset($_SESSION['sec-username'])) {
-    // Blog user
-    $current_username = $_SESSION['sec-username'];
-    $stmt = $blog_pdo->prepare('SELECT avatar FROM users WHERE username = ? LIMIT 1');
     $stmt->execute([$current_username]);
     $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($user_data && !empty($user_data['avatar'])) {
@@ -239,7 +226,7 @@ if (isset($_SESSION['loggedin']) && isset($_SESSION['name'])) {
                                 $cancomment = 'No';
                                 $approved = 'No';
                                 
-                                if (isset($_SESSION['loggedin']) || isset($_SESSION['bloggedin'])) {
+                                if (isset($_SESSION['loggedin'])) {
                                     $guest = 'Yes';
                                     $cancomment = 'Yes';
                                     $approved = 'Yes';

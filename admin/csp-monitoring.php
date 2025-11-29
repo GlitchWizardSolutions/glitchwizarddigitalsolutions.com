@@ -8,9 +8,9 @@
 
 include '../assets/includes/admin_config.php';
 
-// Check admin access
-if (!isset($_SESSION['loggedin']) || $_SESSION['access_level'] !== 'admin') {
-    header('Location: index.php');
+// Check admin access - only Admin level can access
+if (!isset($_SESSION['loggedin']) || $_SESSION['access_level'] !== 'Admin') {
+    header('Location: ../index.php');
     exit;
 }
 

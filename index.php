@@ -24,7 +24,6 @@ if (isset($_COOKIE['rememberme']) && !empty($_COOKIE['rememberme'])) {
 		// Authenticate the user
 		session_regenerate_id();
 		$_SESSION['loggedin'] = TRUE;
-		$_SESSION['bloggedin'] = TRUE;//logs all members into the blog area for commenting.
 		$_SESSION['sec-username'] = $auto_login['username'];
 		$_SESSION['name'] = $auto_login['username'];
 		$_SESSION['id'] = $auto_login['id'];
