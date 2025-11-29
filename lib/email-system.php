@@ -63,8 +63,10 @@ function configure_smtp_mail($mail) {
  * @return bool Success status
  */
 function send_email($email, $code, $username, $type) {
-    debug_log('Email System', 'email-system.php', 'Send Email', "=== SEND_EMAIL CALLED ===");
-    debug_log('Email System', 'email-system.php', 'Send Email', "Send Mail Parms: email: $email, code: $code, username: $username, type: $type");
+    if (function_exists('debug_log')) {
+        debug_log('Email System', 'email-system.php', 'Send Email', "=== SEND_EMAIL CALLED ===");
+        debug_log('Email System', 'email-system.php', 'Send Email', "Send Mail Parms: email: $email, code: $code, username: $username, type: $type");
+    }
     
     $body_template = "";
     $link = "";
@@ -123,10 +125,14 @@ function send_email($email, $code, $username, $type) {
         
         // Send mail
         $mail->send();
-        debug_log('Email System', 'email-system.php', 'Send Email', "Email sent successfully to $email");
+        if (function_exists('debug_log')) {
+            debug_log('Email System', 'email-system.php', 'Send Email', "Email sent successfully to $email");
+        }
         return true;
     } catch (Exception $e) {
-        debug_log('Email System', 'email-system.php', 'Send Email', "EMAIL ERROR: " . $mail->ErrorInfo);
+        if (function_exists('debug_log')) {
+            debug_log('Email System', 'email-system.php', 'Send Email', "EMAIL ERROR: " . $mail->ErrorInfo);
+        }
         echo 'error';
         return false;
     }
