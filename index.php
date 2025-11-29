@@ -14,10 +14,8 @@ include 'assets/includes/config-only.php';
    // header('Location: client-dashboard/index.php');
    // exit;
 //}
-// Check if they are "remembered." 
+// Check if they are "remembered."
 // If the remember me cookie matches one in the database then we can update the session variables and the user will be logged-in.
-// TEMPORARILY DISABLED FOR TESTING - RE-ENABLE AFTER EMAIL SYSTEM IS WORKING
-/*
 if (isset($_COOKIE['rememberme']) && !empty($_COOKIE['rememberme'])) {
 	$stmt = $pdo->prepare('SELECT * FROM accounts WHERE rememberme = ?');
 	$stmt->execute([ $_COOKIE['rememberme'] ]);
@@ -44,7 +42,6 @@ if (isset($_COOKIE['rememberme']) && !empty($_COOKIE['rememberme'])) {
 		exit;
 	}//end if account
 }//end if remember me
-*/
 
 //CSRF Protection Add on to prevent cross site request forgery attacks.  
 $_SESSION['token'] = md5(uniqid(rand(), true));

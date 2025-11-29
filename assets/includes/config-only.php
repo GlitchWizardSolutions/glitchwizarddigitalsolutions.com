@@ -1,16 +1,19 @@
 <?php
 /**
  * Configuration Only - No HTML Output
- * 
+ *
  * This file loads configuration and database connections WITHOUT outputting any HTML.
  * Use this for pages that need to:
  * - Send HTTP headers (redirects, cookies, etc.)
  * - Send emails
  * - Modify session data
- * 
+ *
  * Created: 2025-11-18
  * Purpose: Fix "headers already sent" issues in email system
  */
+
+// Increase memory limit for config loading
+ini_set('memory_limit', '1024M');
 
 // Start session
 session_start();
