@@ -114,7 +114,7 @@ if (isset($_SESSION['loggedin']) && isset($_SESSION['name'])) {
             <div class="col-lg-12">
                 <div class="card">
                     <?php if ($row['image']): ?>
-                    <img src="/public_html/<?= $row['image'] ?>" class="card-img-top" alt="<?= htmlspecialchars($row['title']) ?>" style="height: 400px; width: 100%; object-fit: contain; background-color: #f8f9fa;">
+                    <img src="<?= BASE_URL . $row['image'] ?>" class="card-img-top" alt="<?= htmlspecialchars($row['title']) ?>" style="height: 400px; width: 100%; object-fit: contain; background-color: #f8f9fa;">
                     <?php endif; ?>
                     
                     <div class="card-body">

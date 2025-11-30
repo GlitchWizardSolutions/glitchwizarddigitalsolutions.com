@@ -75,7 +75,7 @@ $search_query = $_GET['q'] ?? '';
                                     <?php if (!empty($post['image'])): ?>
                                     <div class="col-md-3">
                                         <a href="post.php?name=<?= $post['slug'] ?>">
-                                            <img src="/public_html/<?= htmlspecialchars($post['image']) ?>" class="img-fluid rounded-start" alt="<?= htmlspecialchars($post['title']) ?>" style="height: 100%; object-fit: cover;">
+                                            <img src="<?= BASE_URL . htmlspecialchars($post['image']) ?>" class="img-fluid rounded-start" alt="<?= htmlspecialchars($post['title']) ?>" style="height: 100%; object-fit: cover;">
                                         </a>
                                     </div>
                                     <?php endif; ?>
