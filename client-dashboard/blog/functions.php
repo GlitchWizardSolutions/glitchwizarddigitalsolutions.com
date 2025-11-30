@@ -76,11 +76,11 @@ function emoticons($text){
 }//function exists
 if (!function_exists('post_author')){
 function post_author($author_id){
-    global $blog_pdo;
+    global $pdo;
     
     $author = '-';
     
-    $stmt = $blog_pdo->prepare("SELECT username FROM users WHERE id = ? LIMIT 1");
+    $stmt = $pdo->prepare("SELECT username FROM accounts WHERE id = ? LIMIT 1");
     $stmt->execute([$author_id]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -175,14 +175,14 @@ function post_commentscount($post_id, $blog_pdo = null){
 }//function exists
 if (!function_exists('head')){
 function head(){
-    global $blog_pdo, $settings;
+    global $blog_pdo, $pdo, $settings;
     if (!isset($_SESSION['sec-username'])) {
         $logged = 'No';
     } else {
         
         $username = $_SESSION['sec-username'];
         
-        $stmt = $blog_pdo->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT * FROM accounts WHERE username = ? LIMIT 1");
         $stmt->execute([$username]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -802,11 +802,8 @@ function get_user_avatar_info($blog_pdo, $pdo, string $username, string $user_id
         $stmt = $pdo->prepare('SELECT * FROM accounts WHERE id = ? LIMIT 1'); 
 	    $stmt->execute([ $account_id ]);
 	    $user_result = $stmt->fetch(PDO::FETCH_ASSOC);
-    }elseif($user='Yes'){//this is a user account.
-        $stmt = $blog_pdo->prepare('SELECT * FROM users WHERE id = ? LIMIT 1'); 
-	    $stmt->execute([ $user_id ]);
-	    $user_result = $stmt->fetch(PDO::FETCH_ASSOC);        
-    }//end checking if the comment is from a user or member.
+    }
+    // All users are now in accounts table - no separate users table
     
     //start populating the output data, using the results above or the default data.
         if ($user_result) {
@@ -828,9 +825,9 @@ function get_user_avatar_info($blog_pdo, $pdo, string $username, string $user_id
 if (!function_exists('sidebar')){
 function sidebar() {
 	
-    global $blog_pdo, $settings;
+    global $blog_pdo, $pdo, $settings;
 ?>
-			<div id="sidebar" class="col-md-4">
+			<div id="sidebar" class="col-lg-4">
 
 				<div class="card">
 					<div class="card-header"><i class="fas fa-list"></i> Categories</div>
@@ -844,7 +841,7 @@ function sidebar() {
         $stmt_count->execute([$category_id]);
 		$posts_count = $stmt_count->rowCount();
         echo '
-							<a href="category?name=' . $row['slug'] . '">
+							<a href="category.php?name=' . $row['slug'] . '">
 								<li class="list-group-item d-flex justify-content-between align-items-center">
 									' . $row['category'] . '
 									<span class="badge bg-secondary rounded-pill">' . $posts_count . '</span>
@@ -886,8 +883,8 @@ function sidebar() {
             $image = "";
             if($row['image'] != "") {
                 $image = '<img class="rounded shadow-1-strong me-1"
-							src="' . $row['image'] . '" alt="' . $row['title'] . '" width="70"
-							height="70" />';
+							src="' . BASE_URL . $row['image'] . '" alt="' . $row['title'] . '" width="70"
+							height="70" style="object-fit: cover;" />';
 			} else {
                 $image = '<svg class="bd-placeholder-img rounded shadow-1-strong me-1" width="70" height="70" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="No Image" preserveAspectRatio="xMidYMid slice" focusable="false">
                 <title>Image</title><rect width="70" height="70" fill="#55595c"/>
@@ -895,17 +892,17 @@ function sidebar() {
             }
             echo '       
 								<div class="mb-2 d-flex flex-start align-items-center bg-light rounded">
-									<a href="post?name=' . $row['slug'] . '" class="ms-1">
+									<a href="post.php?name=' . $row['slug'] . '" class="ms-1">
 										' . $image . '
 									</a>
 									<div class="mt-2 mb-2 ms-1 me-1">
 										<h6 class="text-primary mb-1">
-											<a href="post?name=' . $row['slug'] . '">' . $row['title'] . '</a>
+											<a href="post.php?name=' . $row['slug'] . '">' . $row['title'] . '</a>
 										</h6>
 										<p class="text-muted small mb-0">
 											<i class="fas fa-calendar"></i> ' . date($settings['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '<br />
                                             <i class="fa fa-comments"></i> Comments: 
-												<a href="post?name=' . $row['slug'] . '#comments">
+												<a href="post.php?name=' . $row['slug'] . '#comments">
 													<b>' . post_commentscount($row['id']) . '</b>
 												</a>
 										</p>
@@ -927,16 +924,19 @@ function sidebar() {
 			
 			$badge = '';
 			$acuthor = $row['user_id'];
+			$acavatar = BASE_URL . 'assets/img/avatar.png'; // Default avatar
+			
             if ($row['guest'] == 'Yes') {
-                $acavatar = 'assets/img/avatar.png';
+                $acavatar = BASE_URL . 'assets/img/avatar.png';
 				$badge = ' <span class="badge bg-secondary">Guest</span>';
             } else {
-                $stmt_user = $blog_pdo->prepare("SELECT * FROM users WHERE id = ? LIMIT 1");
+                $stmt_user = $pdo->prepare("SELECT * FROM accounts WHERE id = ? LIMIT 1");
                 $stmt_user->execute([$acuthor]);
                 $rowch = $stmt_user->fetch(PDO::FETCH_ASSOC);
                 
                 if ($rowch) {
-                    $acavatar = $rowch['avatar'];
+                    $acavatar_path = $rowch['avatar'];
+                    $acavatar = (strpos($acavatar_path, 'http') === 0) ? $acavatar_path : BASE_URL . ltrim($acavatar_path, '/');
                     $acuthor = $rowch['username'];
                 }
             }
@@ -946,17 +946,17 @@ function sidebar() {
             while ($row2 = $stmt_post->fetch(PDO::FETCH_ASSOC)) {
 				echo '
 								<div class="mb-2 d-flex flex-start align-items-center bg-light rounded border">
-									<a href="post?name=' . $row2['slug'] . '#comments" class="ms-2">
+									<a href="post.php?name=' . $row2['slug'] . '#comments" class="ms-2">
 										<img class="rounded-circle shadow-1-strong me-2"
 										src="' . $acavatar . '" alt="' . $acuthor . '" 
-										width="60" height="60" />
+										width="60" height="60" style="object-fit: cover;" />
 									</a>
 									<div class="mt-1 mb-1 ms-1 me-1">
 										<h6 class="text-primary mb-1">
-											<a href="post?name=' . $row2['slug'] . '#comments">' . $acuthor . '</a>
+											<a href="post.php?name=' . $row2['slug'] . '#comments">' . $acuthor . '</a>
 										</h6>
 										<p class="text-muted small mb-0">
-											on <a href="post?name=' . $row2['slug'] . '#comments">' . $row2['title'] . '</a><br />
+											on <a href="post.php?name=' . $row2['slug'] . '#comments">' . $row2['title'] . '</a><br />
 											<i class="fas fa-calendar"></i> ' . date($settings['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '
 										</p>
 									</div>

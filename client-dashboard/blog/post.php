@@ -132,7 +132,7 @@ if (isset($_SESSION['loggedin']) && isset($_SESSION['name'])) {
 
     <section class="section">
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-8">
                 <div class="card">
                     <?php if ($row['image']): ?>
                     <img src="<?= BASE_URL . $row['image'] ?>" class="card-img-top" alt="<?= htmlspecialchars($row['title']) ?>" style="height: 400px; width: 100%; object-fit: contain; background-color: #f8f9fa;">
@@ -300,10 +300,15 @@ if (isset($_SESSION['loggedin']) && isset($_SESSION['name'])) {
                                 ?>
                             </div>
                         </div>
-                    </div><!-- .col-lg-8 -->
-                </div><!-- .row -->
-            </section>
-        </main>
+                    </div><!-- .card-body -->
+                </div><!-- .card -->
+            </div><!-- .col-lg-8 -->
+            
+            <?php sidebar(); ?>
+            
+        </div><!-- .row -->
+        </section>
+    </main>
 
         <script>
         function countText() {

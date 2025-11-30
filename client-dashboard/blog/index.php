@@ -20,6 +20,8 @@ include '../assets/includes/page-setup.php';
     </div>
 
     <section class="section">
+        <div class="row">
+            <div class="col-lg-8">
         <?php
         // Featured posts carousel
         $stmt = $blog_pdo->query("SELECT * FROM posts WHERE active='Yes' AND featured='Yes' ORDER BY id DESC");
@@ -141,6 +143,9 @@ include '../assets/includes/page-setup.php';
                     <i class="bi bi-arrow-right-circle"></i> View All Articles
                 </a>
             </div>
+        </div>
+            </div>
+            <?php sidebar(); ?>
         </div>
     </section>
 </main>

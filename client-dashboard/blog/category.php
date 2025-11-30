@@ -37,6 +37,8 @@ $category_name = $category['category'];
     </div>
 
     <section class="section">
+        <div class="row">
+            <div class="col-lg-8">
         <div class="card">
             <div class="card-header">
                 <h5 class="mb-0"><i class="bi bi-folder"></i> <?= htmlspecialchars($category_name) ?></h5>
@@ -136,6 +138,9 @@ $category_name = $category['category'];
                 }
                 ?>
             </div>
+        </div>
+            </div>
+            <?php sidebar(); ?>
         </div>
     </section>
 </main>

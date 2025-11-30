@@ -23,7 +23,7 @@ $search_query = $_GET['q'] ?? '';
 
     <section class="section">
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-8">
                 <!-- Search Form -->
                 <div class="card mb-4">
                     <div class="card-body">
@@ -146,6 +146,9 @@ $search_query = $_GET['q'] ?? '';
                 }
                 ?>
             </div>
+        </div>
+            </div>
+            <?php sidebar(); ?>
         </div>
     </section>
 </main>
