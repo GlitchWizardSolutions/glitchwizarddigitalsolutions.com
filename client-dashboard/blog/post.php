@@ -3,6 +3,25 @@
 include_once 'assets/includes/blog-config.php';
 include "core.php";
 
+/**
+ * Process blog content to fix image paths for environment-aware display
+ */
+function process_blog_content($content) {
+    // Replace image src paths that don't start with http/https
+    $content = preg_replace_callback(
+        '/<img([^>]*)src=["\'](?!https?:\/\/)([^"\']+)["\']([^>]*)>/i',
+        function($matches) {
+            $before = $matches[1];
+            $path = $matches[2];
+            $after = $matches[3];
+            // Prepend BASE_URL to relative paths
+            return '<img' . $before . 'src="' . BASE_URL . $path . '"' . $after . '>';
+        },
+        $content
+    );
+    return $content;
+}
+
 $slug = $_GET['name'] ?? '';
 if (empty($slug)) {
     header('Location: index.php');
@@ -83,7 +102,7 @@ $post_slug = $row['slug'];
 // Check if user is logged in and get their info
 $logged_in = isset($_SESSION['loggedin']);
 $current_username = '';
-$current_avatar = '/assets/img/avatar.png'; // Default avatar
+$current_avatar = BASE_URL . 'assets/img/avatar.png'; // Default avatar
 
 if (isset($_SESSION['loggedin']) && isset($_SESSION['name'])) {
     // Portal user - session uses 'name' not 'username'
@@ -92,7 +111,9 @@ if (isset($_SESSION['loggedin']) && isset($_SESSION['name'])) {
     $stmt->execute([$current_username]);
     $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($user_data && !empty($user_data['avatar'])) {
-        $current_avatar = $user_data['avatar'];
+        // Prepend BASE_URL if path doesn't start with http
+        $avatar_path = $user_data['avatar'];
+        $current_avatar = (strpos($avatar_path, 'http') === 0) ? $avatar_path : BASE_URL . ltrim($avatar_path, '/');
     }
 }
 ?>
@@ -143,7 +164,7 @@ if (isset($_SESSION['loggedin']) && isset($_SESSION['name'])) {
                         
                         <!-- Post Content -->
                         <div class="post-content">
-                            <?= html_entity_decode($row['content']) ?>
+                            <?= process_blog_content(html_entity_decode($row['content'])) ?>
                         </div>
                         
                         <hr>
@@ -173,17 +194,18 @@ if (isset($_SESSION['loggedin']) && isset($_SESSION['name'])) {
                                     
                                     if ($user) {
                                         $author = $user['username'];
-                                        $avatar = !empty($user['avatar']) ? $user['avatar'] : '/assets/img/avatar.png';
+                                        $avatar_path = !empty($user['avatar']) ? $user['avatar'] : 'assets/img/avatar.png';
+                                        $avatar = (strpos($avatar_path, 'http') === 0) ? $avatar_path : BASE_URL . ltrim($avatar_path, '/');
                                         $badge = '<span class="badge bg-primary">Member</span>';
                                     } else {
                                         $author = 'Unknown User';
-                                        $avatar = '/assets/img/avatar.png';
+                                        $avatar = BASE_URL . 'assets/img/avatar.png';
                                         $badge = '<span class="badge bg-secondary">Guest</span>';
                                     }
                                 } else {
                                     // Guest or blog user
                                     $author = 'Guest';
-                                    $avatar = '/assets/img/avatar.png';
+                                    $avatar = BASE_URL . 'assets/img/avatar.png';
                                     $badge = '<span class="badge bg-secondary">Guest</span>';
                                 }
                         ?>
