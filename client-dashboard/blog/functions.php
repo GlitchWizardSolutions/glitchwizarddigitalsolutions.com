@@ -851,6 +851,11 @@ function sidebar() {
     }
 ?>
 						</ul>
+						<div class="text-center mt-3">
+							<a href="blog.php" class="btn btn-primary btn-sm">
+								<i class="bi bi-grid"></i> View All Articles
+							</a>
+						</div>
 					</div>
 				</div>
 				
@@ -859,7 +864,7 @@ function sidebar() {
 						<ul class="nav nav-tabs card-header-tabs nav-justified">
 							<li class="nav-item active">
 								<a class="nav-link active" href="#popular" data-bs-toggle="tab">
-									Popular Posts
+									Recent Articles
 								</a>
 							</li>
 							<li class="nav-item">

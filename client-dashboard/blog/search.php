@@ -26,8 +26,8 @@ $search_query = $_GET['q'] ?? '';
             <div class="col-lg-8">
                 <!-- Search Form -->
                 <div class="card mb-4">
-                    <div class="card-body">
-                        <form action="search.php" method="get">
+                    <div class="card-body d-flex align-items-center justify-content-center" style="min-height: 120px; padding: 2rem;">
+                        <form action="search.php" method="get" class="w-100">
                             <div class="input-group">
                                 <input type="text" name="q" class="form-control" placeholder="Search articles..." value="<?= htmlspecialchars($search_query) ?>" required minlength="2">
                                 <button class="btn btn-primary" type="submit">
@@ -69,25 +69,29 @@ $search_query = $_GET['q'] ?? '';
                             $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             
                             foreach ($posts as $post) {
+                                $image_html = "";
+                                if (!empty($post['image'])) {
+                                    $image_html = '<img src="' . BASE_URL . htmlspecialchars($post['image']) . '" alt="' . htmlspecialchars($post['title']) . '" class="rounded-start" style="width: 100%; height: 100%; object-fit: contain; background-color: #f8f9fa;">';
+                                } else {
+                                    $image_html = '<div style="width: 100%; height: 100%; background: #55595c; display: flex; align-items: center; justify-content: center; color: #eceeef;">No Image</div>';
+                                }
                             ?>
-                            <div class="card mb-3">
+                            <div class="card shadow-sm mb-3">
                                 <div class="row g-0">
-                                    <?php if (!empty($post['image'])): ?>
-                                    <div class="col-md-3">
+                                    <div class="col-md-4" style="height: 200px;">
                                         <a href="post.php?name=<?= $post['slug'] ?>">
-                                            <img src="<?= BASE_URL . htmlspecialchars($post['image']) ?>" class="img-fluid rounded-start" alt="<?= htmlspecialchars($post['title']) ?>" style="height: 100%; object-fit: cover;">
+                                            <?= $image_html ?>
                                         </a>
                                     </div>
-                                    <?php endif; ?>
                                     
-                                    <div class="<?= !empty($post['image']) ? 'col-md-9' : 'col-md-12' ?>">
+                                    <div class="col-md-8">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start mb-2">
                                                 <h5 class="card-title mb-0">
                                                     <a href="post.php?name=<?= $post['slug'] ?>"><?= htmlspecialchars($post['title']) ?></a>
                                                 </h5>
                                                 <a href="category.php?name=<?= post_categoryslug($post['category_id']) ?>">
-                                                    <span class="badge bg-secondary"><?= post_category($post['category_id']) ?></span>
+                                                    <span class="badge bg-primary"><?= post_category($post['category_id']) ?></span>
                                                 </a>
                                             </div>
                                             
@@ -146,8 +150,7 @@ $search_query = $_GET['q'] ?? '';
                 }
                 ?>
             </div>
-        </div>
-            </div>
+            
             <?php sidebar(); ?>
         </div>
     </section>

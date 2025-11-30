@@ -13,7 +13,7 @@ include '../assets/includes/page-setup.php';
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/index.php">Home</a></li>
                 <li class="breadcrumb-item"><a href="index.php">Knowledge Base</a></li>
-                <li class="breadcrumb-item active">All Posts</li>
+                <li class="breadcrumb-item active">All Articles</li>
             </ol>
         </nav>
     </div>
@@ -23,7 +23,7 @@ include '../assets/includes/page-setup.php';
             <div class="col-lg-8">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-file-text"></i> All Blog Posts</h5>
+                <h5 class="mb-0"><i class="bi bi-file-text"></i> All Knowledge Base Articles</h5>
             </div>
             <div class="card-body">
                 <?php

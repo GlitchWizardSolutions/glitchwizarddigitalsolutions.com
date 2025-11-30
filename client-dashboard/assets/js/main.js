@@ -50,6 +50,74 @@
   }
 
   /**
+   * Sidebar navigation active state
+   * Keeps the menu section open and highlights the current page
+   */
+  const activateSidebarNav = () => {
+    // Get current page filename
+    const currentPath = window.location.pathname;
+    const currentPage = currentPath.substring(currentPath.lastIndexOf('/') + 1);
+    
+    // Don't activate any menus on the main dashboard index page
+    if (currentPage === 'index.php' && currentPath.includes('client-dashboard') && !currentPath.includes('client-dashboard/blog')) {
+      return;
+    }
+    
+    // Check if we're in a specific folder (like blog)
+    let activeMenuId = null;
+    if (currentPath.includes('/blog/')) {
+      activeMenuId = 'blog-nav';
+    }
+    
+    // Find all links in the sidebar navigation (both parent and submenu)
+    const allLinks = select('.sidebar-nav a', true);
+    
+    allLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      
+      if (href && href !== '#') {
+        // Get the filename from the href
+        const linkPage = href.substring(href.lastIndexOf('/') + 1).split('?')[0];
+        
+        // Check if this link matches the current page (exact match)
+        if (linkPage === currentPage) {
+          // Add active class to the link
+          link.classList.add('active');
+          
+          // Check if this is inside a submenu
+          const parentNav = link.closest('.nav-content');
+          
+          if (parentNav) {
+            // This is a submenu item - keep the parent menu open
+            parentNav.classList.add('show');
+            
+            // Find and update the parent menu toggle link
+            const parentToggle = document.querySelector(`[data-bs-target="#${parentNav.id}"]`);
+            if (parentToggle) {
+              parentToggle.classList.remove('collapsed');
+            }
+          }
+        }
+      }
+    });
+    
+    // If we're in a specific folder but didn't find an exact match, open that menu anyway
+    if (activeMenuId) {
+      const menuToOpen = document.getElementById(activeMenuId);
+      if (menuToOpen && !menuToOpen.classList.contains('show')) {
+        menuToOpen.classList.add('show');
+        const parentToggle = document.querySelector(`[data-bs-target="#${activeMenuId}"]`);
+        if (parentToggle) {
+          parentToggle.classList.remove('collapsed');
+        }
+      }
+    }
+  }
+  
+  // Run on page load
+  window.addEventListener('load', activateSidebarNav);
+
+  /**
    * Navbar links active state on scroll
    */
   let navbarlinks = select('#navbar .scrollto', true)

@@ -65,14 +65,14 @@
           <i class="bi bi-book"></i><span>Knowledge Base</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="blog-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li id='blog-home'>
-            <a href="<?php echo site_menu_base ?>client-dashboard/blog/index.php">
-              <i class="bi bi-circle"></i><span>All Articles</span>
-            </a>
-          </li>
           <li id='blog-search'>
             <a href="<?php echo site_menu_base ?>client-dashboard/blog/search.php">
               <i class="bi bi-circle"></i><span>Search</span>
+            </a>
+          </li>
+          <li id='blog-home'>
+            <a href="<?php echo site_menu_base ?>client-dashboard/blog/blog.php">
+              <i class="bi bi-circle"></i><span>All Articles</span>
             </a>
           </li>
         </ul>
