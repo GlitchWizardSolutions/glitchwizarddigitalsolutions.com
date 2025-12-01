@@ -1,0 +1,32 @@
+
+ID	Budget Name	Current Balance	New Balance	Change	Status
+1	Homeowner Insurance	$-1,018.87	$-1,018.87	-	No change
+5	YouMail App	$-179.88	$-179.88	-	No change
+7	Property Taxes - Florida	$0.00	$0.00	-	No change
+8	Auto Insurance	$-2,768.01	$-2,768.01	-	No change
+9	Amazon Prime	$-140.13	$-140.13	-	No change
+10	Vehicle Registrations	$-329.40	$-329.40	-	No change
+11	Instacart Subscription	$-79.00	$-79.00	-	No change
+12	TurboTax	$0.00	$0.00	-	No change
+13	MessageEZ App	$-12.87	$-12.87	-	No change
+14	Verizon Cellular	$-3,184.04	$-3,184.04	-	No change
+15	CHEWY-Animal Supplies	$-1,805.72	$-1,805.72	-	No change
+20	Brilliant Pad	$-584.95	$-584.95	-	No change
+21	Starlink WiFi	$-670.48	$-670.48	-	No change
+22	Microsoft 365	$-367.54	$-367.54	-	No change
+23	Remaining Balance	$-25,287.12	$-25,287.12	-	No change
+24	Minimum Balance MIN BALANCE	$5,000.00	$5,000.00	-	No change
+25	Savings	$-180.87	$-180.87	-	No change
+26	Difference	$17,351.56	$17,351.56	-	No change
+27	Home Pest Control Delivery Subscription	$-209.25	$-209.25	-	No change
+28	Security Camera Sub	$-256.83	$-256.83	-	No change
+29	Credit Card/Bank/ATM Fees	$-208.07	$-208.07	-	No change
+30	AI	$-260.00	$-260.00	-	No change
+31	Talquin Electric	$-3,671.11	$-3,671.11	-	No change
+32	Waste Pro	$0.00	$0.00	-	No change
+33	Optician & Prescription Eyeglasses	$-612.37	$-612.37	-	No change
+34	Dollar Shave Club	$-54.23	$-54.23	-	No change
+35	Lucky's Barber Shop	$-75.00	$-75.00	-	No change
+36	Allowance FIXED	$38,500.00	$38,500.00	-	No change
+37	Dog Nail Trims / Vaccinations	$-1,243.20	$-1,243.20	-	No change
+38	Earth Breeze FIXED	$-198.45	$-198.45	-	No change

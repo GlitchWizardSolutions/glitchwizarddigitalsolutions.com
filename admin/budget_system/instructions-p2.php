@@ -1,33 +1,48 @@
 <?php
 include_once 'assets/includes/admin_config.php';
+include_once 'assets/includes/budget_constants.php';
+include_once 'assets/includes/budget_helpers.php';
+
 // Connect to MySQL database
 $budget_pdo = pdo_connect_budget_db($db_host, $db_name7, $db_user, $db_pass);
 // Error message
 $error_msg = ''; 
 // Success message
 $success_msg = NULL;
-$stmt =$budget_pdo->prepare('SELECT * FROM csv_upload ORDER BY date DESC');
-$stmt->execute();
-$uploads = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//CSV_UPLOAD TABLE
-// Get the transactions from the csv table
-$stmt = $budget_pdo->prepare('SELECT * FROM csv_upload');
+// Get transactions from csv_upload table (ordered by date for display and processing)
+$stmt = $budget_pdo->prepare('SELECT * FROM csv_upload ORDER BY date ASC');
 $stmt->execute();
-$transactions  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //YOU MUST CLICK SUBMIT TO RUN THIS PROCESS
 
-if(isset($_POST['submit']) ){
-//LOOP THROUGH CSV_UPLOAD TABLE 
-foreach($transactions as $row){
+if (isset($_POST['submit'])) {
+    // Validate we have transactions to process
+    if (empty($transactions)) {
+        $error_msg = 'No transactions found in csv_upload table. Please upload a CSV file first.';
+    } else {
+        try {
+            // Start database transaction for atomicity
+            $budget_pdo->beginTransaction();
+            
+            // Clear csv_process table before processing new transactions
+            // Note: Using DELETE instead of TRUNCATE to preserve transaction
+            $budget_pdo->exec('DELETE FROM csv_process');
+            
+            // OPTIMIZATION: Load all budget balances once instead of querying in loop
+            $budget_balances = get_all_budget_balances($budget_pdo);
+            
+            $processed_count = 0;
+            
+            //LOOP THROUGH CSV_UPLOAD TABLE 
+            foreach ($transactions as $row) {
 //SETS DEFAULT TRANSACTION VALUES TO REMAINING BALANCE.
 //for transactions not found in bills or in hancock table.
-$remainder_flag = 'No';
-$flags_id=3;
-$budget_id=23;
+$flags_id = FLAG_LEFT_TO_SPEND;
+$budget_id = BUDGET_NONE;
 $budget='None';
-$bill_id=25;//BLANK DESCRIPTION
+$bill_id = BILL_NONE; //BLANK DESCRIPTION
 $bill='None';
 $description='';
 $autopay_flag='N';
@@ -35,7 +50,6 @@ $updated_balance=0;
 $allowance_update='No';
 $reconciled='New';
 $reimbursement='';
-$allowance_split='No';
 $comment= 'No matching bill found';
 $notes='Automagically Updated';
 $hancock_table_match='No';
@@ -45,7 +59,9 @@ $prior_balance=0;
 $bills_table_updated='N';
 $bills_table_id=0;
 $budget_name='';    
-$edited='No';    
+$edited='No';
+$frequency=0;
+$next_due_date=null;    
 $date=$row['date'];
 $rollback_next_due_date=$date;
 $rollback_next_due_amount=0;
@@ -58,7 +74,7 @@ $year = date('Y', strtotime($date));
 $check_number=$row['check_number'];
 $transaction_type=$row['transaction_type'];
 //LIMITS THE DESCRIPTION TO ELIMINATE THE DATES COMING IN.
-$description= substr($row['description']??'', 0, 15);
+$description= substr($row['description']??'', 0, DESC_MATCH_LENGTH);
 $reference=$description;
 $hancock=$description;
 $debits=$row['debits'];
@@ -88,12 +104,9 @@ $bill_reference = $stmt->fetch(PDO::FETCH_ASSOC);
                 //CAPTURE POTENTIAL UPDATES TO THE BILLS TABLE, IF ANY
                 $bills_table_updated='M';
                 $bills_table_id=$bill_reference['id'];
-               
-                if($frequency !=0){
-                $next_due_date= date('Y-m-d', strtotime($date. ' + ' . $frequency . ' days'));
-                }else{
-                $next_due_date= $bill_reference['next_due_date'];    
-                }
+                
+                // Use helper function for date calculation
+                $next_due_date = calculate_next_due_date($date, $frequency, $bill_reference['next_due_date']);
 }else{
         $stmt = $budget_pdo->prepare('SELECT * FROM hancock WHERE description = ? limit 1');
         $stmt->execute([$description]);
@@ -118,16 +131,14 @@ $bill_reference = $stmt->fetch(PDO::FETCH_ASSOC);
                 //CAPTURE POTENTIAL UPDATES TO THE BILLS TABLE, IF ANY
                 $bills_table_updated='M';
                 $bills_table_id=$bank_reference['bill_id'];
-                 if($frequency !=0){
-                $next_due_date= date('Y-m-d', strtotime($date. ' + ' . $frequency . ' days'));
-                }else{
-                $next_due_date= $bill_reference['next_due_date'];    
-                }
+                
+                // Use helper function for date calculation
+                $next_due_date = calculate_next_due_date($date, $frequency, $bill_reference['next_due_date']);
         }else{ 
                 //THIS IS FOR ALL TRANSACTIONS NOT FOUND IN BILLS OR HANCOCK TABLES.
-                //FORCES BILL #25 
+                //FORCES BILL #25 (BILL_NONE constant)
                 $stmt = $budget_pdo->prepare('SELECT * FROM bills WHERE id = ?');
-                $stmt->execute([25]);
+                $stmt->execute([BILL_NONE]);
                 $bill_reference = $stmt->fetch(PDO::FETCH_ASSOC);
                 $bill= $bill_reference['bill'];
                 $budget_id=$bill_reference['budget_id'];
@@ -147,400 +158,91 @@ $bill_reference = $stmt->fetch(PDO::FETCH_ASSOC);
 }//END if bill reference
 //WHETHER OR NOT THE RECORD WAS FOUND IN BILLS OR IN HANCOCK, WE CAN UPDATE.  
 //WE CAN USE DEFAULT VALUES IF THERE IS NO PRIOR TRANSACTION.
-        //Pre-Update Balance for Budget Id
-         $prior_balance = 0;
+        //Pre-Update Balance for Budget Id - OPTIMIZED: Use pre-loaded array
+         $prior_balance = $budget_balances[$budget_id]['balance'] ?? 0;
+         $budget_name = $budget_balances[$budget_id]['budget'] ?? 'Unknown';
          $budget_updated='No';
-         $stmt = $budget_pdo->prepare('SELECT balance FROM budget WHERE id = ?');
-         $stmt->execute([ $budget_id ]);
-         $balance= $stmt->fetchColumn(); 
-         $stmt = $budget_pdo->prepare('SELECT budget FROM budget WHERE id = ?');
-         $stmt->execute([ $budget_id ]);
-         $budget_name= $stmt->fetchColumn(); 
-         $prior_balance=$balance;
-         $updated_balance= $balance+$amount;
+         $updated_balance= $prior_balance + $amount;
 //HANDLE BUDGET LOADING TRANSACTION, IF ANY.         
-            if($description=='OLB XFER FROM 9'){
-                //These are processed differently, and can override input.
-                if($row['credits']==3500){
-                    $amount=0;
-                    $next_due_amount=$row['credits'];;
-                    $last_paid_amount=$row['credits'];;
-                    $last_paid_date=$date;
-                    $allowance_update='Yes';
-                    $allowance_split='No';
-                            $credits                = $row['credits'];
-                            $updated_balance        = 0;
-                            $prior_balance          = 0;
-                            $budget_updated         = "No";
-                            $bills_table_updated    = "No";
-                            $hancock_table_match    = "No";
-                            $reconciled             = "No"; 
-                            $comment                = $month . '/' . $year . ' Budget Deposit';
-                            $bill_id                = 36;
-                            $budget_id              = 36;
-                            $budget_name            = 'Fill Budget Buckets';
-                            $flags_id               = '5';
-                            $reimbursement          = '';
-                            $notes                  = 'Budget buckets have been loaded.';
-                  // End if that deposit is exactly $3500.00          
-                }else if($row['credits'] > 3500.00){
-                $stmt = $budget_pdo->prepare('SELECT * FROM bills WHERE id = ?');
-                $stmt->execute([36]);
-                $bill_reference2 = $stmt->fetch(PDO::FETCH_ASSOC);
-                $bill= $bill_reference2['bill'];
-                $frequency=$bill_reference2['frequency'];
-                if($frequency !=0){
-                $next_due_date= date('Y-m-d', strtotime($date . ' + ' . $frequency . ' days'));
-                }else{
-                $next_due_date= $bill_reference['next_due_date'];    
+            if($description == DESC_ALLOWANCE_DEPOSIT){
+                // Use helper function to process complex deposit logic
+                $deposit_transactions = process_allowance_deposit(
+                    $budget_pdo, 
+                    $row, 
+                    $description, 
+                    $date, 
+                    $month, 
+                    $year, 
+                    $check_number, 
+                    $transaction_type, 
+                    $hancock, 
+                    $reference, 
+                    $budget_balances
+                );
+                
+                // Insert all deposit-related transactions
+                foreach ($deposit_transactions as $deposit_data) {
+                    insert_csv_process_row($budget_pdo, $deposit_data);
                 }
-                            $amount=0;
-                            $next_due_amount=3500.00;
-                            $last_paid_amount=3500.00;
-                            $last_paid_date=$date;
-                            $credits                = 3500.00;
-                            $updated_balance        = 0;
-                            $prior_balance          = 0;
-                            $budget_updated         = "No";
-                            $bills_table_updated    = "No";
-                            $hancock_table_match    = "No";
-                            $reconciled             = "No"; 
-                            $comment                = $month . '/' . $year . ' Budget Deposit';
-                            $bill_id                = 36;
-                            $budget_id              = 36;
-                            $budget_name            = 'Fill Budget Buckets';
-                            $flags_id               = '5';
-                            $reimbursement          = '';
-                            $notes                  = 'Budget Deposit';
-                            $allowance_split='Yes';
-                            $split_amount = $row['credits'] - 3500.00;
-
-                $stmt = $budget_pdo->prepare('SELECT balance FROM budget WHERE id = ?');
-                $stmt->execute([ 24 ]);//MINIMUM BALANCE TABLE NEEDS TO BE $5000.
-                $split_prior_balance= $stmt->fetchColumn();   
-                $split_updated_balance = $split_prior_balance + $split_amount;
-                $pre_split_updated_balance = $split_updated_balance;
-                if($split_updated_balance > 5000.00){
-                   $split_updated_balance = 5000.00;
-                   $remainder = $pre_split_updated_balance-$split_updated_balance;
-                   $split_amount=$split_amount-$remainder;
-                   if($remainder > 0){
-                       $remainder_amount = $remainder;
-                       $stmt = $budget_pdo->prepare('SELECT balance FROM budget WHERE id = ?');
-                       $stmt->execute([ 25 ]);//SAVINGS.
-                       $remainder_prior_balance = $stmt->fetchColumn();   
-                       $remainder_updated_balance = $remainder_prior_balance + $remainder_amount;
-                        $stmt = $budget_pdo->prepare('SELECT * FROM bills WHERE id = ?');
-                        $stmt->execute([43]);//savings
-                        $bill_savings = $stmt->fetch(PDO::FETCH_ASSOC);
-                        $remainder_bill= $bill_savings['bill'];
-                        $remainder_frequency=$bill_savings['frequency'];
-                        if($remainder_frequency !=0){
-                        $remainder_next_due_date= date('Y-m-d', strtotime($date . ' + ' . $frequency . ' days'));
-                        }else{
-                        $remainder_next_due_date= $bill_savings['next_due_date'];    
-                        }
-                            $remainder_next_due_amount          = 0;
-                            $remainder_last_paid_amount         = $remainder_amount;
-                            $remainder_last_paid_date           = $date;
-                            $remainder_credits                  = $remainder_amount;
-                            $remainder_budget_updated           = "No";
-                            $remainder_bills_table_updated      = "No";
-                            $remainder_hancock_table_match      = "No";
-                            $remainder_reconciled               = "No"; 
-                            $remainder_comment                  = $month . '/' . $year . ' Min. Balance Deposit';
-                            $remainder_bill_id                  = 43;
-                            $remainder_budget_id                = 25;
-                            $remainder_budget_name              = 'Savings';
-                            $remainder_flags_id                 = '6';
-                            $remainder_reimbursement            = 'Mom';
-                            $remainder_notes                    = 'Remainder of Deposit';
-                            $remainder_flag                     = 'Yes';
-                   }
-                }
-                $stmt = $budget_pdo->prepare('SELECT * FROM bills WHERE id = ?');
-                $stmt->execute([44]);
-                $bill_reference3 = $stmt->fetch(PDO::FETCH_ASSOC);
-                $split_frequency=$bill_reference3['frequency'];
-                if( $split_frequency !=0){
-                $split_next_due_date= date('Y-m-d', strtotime($date. ' + ' .  $split_frequency . ' days'));
-                }else{
-                $split_next_due_date= $bill_reference3['next_due_date'];    
-                }
-                            $split_next_due_amount          = 0;
-                            $split_last_paid_amount         = $split_amount;
-                            $split_last_paid_date           = $date;
-                            $split_bill                     = $bill_reference3['bill'];
-                            $split_credits                  = $split_amount;
-                            $split_budget_updated           = "No";
-                            $split_bills_table_updated      = "No";
-                            $split_hancock_table_match      = "No";
-                            $split_reconciled               = "No"; 
-                            $split_comment                  = $month . '/' . $year . ' Min. Balance Deposit';
-                            $split_bill_id                  = 44;
-                            $split_budget_id                = 24;
-                            $split_budget_name              = 'Reimbursements';
-                            $split_flags_id                 = '4';
-                            $split_reimbursement            = 'Mom';
-                            $split_notes                    = 'Minimum Balance Deposit';
-                }else if($row['credits'] < 3500){
-                $stmt = $budget_pdo->prepare('SELECT balance FROM budget WHERE id = ?');
-                $stmt->execute([ 24 ]);
-                $prior_balance= $stmt->fetchColumn();   
-                $stmt = $budget_pdo->prepare('SELECT * FROM bills WHERE id = ?');
-                $stmt->execute([44]);
-                $bill_reference4 = $stmt->fetch(PDO::FETCH_ASSOC);
-                $frequency=$bill_reference4['frequency'];
-                if($frequency !=0){
-                $next_due_date= date('Y-m-d', strtotime($date. ' + ' . $frequency . ' days'));
-                }else{
-                $next_due_date= $bill_reference['next_due_date'];    
-                }
-                            $updated_balance = $prior_balance + $row['credits'];
-                            $allowance_split='No';
-                            $budget_updated         = "M";
-                            $bills_table_updated    = "N";
-                            $hancock_table_match    = "N";
-                            $reconciled             = "No"; 
-                            $comment                = $month . '/' . $year . 'Budget Deposit';
-                            $bill_id                = 44;
-                            $budget_id              = 24;
-                            $budget_name            = 'Reimbursements';
-                            $flags_id               = '4';
-                            $reimbursement          = 'Mom';
-                            $notes                  = 'Minimum Balance Deposit';
-                }
+                
+                // Skip the normal insert for this row since we handled it above
+                continue;
             }//if deposit from mom's account         
-        // Insert the transaction into the database table 'csv_process'
-
-
-      if($allowance_split=='Yes'){
-           $stmt = $budget_pdo->prepare('INSERT INTO csv_process 
-         ( 
-         date,
-         check_number, 
-         transaction_type, 
-         description, 
-         debits, 
-         credits,
-         edited,
-         reconciled, 
-         comment, 
-         bill_id,
-         bill,
-         budget_id,
-         budget,
-         amount,
-         flags_id,
-         reimbursement,
-         notes,
-         last_paid_amount,
-         last_paid_date,
-         next_due_amount,
-         next_due_date,
-         hancock,
-         frequency,
-         bills_table_updated,
-         budget_updated,
-         prior_balance,
-         updated_balance,
-         reference,
-         hancock_table_match,
-         rollback_next_due_date, 
-         rollback_last_paid_date,  
-         rollback_next_due_amount,   
-         rollback_last_paid_amount   
-         ) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-         $stmt->execute([
-            $date,
-            $check_number, 
-            $transaction_type, 
-            $description, 
-            $debits, 
-            $split_credits,
-            $edited,
-            $split_reconciled,    
-            $split_comment,
-            $split_bill_id,
-            $split_bill,
-            $split_budget_id,
-            $split_budget_name,
-            $split_amount,
-            $split_flags_id,
-            $split_reimbursement,
-            $split_notes,
-            $split_amount,                
-            $split_last_paid_date, 
-            0,
-            $split_next_due_date,
-            $hancock,
-            $split_frequency,
-            $split_bills_table_updated,
-            $split_budget_updated,
-            $split_prior_balance,
-            $split_updated_balance, 
-            $reference,
-            $split_hancock_table_match,
-            $split_next_due_date,
-            $split_last_paid_date,
-            $split_next_due_amount,
-            $split_last_paid_amount
-            ]);
-       }
-if($remainder_flag == 'Yes'){
-     $stmt = $budget_pdo->prepare('INSERT INTO csv_process 
-         ( 
-         date,
-         check_number, 
-         transaction_type, 
-         description, 
-         debits, 
-         credits,
-         edited,
-         reconciled, 
-         comment, 
-         bill_id,
-         bill,
-         budget_id,
-         budget,
-         amount,
-         flags_id,
-         reimbursement,
-         notes,
-         last_paid_amount,
-         last_paid_date,
-         next_due_amount,
-         next_due_date,
-         hancock,
-         frequency,
-         bills_table_updated,
-         budget_updated,
-         prior_balance,
-         updated_balance,
-         reference,
-         hancock_table_match,
-         rollback_next_due_date, 
-         rollback_last_paid_date,  
-         rollback_next_due_amount,   
-         rollback_last_paid_amount   
-         ) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-         $stmt->execute([
-            $date,
-            $check_number, 
-            $transaction_type, 
-            $description, 
-            $debits, 
-            $remainder_credits,
-            'No',
-            $remainder_reconciled,
-            $remainder_comment,
-            $remainder_bill_id,
-            $remainder_bill,
-            $remainder_budget_id,
-            $remainder_budget_name,
-            $remainder_amount,
-            $remainder_flags_id,
-            $remainder_reimbursement,
-            $remainder_notes,
-            $remainder_amount,
-            $remainder_last_paid_date, 
-            $remainder_next_due_amount,
-            $remainder_next_due_date,
-            $hancock,
-            $remainder_frequency,
-            $remainder_bills_table_updated,
-            $remainder_budget_updated,
-            $remainder_prior_balance,
-            $remainder_updated_balance, 
-            $reference,
-            $remainder_hancock_table_match,
-            $remainder_next_due_date,
-            $remainder_last_paid_date,
-            $remainder_next_due_amount,
-            $remainder_last_paid_amount
-            ]);
-       }
+        // Insert the transaction into the database table 'csv_process' using helper function
+        insert_csv_process_row($budget_pdo, [
+            'date' => $date,
+            'check_number' => $check_number,
+            'transaction_type' => $transaction_type,
+            'description' => $description,
+            'debits' => $debits,
+            'credits' => $credits,
+            'edited' => $edited,
+            'reconciled' => $reconciled,
+            'comment' => $comment,
+            'bill_id' => $bill_id,
+            'bill' => $bill,
+            'budget_id' => $budget_id,
+            'budget_name' => $budget_name,
+            'amount' => $amount,
+            'flags_id' => $flags_id,
+            'reimbursement' => $reimbursement,
+            'notes' => $notes,
+            'last_paid_amount' => $last_paid_amount,
+            'last_paid_date' => $last_paid_date,
+            'next_due_amount' => $next_due_amount,
+            'next_due_date' => $next_due_date,
+            'hancock' => $hancock,
+            'frequency' => $frequency ?? 0,
+            'bills_table_updated' => $bills_table_updated,
+            'budget_updated' => $budget_updated,
+            'prior_balance' => $prior_balance,
+            'updated_balance' => $updated_balance,
+            'reference' => $reference,
+            'hancock_table_match' => $hancock_table_match,
+            'rollback_next_due_date' => $rollback_next_due_date,
+            'rollback_last_paid_date' => $rollback_last_paid_date,
+            'rollback_next_due_amount' => $rollback_next_due_amount,
+            'rollback_last_paid_amount' => $rollback_last_paid_amount
+        ]);
+        
+        $processed_count++;
+    }//END FOR EACH TRANSACTIONS AS ROW
     
-    
-    
-                  
-         $stmt = $budget_pdo->prepare('INSERT INTO csv_process 
-         ( 
-         date,
-         check_number, 
-         transaction_type, 
-         description, 
-         debits, 
-         credits,
-         edited,
-         reconciled, 
-         comment, 
-         bill_id,
-         bill,
-         budget_id,
-         budget,
-         amount,
-         flags_id,
-         reimbursement,
-         notes,
-         last_paid_amount,
-         last_paid_date,
-         next_due_amount,
-         next_due_date,
-         hancock,
-         frequency,
-         bills_table_updated,
-         budget_updated,
-         prior_balance,
-         updated_balance,
-         reference,
-         hancock_table_match,
-         rollback_next_due_date, 
-         rollback_last_paid_date,  
-         rollback_next_due_amount,   
-         rollback_last_paid_amount   
-         ) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-         $stmt->execute([
-            $date,
-            $check_number, 
-            $transaction_type, 
-            $description, 
-            $debits, 
-            $credits,
-            $edited,
-            $reconciled,    
-            $comment,
-            $bill_id,
-            $bill,
-            $budget_id,
-            $budget_name,
-            $amount,
-            $flags_id,
-            $reimbursement,
-            $notes,
-            $last_paid_amount,                
-            $last_paid_date, 
-            $next_due_amount,
-            $next_due_date,
-            $hancock,
-            $frequency,
-            $bills_table_updated,
-            $budget_updated,
-            $prior_balance,
-            $updated_balance, 
-            $reference,
-            $hancock_table_match,
-            $rollback_next_due_date,
-            $rollback_last_paid_date,
-            $rollback_next_due_amount,
-            $rollback_last_paid_amount
-            ]);
-        $success_msg = 'Created Successfully!';
-        $error_msg= 'Remember to EMPTY the table when you are done.';
- }//END FOR EACH TRANSACTIONS AS ROW
+            // Commit transaction - all or nothing
+            $budget_pdo->commit();
+            
+            $success_msg = "Successfully processed {$processed_count} transaction(s) into csv_process table.";
+            $error_msg = 'Remember to review in Step 3 before final commit.';
+            
+        } catch (Exception $e) {
+            // Rollback on error
+            if ($budget_pdo->inTransaction()) {
+                $budget_pdo->rollBack();
+            }
+            $error_msg = 'Processing failed: ' . $e->getMessage();
+            error_log('Budget processing error: ' . $e->getMessage());
+        }
+    }
 }//End Submit Form
 ?>
 <?=template_admin_header('Upload CSV file', 'budget', 'process')?>
@@ -566,12 +268,12 @@ if($remainder_flag == 'Yes'){
 					</tr>
 				</thead>
 				<tbody>
-					<?php if (empty($uploads)): ?>
+					<?php if (empty($transactions)): ?>
 					<tr>
 						<td colspan="10" style="text-align:center;">There are no records.</td>
 					</tr>
 					<?php endif; ?>
-					<?php foreach ($uploads as $result): ?>
+					<?php foreach ($transactions as $result): ?>
 			 
 					<tr>
 						<td class="date"><?=date("m/d/y", strtotime($result['date'])?? '')?></td> 
@@ -598,7 +300,7 @@ if($remainder_flag == 'Yes'){
         <?php endif; ?>
  <a href='<?=budget_link_path?>instructions-p1.php' style='background:grey; color:white' class='btn btn-sm'><<< BACK <<<<</a>&nbsp;&nbsp;        
  <button type="submit" name="submit" class="btn" style='background:red'>Start the Process!</button>&nbsp;&nbsp; 
- <a href='<?=budget_link_path?>instructions-p3.php' style='background:yellow; color:black' class='btn btn-sm'>>>> NEXT >>></a> 
+ <a href='<?=budget_link_path?>instructions-p2-5-reconcile.php' style='background:orange; color:white' class='btn btn-sm'>>>> NEXT: Reconcile >>></a> 
     </form>
 </div>
 <style>

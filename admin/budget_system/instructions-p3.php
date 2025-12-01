@@ -1,99 +1,100 @@
 <?php
 include_once 'assets/includes/admin_config.php';
+include_once 'assets/includes/budget_constants.php';
+include_once 'assets/includes/budget_helpers.php';
+
 // Connect to MySQL database
 $budget_pdo = pdo_connect_budget_db($db_host, $db_name7, $db_user, $db_pass);
 // Error message
 $error_msg = ''; 
 // Success message
 $success_msg = NULL;
-$stmt =$budget_pdo->prepare('SELECT * FROM csv_process ORDER BY date DESC');
-$stmt->execute();
-$csv_processs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$stmt =$budget_pdo->prepare('SELECT * FROM bills');
+// Get transactions from csv_process table (ordered by date for display and processing)
+$stmt = $budget_pdo->prepare('SELECT * FROM csv_process ORDER BY date ASC');
 $stmt->execute();
-$bills = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$stmt = $budget_pdo->prepare('SELECT * FROM budget');
+// Pre-load flags for display (avoid N+1 query problem)
+$stmt = $budget_pdo->prepare('SELECT id, description FROM flags');
 $stmt->execute();
-$budget = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$allowance_update='No';
-
-//CSV_UPLOAD TABLE
-//Get the transactions from the csv table
-$stmt = $budget_pdo->prepare('SELECT * FROM csv_process');
-$stmt->execute();
-$transactions  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$flags_lookup = [];
+foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $flag) {
+    $flags_lookup[$flag['id']] = $flag['description'];
+}
 
 //YOU MUST CLICK SUBMIT TO RUN THIS PROCESS
-if(isset($_POST['submit']) ){
-//LOOP THROUGH CSV_PROCESS TABLE 
-foreach($transactions as $row){
-$previously_processed       = 'No';    
-$date                       = $row['date']; 
-$check_number               = $row['check_number'];
-$transaction_type           = $row['transaction_type'];
-$description                = $row['description'];
-$debits                     = $row['debits'];
-$credits                    = $row['credits'];
-$edited                     = $row['edited'];  
-$amount                     = $row['amount'];
-$reimbursement              = $row['reimbursement'];
-$comment                    = $row['comment'];
-$flags_id                   = $row['flags_id'];
-$bill_id                    = $row['bill_id'];
-$notes                      = $row['notes'];
-$next_due_amount            = $row['next_due_amount'];
-$next_due_date              = $row['next_due_date'];
-$last_paid_amount           = $row['last_paid_amount'];
-$last_paid_date             = $row['last_paid_date'];
-$frequency                  = $row['frequency'];
-$reconciled                 = "New"; 
-$bills_table_updated        = 'Yes';
-$hancock_table_match        = $row['hancock_table_match'];
-$budget_id                  = $row['budget_id'];
-$budget_updated             = $row['budget_updated'];
-$rollback_next_due_date     = $row['rollback_next_due_date']; 
-$rollback_last_paid_date    = $row['rollback_last_paid_date'];   
-$rollback_next_due_amount   = $row['rollback_next_due_amount'];   
-$rollback_last_paid_amount  = $row['rollback_last_paid_amount']; 
-//This has to be a new pull due to records processed file using the same prior balance, otherwise.
-$stmt = $budget_pdo->prepare('SELECT * FROM budget WHERE id = ?');
-$stmt->execute([$budget_id]);
-$budget_reference           = $stmt->fetch(PDO::FETCH_ASSOC);
-$prior_balance              = $budget_reference['balance'];
-$updated_balance            = $prior_balance + $amount;
+if (isset($_POST['submit'])) {
+    // Validate we have transactions to process
+    if (empty($transactions)) {
+        $error_msg = 'No transactions found in csv_process table. Please complete Step 2 first.';
+    } else {
+        try {
+            // Start database transaction for atomicity
+            $budget_pdo->beginTransaction();
+            
+            $processed_count = 0;
+            $allowance_updated = false;
+            
+            //LOOP THROUGH CSV_PROCESS TABLE 
+            foreach ($transactions as $row) {
+                $previously_processed       = 'No';    
+                $date                       = $row['date']; 
+                $check_number               = $row['check_number'];
+                $transaction_type           = $row['transaction_type'];
+                $description                = $row['description'];
+                $debits                     = $row['debits'];
+                $credits                    = $row['credits'];
+                $edited                     = $row['edited'];  
+                $amount                     = $row['amount'];
+                $reimbursement              = $row['reimbursement'];
+                $comment                    = $row['comment'];
+                $flags_id                   = $row['flags_id'];
+                $bill_id                    = $row['bill_id'];
+                $notes                      = $row['notes'];
+                $next_due_amount            = $row['next_due_amount'];
+                $next_due_date              = $row['next_due_date'];
+                $last_paid_amount           = $row['last_paid_amount'];
+                $last_paid_date             = $row['last_paid_date'];
+                $frequency                  = $row['frequency'];
+                $reconciled                 = "New"; 
+                $bills_table_updated        = 'Yes';
+                $hancock_table_match        = $row['hancock_table_match'];
+                $budget_id                  = $row['budget_id'];
+                $budget_updated             = $row['budget_updated'];
+                $rollback_next_due_date     = $row['rollback_next_due_date']; 
+                $rollback_last_paid_date    = $row['rollback_last_paid_date'];   
+                $rollback_next_due_amount   = $row['rollback_next_due_amount'];   
+                $rollback_last_paid_amount  = $row['rollback_last_paid_amount']; 
+                
+                // Get current budget balance for this transaction
+                $stmt = $budget_pdo->prepare('SELECT balance FROM budget WHERE id = ?');
+                $stmt->execute([$budget_id]);
+                $prior_balance              = $stmt->fetchColumn();
+                $updated_balance            = $prior_balance + $amount;
 
-if($description=='OLB XFER FROM 9'){
-//IF THE TRANSACTION IS EXACTLY 3500.00:
-if($row['credits'] == 3500.00) {
-   $allowance_update        = 'Yes'; 
-//process the monthly allowance
-         $stmt = $budget_pdo->prepare('SELECT * FROM budget');
-         $stmt->execute();//ALL ENVELOPES
-         $budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-         foreach($budgets as $budget_row){ 
-         $budget_balance=$budget_row['balance'];
-         $amount_to_add = $budget_row['amount'];
-         $adjusted_balance=$budget_balance + $amount_to_add;
-         $budget_id=$budget_row['id'];
-         $stmt = $budget_pdo->prepare('UPDATE budget 
-                 SET
-                 balance   = ?
-                 WHERE 
-                 id        = ?');
-                   $stmt->execute([
-                   $adjusted_balance,
-                   $budget_id ]); 
-            }
-        $updated_balance        = 0;
-        $prior_balance          = 0;
-        $amount                 = 0;
-        $budget_updated         = "Yes";
-        $previously_processed    = 'Yes';
-    }//$row['credits'] == 3500.00
-}//if($description=='OLB XFER FROM 9')
+                // Check if this is the monthly allowance deposit
+                if ($description == DESC_ALLOWANCE_DEPOSIT && $credits == MONTHLY_ALLOWANCE) {
+                    $stmt = $budget_pdo->prepare('SELECT id, balance, amount FROM budget');
+                    $stmt->execute();
+                    $budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    foreach ($budgets as $budget_row) { 
+                        $budget_balance = $budget_row['balance'];
+                        $amount_to_add = $budget_row['amount'];
+                        $adjusted_balance = $budget_balance + $amount_to_add;
+                        $budget_id_to_update = $budget_row['id'];
+                        
+                        $stmt = $budget_pdo->prepare('UPDATE budget SET balance = ? WHERE id = ?');
+                        $stmt->execute([$adjusted_balance, $budget_id_to_update]); 
+                    }
+                    
+                    $updated_balance        = 0;
+                    $prior_balance          = 0;
+                    $amount                 = 0;
+                    $budget_updated         = "Yes";
+                    $previously_processed   = 'Yes';
+                }
 
 
 // Update the bill in bills table to set dates.
@@ -212,11 +213,31 @@ if($row['credits'] == 3500.00) {
             $flags_id,
             $reimbursement,
             $notes]);
-       // Output message
-        $_POST = array();
-        $success_msg = 'Created Successfully!';
-        $error_msg= 'Remember to EMPTY the table when you are done.';
-   }//END FOR EACH TRANSACTIONS AS ROW
+            
+                $processed_count++;
+            }//END FOR EACH TRANSACTIONS AS ROW
+            
+            // Commit transaction - all or nothing
+            $budget_pdo->commit();
+            
+            // Clear POST to prevent re-submission
+            $_POST = array();
+            
+            $success_msg = "Successfully processed {$processed_count} transaction(s) to hancock and bills tables.";
+            if ($allowance_updated) {
+                $success_msg .= " Monthly allowance of $" . number_format(MONTHLY_ALLOWANCE, 2) . " distributed to budget envelopes.";
+            }
+            $error_msg = 'Processing complete. Remember to clear csv_process table when done.';
+            
+        } catch (Exception $e) {
+            // Rollback on error
+            if ($budget_pdo->inTransaction()) {
+                $budget_pdo->rollBack();
+            }
+            $error_msg = 'Processing failed: ' . $e->getMessage();
+            error_log('Budget Step 3 processing error: ' . $e->getMessage());
+        }
+    }
 }
 ?>
 <?=template_admin_header('Upload CSV file', 'budget', 'process')?>
@@ -248,24 +269,24 @@ if($row['credits'] == 3500.00) {
 					</tr>
 				</thead>
 				<tbody>
-					<?php if (empty($csv_processs)): ?>
+					<?php if (empty($transactions)): ?>
 					<tr>
 						<td colspan="10" style="text-align:center;">There are no records.</td>
 					</tr>
 					<?php endif; ?>
-					<?php foreach ($csv_processs as $result): ?>
-                    <?php		            
-                        $stmt = $budget_pdo->prepare('SELECT description FROM flags WHERE id = ?');
-                        $stmt->execute([$result['flags_id']]);
-                        $flags = $stmt->fetch(PDO::FETCH_ASSOC);?>
+					<?php foreach ($transactions as $result): ?>
+                    <?php
+                        // Use pre-loaded flags lookup instead of query per row
+                        $flag_description = $flags_lookup[$result['flags_id']] ?? 'Unknown';
+                    ?>
 					<tr>
-						<td class="date"><?=date("m/d", strtotime($result['date'])?? '')?></td> 
+						<td class="date" style="padding-right: 8px;"><?=date("m/d", strtotime($result['date'])?? '')?></td> 
 					    <td class="description"><?=htmlspecialchars($result['description']?? '', ENT_QUOTES)?></td>
-					    <td class="flag"><?=htmlspecialchars($flags['description']?? '', ENT_QUOTES)?></td>
+					    <td class="flag"><?=htmlspecialchars($flag_description, ENT_QUOTES)?></td>
 					    <td class="comment"><?=substr($result['comment']??'', 0, 16);?></td>
-					    <td class="amount right"><?=$result['amount']?? '' ?></td>
-					    <td class="prior_balance right"><?=$result['prior_balance']?? '' ?>&nbsp;</td>
-					   	<td class="budget">&nbsp;<?=substr($result['budget']??'', 0, 16);?></td>
+					    <td class="amount right" style="padding-right: 8px;"><?=$result['amount']?? '' ?></td>
+					    <td class="prior_balance right" style="padding-left: 8px;"><?=$result['prior_balance']?? '' ?></td>
+					   	<td class="budget"><?=substr($result['budget']??'', 0, 16);?></td>
 					   	<td class="bill"><?=substr($result['bill']??'', 0, 16);?></td>
 					   	<td class="edited"><?=htmlspecialchars($result['edited']?? '', ENT_QUOTES)?></td>
 					 <td class="actions" style="text-align: center;">
@@ -302,7 +323,7 @@ if($row['credits'] == 3500.00) {
         <?php if ($success_msg): ?>
         <p class="msg-success"><?=$success_msg?></p>
         <?php endif; ?>
- <a href='<?=budget_link_path?>instructions-p2.php' style='background:grey; color:white' class='btn btn-sm'><<< BACK <<<<</a>&nbsp;&nbsp;        
+ <a href='<?=budget_link_path?>instructions-p2-5-reconcile.php' style='background:grey; color:white' class='btn btn-sm'><<< BACK: Reconcile <<<<</a>&nbsp;&nbsp;        
  <button type="submit" name="submit" class="btn" style='background:red'>Start the Process!</button>&nbsp;&nbsp; 
  <a href='<?=budget_link_path?>instructions-p4.php' style='background:yellow; color:black' class='btn btn-sm'>>>> NEXT >>></a> 
     </form>

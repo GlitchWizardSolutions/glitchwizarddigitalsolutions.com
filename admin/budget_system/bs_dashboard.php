@@ -92,8 +92,11 @@ $total_hancock_debits  = $stmt->fetchColumn();
 </div>
 
 <div class="content-header responsive-flex-wrap responsive-pad-bot-3">
-    <a href='<?=budget_link_path?>instructions-p1.php' class='btn btn-primary'>Process Transactions</a>
-    <a href='<?=budget_link_path?>reports/mom-hancock-report.php' class='btn btn-success'>View Monthly Report</a>
+    <a href='<?=budget_link_path?>csv-upload-auto.php' class='btn btn-success'>
+        <i class="fa-solid fa-upload"></i> Upload CSV (Auto)
+    </a>
+    <a href='<?=budget_link_path?>instructions-p1.php' class='btn btn-primary'>Process Transactions (Manual)</a>
+    <a href='<?=budget_link_path?>reports/mom-hancock-report.php' class='btn btn-info'>View Monthly Report</a>
 </div>
 
  <div id="budgets" class="dashboard">

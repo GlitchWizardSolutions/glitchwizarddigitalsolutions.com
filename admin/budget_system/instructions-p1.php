@@ -62,40 +62,20 @@ $hancocks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                           <h5><strong>Request File: Name it YYYY-MON-dd-dd.csv and download to download folder.</strong></h5> 
                                      </li>
                                  </ul>        
-<br><h3><strong>3. Edit CSV file for importing into database.</strong></h3> 	                                        
-                                         <ul>
-                                             <li>
-                                                <h5><strong>Open Downloads folder</strong></h5>
-                                            </li>
-                                             <li>
-                                                <h5><strong>Delete first row</strong></h5>
-                                            </li>
-                                            <li>
-                                                <h5><strong>Add 0 into blank fields of debits and credits.</strong></h5>
-                                            <li>
-                                                <h5><strong>Format date to YYYY-MM-DD.</strong></h5>
-                                            </li>
-                                            <li>
-                                                <h5><strong>Close bank browser, close edited csv file.</strong></h5>
-                                            </li>
-                                         </ul>
                                    <br>
-<br><h3><strong>4. Import the csv file into csv_upload table.</strong></h3>                                     
-<a href='https://glitchwizardsolutions.com:2083/' target="_blank"  class='btn btn-sm'>Log into Database</a><br>   
-                                    <ul>
-                                        <li>
-                                             <h4><strong>In glitchwizarddigi_budget_2025, clear the csv_upload table.</strong></h4>
-                                        </li>
-                                        <li>
-                                            <h4><strong>In the same table, go to import, select the edited csv file.</strong></h4>
-                                        </li> 
-                                        <li>
-                                            <h2><strong>Copy this to clipboard: <br><strong  style='color:blue'>date,check_number,transaction_type,description,debits,credits</strong><br></h2>
-                                        </li> 
-                                        <li>
-                                         <h4><strong>Paste into bottom form field.  Submit.</strong></h4>
-                                        </li>
-                                    </ul>
+<br><h3><strong>3. Upload the csv file to the applicaiton.</strong></h3> 
+<div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4CAF50;">
+    <h3 style="color: #2e7d32; margin-top: 0;">
+        <i class="fa-solid fa-lightbulb"></i> <strong>NEW: Automated CSV Upload Available!</strong>
+    </h3>
+    <p style="font-size: 16px; margin: 10px 0;">
+        Skip the manual Excel editing and phpMyAdmin steps. Upload your CSV directly and let the system handle everything!
+    </p>
+    <a href='<?=budget_link_path?>csv-upload-auto.php' class='btn' style='background:#4CAF50; color:white; padding: 12px 24px; font-size: 16px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 10px;'>
+        <i class="fa-solid fa-upload"></i> Use Automated CSV Upload
+    </a>
+</div>
+
 <a href='<?=budget_link_path?>instructions-p2.php' style='background:yellow; color:black' class='btn btn-sm'>>>> NEXT >>></a><br>                                    
 </div>
 <style>
