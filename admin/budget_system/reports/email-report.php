@@ -41,10 +41,11 @@ file_put_contents($temp_file, $pdf_content);
 // Send email with PDF attachment
 $subject = 'Monthly Budget Report - ' . date('F Y', strtotime($date_start));
 $message = "Hello {$recipient_name},\n\n";
-$message .= "Please find attached your monthly budget report for " . date('F Y', strtotime($date_start)) . ".\n\n";
-$message .= "Report Date Range: " . date('M d, Y', strtotime($date_start)) . " to " . date('M d, Y', strtotime($date_end)) . "\n\n";
-$message .= "Best regards,\n";
-$message .= "Glitch Wizard Digital Solutions";
+$message .= "The monthly report is attached for " . date('F Y', strtotime($date_start)) . ".\n\n";
+$message .= "Report Date Range: " . date('M d, Y', strtotime($date_start)) . " to " . date('M d, Y', strtotime($date_end)) . "\n";
+
+// Note: Signature will be automatically appended by send_email_with_attachment() function
+// No need to manually add signature here anymore
 
 $filename = 'Mom_Hancock_Report_' . date('Y-m', strtotime($date_start)) . '.pdf';
 

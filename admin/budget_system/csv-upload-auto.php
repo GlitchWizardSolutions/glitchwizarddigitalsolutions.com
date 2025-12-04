@@ -107,14 +107,14 @@ if (isset($_POST['upload_csv']) && isset($_FILES['csv_file'])) {
             
             // Convert empty/blank values to 0 for debits and credits
             // Bank exports debits in accounting notation with parentheses: (100.00)
-            // Remove parentheses and convert to positive number
+            // Remove parentheses and convert to NEGATIVE number (debits are money OUT)
             $debits = trim($debits);
             if ($debits === '') {
                 $debits = 0;
             } else {
-                // Remove parentheses and commas, then convert to float
+                // Remove parentheses and commas, then convert to negative float
                 $debits = str_replace(['(', ')', ','], '', $debits);
-                $debits = is_numeric($debits) ? abs(floatval($debits)) : 0;
+                $debits = is_numeric($debits) ? -abs(floatval($debits)) : 0;
             }
             
             $credits = trim($credits);

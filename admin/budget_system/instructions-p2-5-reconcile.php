@@ -15,12 +15,56 @@
  * 7. Blocks commit if any bucket goes negative
  */
 
-require_once '../assets/includes/admin_config.php';
+require_once 'assets/includes/admin_config.php';
 require_once 'assets/includes/budget_constants.php';
 require_once 'assets/includes/budget_helpers.php';
 
 // Connect to budget database
 $budget_pdo = pdo_connect_budget_db();
+
+// Handle reconciliation transaction creation
+if (isset($_POST['create_reconciliation'])) {
+    $reconcile_amount = floatval($_POST['reconcile_amount']);
+    $bank_date = $_POST['bank_date'];
+    
+    try {
+        $budget_pdo->beginTransaction();
+        
+        // Insert reconciliation transaction into csv_process
+        $stmt = $budget_pdo->prepare("
+            INSERT INTO csv_process 
+            (date, description, credits, debits, budget_id, budget, bill_id, bill, flags_id, comment) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        
+        $credits = $reconcile_amount > 0 ? $reconcile_amount : 0;
+        $debits = $reconcile_amount < 0 ? $reconcile_amount : 0;
+        
+        $stmt->execute([
+            $bank_date,
+            'Bank Reconciliation Adjustment',
+            $credits,
+            $debits,
+            BUDGET_DIFFERENCE,
+            'Difference',
+            BILL_NONE,
+            'None',
+            FLAG_LEFT_TO_SPEND,
+            'Auto-created reconciliation to sync hancock with bank balance'
+        ]);
+        
+        $budget_pdo->commit();
+        $_SESSION['success'] = "Reconciliation transaction created: $" . number_format(abs($reconcile_amount), 2) . " added to Difference bucket. Proceed to analyze redistribution.";
+        
+        // Reload page to show updated analysis
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
+        
+    } catch (Exception $e) {
+        $budget_pdo->rollBack();
+        $_SESSION['error'] = "Failed to create reconciliation transaction: " . $e->getMessage();
+    }
+}
 
 // Initialize variables
 $bank_balance_input = isset($_POST['bank_balance']) ? floatval($_POST['bank_balance']) : 0;
@@ -32,8 +76,8 @@ $apply_suggestions = isset($_POST['apply_suggestions']);
 // Get current budget balances
 $budget_balances = get_all_budget_balances($budget_pdo);
 
-// Calculate last Hancock balance
-$stmt = $budget_pdo->query("SELECT balance FROM hancock ORDER BY id DESC LIMIT 1");
+// Calculate current Hancock balance (SUM of all transactions)
+$stmt = $budget_pdo->query("SELECT SUM(credits) + SUM(debits) as total FROM hancock");
 $last_hancock_balance = $stmt ? floatval($stmt->fetchColumn()) : 0;
 
 // Get pending transactions from csv_process
@@ -114,15 +158,19 @@ foreach ($budget_balances as $budget_id => $budget) {
             'issue' => 'Balance will be negative: $' . number_format($new_balance, 2),
             'severity' => 'critical'
         ];
-    } elseif ($budget_id == BUDGET_REIMBURSEMENTS && $new_balance != MIN_BALANCE_CAP) {
-        $status = 'MIN BALANCE ERROR';
-        $status_class = 'table-danger';
-        $status_icon = '⚠';
-        $problems[] = [
-            'bucket' => $budget['budget'],
-            'issue' => 'Minimum Balance must be $5,000.00, currently $' . number_format($new_balance, 2),
-            'severity' => 'critical'
-        ];
+    } elseif ($budget_id == BUDGET_REIMBURSEMENTS) {
+        // Minimum Balance: Can dip below $5k for reimbursables, topped up from monthly deposit
+        // Any excess over $5k goes to Savings automatically - NEVER use for redistribution
+        if ($new_balance < MIN_BALANCE_CAP) {
+            $status = 'Below Min (Reimbursable)';
+            $status_class = 'table-info';
+            $status_icon = '💳';
+        } else {
+            $status = 'Protected Reserve';
+            $status_class = 'table-success';
+            $status_icon = '🔒';
+        }
+        // Do NOT add to over_target_buckets even if over $5k
     } elseif ($over_target > 0) {
         $status = 'Over Target';
         $status_class = 'table-warning';
@@ -154,7 +202,7 @@ foreach ($budget_balances as $budget_id => $budget) {
         'status' => $status,
         'status_class' => $status_class,
         'status_icon' => $status_icon,
-        'monthly_amount' => floatval($budget['amount']),
+        'monthly_amount' => floatval($budget['amount'] ?? 0),
         'transaction_count' => isset($budget_impacts[$budget_id]) ? $budget_impacts[$budget_id]['count'] : 0
     ];
 }
@@ -384,11 +432,66 @@ uasort($bucket_analysis, function($a, $b) {
                                 <?php if (abs($bank_difference) < 0.01): ?>
                                     <i class="fas fa-check-circle"></i> Reconciled!
                                 <?php else: ?>
-                                    <br><small>This amount will be added to "Difference" bucket (ID <?php echo BUDGET_DIFFERENCE ?>)</small>
+                                    <br><small>A reconciliation transaction will be created to sync hancock with your bank balance</small>
                                 <?php endif; ?>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Reconciliation Transaction Preview -->
+                    <?php if (abs($bank_difference) >= 0.01): ?>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0"><i class="fas fa-sync-alt"></i> Reconciliation Transaction Preview</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-2">To bring your hancock balance in sync with your actual bank balance, the following transaction will be created:</p>
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Description</th>
+                                                <th>Budget</th>
+                                                <th>Amount</th>
+                                                <th>Type</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><?php echo $bank_date ?></td>
+                                                <td>Bank Reconciliation Adjustment</td>
+                                                <td>Difference (ID <?php echo BUDGET_DIFFERENCE ?>)</td>
+                                                <td class="<?php echo $bank_difference > 0 ? 'text-success' : 'text-danger' ?>">
+                                                    <strong>$<?php echo number_format(abs($bank_difference), 2) ?></strong>
+                                                </td>
+                                                <td><?php echo $bank_difference > 0 ? 'Credit (Bank higher)' : 'Debit (Bank lower)' ?></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <form method="POST" action="" class="d-inline">
+                                        <input type="hidden" name="bank_balance" value="<?php echo $bank_balance_input ?>">
+                                        <input type="hidden" name="bank_date" value="<?php echo $bank_date ?>">
+                                        <input type="hidden" name="reconcile_amount" value="<?php echo $bank_difference ?>">
+                                        <button type="submit" name="create_reconciliation" class="btn btn-info">
+                                            <i class="fas fa-check"></i> Approve & Create Reconciliation Transaction
+                                        </button>
+                                        <button type="submit" name="analyze" class="btn btn-secondary">
+                                            <i class="fas fa-times"></i> Cancel - Adjust Bank Balance
+                                        </button>
+                                    </form>
+                                    <p class="mt-3 mb-0 text-muted small">
+                                        <strong>What this does:</strong> Adds one transaction to csv_process that adjusts hancock to match your bank.
+                                        After approval, this will flow through Step 3 (Edit & Commit) with your other transactions.
+                                        The Difference bucket will be set to $0.00, and you'll have accurate totals for redistribution.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                    
                     <?php endif; ?>
                 </div>
             </div>

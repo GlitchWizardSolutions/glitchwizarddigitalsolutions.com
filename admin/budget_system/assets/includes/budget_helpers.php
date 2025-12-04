@@ -8,10 +8,10 @@ require_once 'budget_constants.php';
 
 /**
  * Get all budget balances and names in one query
- * Returns associative array: [budget_id => ['balance' => float, 'budget' => string]]
+ * Returns associative array: [budget_id => ['balance' => float, 'budget' => string, 'amount' => float]]
  */
 function get_all_budget_balances($pdo) {
-    $stmt = $pdo->prepare('SELECT id, balance, budget FROM budget');
+    $stmt = $pdo->prepare('SELECT id, balance, budget, amount FROM budget');
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
@@ -19,7 +19,8 @@ function get_all_budget_balances($pdo) {
     foreach ($results as $row) {
         $balances[$row['id']] = [
             'balance' => floatval($row['balance']),
-            'budget' => $row['budget']
+            'budget' => $row['budget'],
+            'amount' => floatval($row['amount'] ?? 0)
         ];
     }
     return $balances;

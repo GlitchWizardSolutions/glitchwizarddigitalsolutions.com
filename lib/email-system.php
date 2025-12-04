@@ -33,6 +33,74 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 /**
+ * Get active email signature from database
+ * 
+ * @param string $format 'html' or 'text'
+ * @param bool $include_do_not_reply Whether to include do-not-reply notice
+ * @return string Signature content
+ */
+function get_email_signature($format = 'html', $include_do_not_reply = false) {
+    try {
+        // Connect to database
+        $pdo = new PDO('mysql:host=' . db_host . ';dbname=' . db_name . ';charset=utf8', db_user, db_pass);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        // Get active signature
+        $stmt = $pdo->query('SELECT * FROM email_signatures WHERE is_active = 1 LIMIT 1');
+        $signature = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$signature) {
+            return ''; // No active signature
+        }
+        
+        // Get appropriate format
+        $content = ($format === 'html') ? $signature['signature_html'] : $signature['signature_text'];
+        
+        // Add do-not-reply notice if requested and enabled
+        if ($include_do_not_reply && $signature['include_do_not_reply']) {
+            if ($format === 'html') {
+                $content .= '<p style="font-size: 11px; color: #999; margin-top: 10px;"><em>' . htmlspecialchars($signature['do_not_reply_text']) . '</em></p>';
+            } else {
+                $content .= "\n\n" . $signature['do_not_reply_text'];
+            }
+        }
+        
+        return $content;
+    } catch (PDOException $e) {
+        // Silently fail - don't break email sending if signature lookup fails
+        error_log('Email signature lookup failed: ' . $e->getMessage());
+        return '';
+    }
+}
+
+/**
+ * Append email signature to message body
+ * 
+ * @param string $message Original message body
+ * @param string $format 'html' or 'text'
+ * @param string $from_email Check if noreply@ to add do-not-reply notice
+ * @return string Message with signature appended
+ */
+function append_email_signature($message, $format = 'html', $from_email = '') {
+    // Check if email is from noreply address
+    $is_noreply = (stripos($from_email, 'noreply@') === 0 || stripos($from_email, 'no-reply@') === 0);
+    
+    // Get signature
+    $signature = get_email_signature($format, $is_noreply);
+    
+    if (empty($signature)) {
+        return $message; // No signature to append
+    }
+    
+    // Append with proper spacing
+    if ($format === 'html') {
+        return $message . "\n\n" . $signature;
+    } else {
+        return $message . "\n\n" . $signature;
+    }
+}
+
+/**
  * Configure PHPMailer instance with SMTP settings
  * Uses password authentication
  * 
@@ -120,8 +188,8 @@ function send_email($email, $code, $username, $type) {
         // Content
         $mail->isHTML(true);
         $mail->Subject = $subject;
-        $mail->Body = $email_template;
-        $mail->AltBody = strip_tags($email_template);
+        $mail->Body = append_email_signature($email_template, 'html', mail_from);
+        $mail->AltBody = append_email_signature(strip_tags($email_template), 'text', mail_from);
         
         // Send mail
         $mail->send();
@@ -310,8 +378,8 @@ function send_client_invoice_email($invoice, $client, $subject = '') {
             $mail->AddAttachment(public_path . '/client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf', $invoice['invoice_number'] . '.pdf');
         }
         
-        $mail->Body = $email_template;
-        $mail->AltBody = strip_tags($email_template);
+        $mail->Body = append_email_signature($email_template, 'html', mail_from);
+        $mail->AltBody = append_email_signature(strip_tags($email_template), 'text', mail_from);
         
         // Send mail
         $mail->send();
@@ -371,8 +439,8 @@ function send_client_receipt_email($invoice, $client, $subject = '') {
             $mail->AddAttachment(public_path . '/client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf', $invoice['invoice_number'] . '.pdf');
         }
         
-        $mail->Body = $email_template;
-        $mail->AltBody = strip_tags($email_template);
+        $mail->Body = append_email_signature($email_template, 'html', mail_from);
+        $mail->AltBody = append_email_signature(strip_tags($email_template), 'text', mail_from);
         
         // Send mail
         $mail->send();
@@ -436,8 +504,8 @@ function send_admin_invoice_email($invoice, $client) {
             file_get_contents(client_side_invoice . 'templates/notification-email-template.html')
         );
         
-        $mail->Body = $email_template;
-        $mail->AltBody = strip_tags($email_template);
+        $mail->Body = append_email_signature($email_template, 'html', mail_from);
+        $mail->AltBody = append_email_signature(strip_tags($email_template), 'text', mail_from);
         
         // Send mail
         $mail->send();
@@ -479,7 +547,7 @@ function send_email_with_attachment($to_email, $to_name, $subject, $message, $at
         $mail->isHTML(false);
         $mail->CharSet = 'UTF-8';
         $mail->Subject = $subject;
-        $mail->Body = $message;
+        $mail->Body = append_email_signature($message, 'text', mail_from);
         
         // Attach file if provided
         if (!empty($attachment_path) && file_exists($attachment_path)) {

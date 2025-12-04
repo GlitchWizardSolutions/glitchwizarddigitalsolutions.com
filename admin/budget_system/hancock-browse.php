@@ -181,7 +181,7 @@ $num_results = $stmt->fetchColumn();
 						<td class="actions">
 					<!--	<a href="hancock_view.php?id=<?=$result['id']?>"   class="edit"> <i class="fa-solid far fa-eye fa-xs"></i> </a>-->
 						<a href="hancock-edit.php?id=<?=$result['id']?>" class="edit"> <i class="fa-solid fa-pen fa-xs"></i></a>
-						<a href="hancock_delete.php?id=<?=$result['id']?>" class="trash"> <i class="fa-solid fa-xmark fa-xs"></i></a>
+						<a href="hancock-delete.php?id=<?=$result['id']?>" class="trash"> <i class="fa-solid fa-xmark fa-xs"></i></a>
 						</td>
 					</tr>
 					<?php endforeach; ?>

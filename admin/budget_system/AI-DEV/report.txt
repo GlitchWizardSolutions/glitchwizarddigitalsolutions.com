@@ -1,32 +1,74 @@
+Calculate Starting Balances (Before CSV Processing)
+Goal: Set budget balances so that AFTER processing csv_process, they total $11,850.65
 
-ID	Budget Name	Current Balance	New Balance	Change	Status
-1	Homeowner Insurance	$-1,018.87	$-1,018.87	-	No change
-5	YouMail App	$-179.88	$-179.88	-	No change
-7	Property Taxes - Florida	$0.00	$0.00	-	No change
-8	Auto Insurance	$-2,768.01	$-2,768.01	-	No change
-9	Amazon Prime	$-140.13	$-140.13	-	No change
-10	Vehicle Registrations	$-329.40	$-329.40	-	No change
-11	Instacart Subscription	$-79.00	$-79.00	-	No change
-12	TurboTax	$0.00	$0.00	-	No change
-13	MessageEZ App	$-12.87	$-12.87	-	No change
-14	Verizon Cellular	$-3,184.04	$-3,184.04	-	No change
-15	CHEWY-Animal Supplies	$-1,805.72	$-1,805.72	-	No change
-20	Brilliant Pad	$-584.95	$-584.95	-	No change
-21	Starlink WiFi	$-670.48	$-670.48	-	No change
-22	Microsoft 365	$-367.54	$-367.54	-	No change
-23	Remaining Balance	$-25,287.12	$-25,287.12	-	No change
-24	Minimum Balance MIN BALANCE	$5,000.00	$5,000.00	-	No change
-25	Savings	$-180.87	$-180.87	-	No change
-26	Difference	$17,351.56	$17,351.56	-	No change
-27	Home Pest Control Delivery Subscription	$-209.25	$-209.25	-	No change
-28	Security Camera Sub	$-256.83	$-256.83	-	No change
-29	Credit Card/Bank/ATM Fees	$-208.07	$-208.07	-	No change
-30	AI	$-260.00	$-260.00	-	No change
-31	Talquin Electric	$-3,671.11	$-3,671.11	-	No change
-32	Waste Pro	$0.00	$0.00	-	No change
-33	Optician & Prescription Eyeglasses	$-612.37	$-612.37	-	No change
-34	Dollar Shave Club	$-54.23	$-54.23	-	No change
-35	Lucky's Barber Shop	$-75.00	$-75.00	-	No change
-36	Allowance FIXED	$38,500.00	$38,500.00	-	No change
-37	Dog Nail Trims / Vaccinations	$-1,243.20	$-1,243.20	-	No change
-38	Earth Breeze FIXED	$-198.45	$-198.45	-	No change
+CSV Transaction Impacts:
+Budget ID	Name	Net Impact
+7	Property Taxes - Florida	$928.72
+13	MessageEZ App	$0.99
+14	Verizon Cellular	$229.98
+15	CHEWY-Animal Supplies	$207.49
+21	Starlink WiFi	$5.00
+23	Remaining Balance	$2,909.72
+24	Reimbursements	$0.00
+25	Savings	$1,090.02
+26	Difference	$-10,311.59
+28	Security Camera Sub	$159.90
+29	Credit Card/Bank/ATM Fees	$418.90
+30	AI	$20.00
+31	Talquin Electric	$297.38
+36	Fill Budget Buckets	$3,500.00
+Total CSV Impact: $-543.49
+
+Required Starting Balances:
+Logic: Starting Balance = Target Balance MINUS CSV Impact
+
+Your Production Balances Total (AFTER): $11,893.93
+
+Bank Balance: $11,850.65
+
+Difference: $43.28 (production is higher)
+
+ID	Name	Target (After)	CSV Impact	Required (Before)	Verify
+1	Homeowner Insurance	$1,281.13	$0.00	$1,281.13	$1,281.13
+5	YouMail App	$320.12	$0.00	$320.12	$320.12
+7	Property Taxes - Florida	$150.00	$928.72	$-778.72	$150.00
+8	Auto Insurance	$2,191.99	$0.00	$2,191.99	$2,191.99
+9	Amazon Prime	$15.00	$0.00	$15.00	$15.00
+10	Vehicle Registrations	$410.28	$0.00	$410.28	$410.28
+11	Instacart Subscription	$141.00	$0.00	$141.00	$141.00
+12	TurboTax	$380.00	$0.00	$380.00	$380.00
+13	MessageEZ App	$1.00	$0.99	$0.01	$1.00
+14	Verizon Cellular	$290.00	$229.98	$60.02	$290.00
+15	CHEWY-Animal Supplies	$26.26	$207.49	$-181.23	$26.26
+20	Brilliant Pad	$183.04	$0.00	$183.04	$183.04
+21	Starlink WiFi	$49.52	$5.00	$44.52	$49.52
+22	Microsoft 365	$40.00	$0.00	$40.00	$40.00
+23	Remaining Balance	$959.32	$2,909.72	$-1,950.40	$959.32
+24	Minimum Balance	$5,000.00	$0.00	$5,000.00	$5,000.00
+25	Savings	$2.25	$1,090.02	$-1,087.77	$2.25
+26	Difference	$0.00	$-10,311.59	$10,311.59	$0.00
+27	Home Pest Control Delivery Subscription	$62.48	$0.00	$62.48	$62.48
+28	Security Camera Sub	$15.00	$159.90	$-144.90	$15.00
+29	Credit Card/Bank/ATM Fees	$15.00	$418.90	$-403.90	$15.00
+30	AI	$20.00	$20.00	$0.00	$20.00
+31	Talquin Electric	$-32.38	$297.38	$-329.76	$-32.38
+32	Waste Pro	$5.00	$0.00	$5.00	$5.00
+33	Optician & Prescription Eyeglasses	$214.73	$0.00	$214.73	$214.73
+34	Dollar Shave Club	$25.77	$0.00	$25.77	$25.77
+35	Lucky's Barber Shop	$70.00	$0.00	$70.00	$70.00
+36	Allowance	$0.00	$3,500.00	$-3,500.00	$0.00
+37	Dog Nail Trims / Vaccinations	$52.42	$0.00	$52.42	$52.42
+38	Earth Breeze	$5.00	$0.00	$5.00	$5.00
+TOTALS	$11,893.93	$-543.49	$12,437.42	
+Summary:
+Required Starting Total: $12,437.42
+
+CSV Will Add/Subtract: $-543.49
+
+Final Total (After): $11,893.93
+
+Target (Bank): $11,850.65
+
+Gap: $43.28 ⚠ Will need reconciliation adjustment
+
+Execute - Set Starting Balances

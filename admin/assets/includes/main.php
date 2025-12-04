@@ -201,6 +201,7 @@ function template_admin_header($title, $selected = 'dashboard', $selected_child 
             <a href= "' . $base_url . '/newsletter_system/campaigns.php"' . ($selected == 'campaigns' || ($selected == 'newsletters' && $selected_child == 'campaigns') ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Campaigns</a>
             <a href= "' . $base_url . '/newsletter_system/subscribers.php"' . ($selected == 'newsletters' && $selected_child == 'subscribers' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Subscribers</a>
             <a href= "' . $base_url . '/newsletter_system/sendmail.php"' . ($selected == 'newsletters' && $selected_child == 'sendmail' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Send Mail</a>
+            <a href= "' . $base_url . '/newsletter_system/email-signature.php"' . ($selected == 'newsletters' && $selected_child == 'signature' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span><strong>Signature Line</strong></a>
         </div>
 
             
@@ -220,8 +221,8 @@ function template_admin_header($title, $selected = 'dashboard', $selected_child 
            <a href= "' . $base_url . '/budget_system/notes-browse.php"' . ($selected == 'budget' && $selected_child == 'notes' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span>Notes Table</a>
            <a href= "' . $base_url . '/budget_system/update-results-browse.php"' . ($selected == 'budget' && $selected_child == 'updateR' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span><strong>Update Results Table</strong></a>
            <a href= "' . $base_url . '/budget_system/flags-browse.php"' . ($selected == 'budget' && $selected_child == 'flags' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span><strong>Flags Table</strong></a>
-           <a href= "' . $base_url . '/budget_system/bills-dash.php"' . ($selected == 'budget' && $selected_child == 'flags' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span><strong>Bill Schedule</strong></a>
-           <a href= "' . $base_url . '/budget_system/mom_report/"' . ($selected == 'budget' && $selected_child == 'mom' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span><strong>Bill Schedule</strong></a>
+           <a href= "' . $base_url . '/budget_system/bills-dash.php"' . ($selected == 'budget' && $selected_child == 'bills-dash' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span><strong>Bill Schedule</strong></a>
+           <a href= "' . $base_url . '/budget_system/reports/mom-hancock-report.php"' . ($selected == 'budget' && $selected_child == 'mom-report' ? ' class="selected"' : '') . '><span class="square" style="background:#6610f2"></span><strong>Budget Report</strong></a>
          </div>
 <!--Admin Settings-->        
     <a href= "' . $base_url . '/settings.php"' . ($selected == 'settings' ? ' class="selected"' : '') . ' title="Settings">
