@@ -299,8 +299,8 @@ function send_ticket_email($email, $id, $title, $msg, $priority, $category, $pri
         // Content
         $mail->isHTML(true);
         $mail->Subject = $subject;
-        $mail->Body = $ticket_email_template;
-        $mail->AltBody = strip_tags($ticket_email_template);
+        $mail->Body = append_email_signature($ticket_email_template, 'html', mail_from);
+        $mail->AltBody = append_email_signature(strip_tags($ticket_email_template), 'text', mail_from);
         
         // Send mail
         $mail->send();
