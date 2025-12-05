@@ -113,9 +113,9 @@ function get_services_by_category($pdo, $category) {
         $stmt = $pdo->prepare('
             SELECT * 
             FROM service_catalog 
-            WHERE category = ? 
+            WHERE service_category = ? 
             AND is_active = 1
-            ORDER BY display_order ASC, base_price ASC
+            ORDER BY sort_order ASC, base_price ASC
         ');
         $stmt->execute([$category]);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -154,16 +154,16 @@ function get_hosting_options($pdo, $tier = null) {
         $sql = '
             SELECT * 
             FROM service_catalog 
-            WHERE category = "hosting" 
+            WHERE service_category = "hosting" 
             AND is_active = 1
         ';
         
         if ($tier) {
             $sql .= ' AND service_slug LIKE ?';
-            $stmt = $pdo->prepare($sql . ' ORDER BY display_order ASC, base_price ASC');
+            $stmt = $pdo->prepare($sql . ' ORDER BY sort_order ASC, base_price ASC');
             $stmt->execute(["hosting-{$tier}-%"]);
         } else {
-            $stmt = $pdo->prepare($sql . ' ORDER BY display_order ASC, base_price ASC');
+            $stmt = $pdo->prepare($sql . ' ORDER BY sort_order ASC, base_price ASC');
             $stmt->execute();
         }
         
