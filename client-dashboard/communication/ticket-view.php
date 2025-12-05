@@ -196,14 +196,17 @@ include includes_path . "page-setup.php";
     <h5 class="uploads-header mt-3 fs-6">Attachment(s)</h5>
     <div class="uploads">
         <?php foreach($ticket_uploads as $ticket_upload): 
-            // Prepend communication_path if not already absolute path
-            $file_path = (strpos($ticket_upload['filepath'], communication_path) === 0) 
+            // Create filesystem path for file_exists/getimagesize checks
+            $file_system_path = (strpos($ticket_upload['filepath'], communication_path) === 0) 
                 ? $ticket_upload['filepath'] 
                 : communication_path . $ticket_upload['filepath'];
+            
+            // Create web-accessible URL for href/src attributes
+            $file_url = site_menu_base . 'client-dashboard/communication/' . $ticket_upload['filepath'];
         ?>
-        <a title="download ticket" href="<?=$file_path?>" download>
-            <?php if (file_exists($file_path) && @getimagesize($file_path)): ?>
-            <img src="<?=$file_path?>" width="80" height="80" alt="">
+        <a title="download ticket" href="<?=$file_url?>" download>
+            <?php if (file_exists($file_system_path) && @getimagesize($file_system_path)): ?>
+            <img src="<?=$file_url?>" width="80" height="80" alt="">
             <?php else: ?>
             <i class="fas fa-file"></i>
             <span><?=pathinfo($ticket_upload['filepath'], PATHINFO_EXTENSION)?></span>
