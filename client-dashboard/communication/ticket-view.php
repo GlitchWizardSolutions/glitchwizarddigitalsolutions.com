@@ -18,7 +18,7 @@ LOG NOTE:   2024-10-08 PRODUCTION  - Active
 if (!session_id()) {
     session_start();
 }
-require '../../../private/config.php';
+require_once '../../../private/config.php'; // Use require_once to prevent duplicate loading
 
 if (isset($_GET['t']) && isset($_GET['token'])) {
     $ticket_id = (int)$_GET['t'];
@@ -106,9 +106,9 @@ include includes_path . "page-setup.php";
     <div class="pagetitle">
       <nav>
         <ol class="breadcrumb">
-         <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/index.php">Home</a></li>
-         <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/communication/submit-ticket.php">Communication</a></li> 
-         <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/communication/review-responses.php">My Tickets</a></li> 
+         <li class="breadcrumb-item"><a href="<?php echo site_menu_base; ?>client-dashboard/index.php">Home</a></li>
+         <li class="breadcrumb-item"><a href="<?php echo site_menu_base; ?>client-dashboard/communication/submit-ticket.php">Communication</a></li> 
+         <li class="breadcrumb-item"><a href="<?php echo site_menu_base; ?>client-dashboard/communication/review-responses.php">My Tickets</a></li> 
          <li class="breadcrumb-item active">Ticket Details</li>
         </ol>
       </nav>
@@ -195,10 +195,15 @@ include includes_path . "page-setup.php";
     <?php if (!empty($ticket_uploads)): ?>
     <h5 class="uploads-header mt-3 fs-6">Attachment(s)</h5>
     <div class="uploads">
-        <?php foreach($ticket_uploads as $ticket_upload): ?>
-        <a title="download ticket" href="<?=$ticket_upload['filepath']?>" download>
-            <?php if (getimagesize($ticket_upload['filepath'])): ?>
-            <img src="<?=$ticket_upload['filepath']?>" width="80" height="80" alt="">
+        <?php foreach($ticket_uploads as $ticket_upload): 
+            // Prepend communication_path if not already absolute path
+            $file_path = (strpos($ticket_upload['filepath'], communication_path) === 0) 
+                ? $ticket_upload['filepath'] 
+                : communication_path . $ticket_upload['filepath'];
+        ?>
+        <a title="download ticket" href="<?=$file_path?>" download>
+            <?php if (file_exists($file_path) && @getimagesize($file_path)): ?>
+            <img src="<?=$file_path?>" width="80" height="80" alt="">
             <?php else: ?>
             <i class="fas fa-file"></i>
             <span><?=pathinfo($ticket_upload['filepath'], PATHINFO_EXTENSION)?></span>

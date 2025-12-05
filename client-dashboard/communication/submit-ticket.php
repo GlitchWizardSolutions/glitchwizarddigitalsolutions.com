@@ -95,11 +95,13 @@ if (isset($_POST['title'], $_POST['ticket-message'], $_POST['priority'], $_POST[
             	// Check to make sure the file is valid
             	if (!empty($_FILES['attachments']['tmp_name'][$i]) && in_array($ext, explode(',', attachments_allowed))) {
             		if ($_FILES['attachments']['size'][$i] <= max_allowed_upload_file_size) {
-            			// If everything checks out, we can move the uploaded file to its final destination...
-            			move_uploaded_file($_FILES['attachments']['tmp_name'][$i], $upload_path);
-            			// Insert attachment info into the database (ticket_id, filepath)
-            			$stmt = $pdo->prepare('INSERT INTO tickets_uploads (ticket_id, filepath) VALUES (?, ?)');
-            	        $stmt->execute([ $ticket_id, $upload_path ]);
+            	// If everything checks out, we can move the uploaded file to its final destination...
+            		move_uploaded_file($_FILES['attachments']['tmp_name'][$i], $upload_path);
+            		// Insert attachment info into the database (ticket_id, filepath)
+            		// Store relative path in database for portability (communication_path will be prepended when displaying)
+            		$relative_path = uploads_directory . $filename . '.' . $ext;
+            		$stmt = $pdo->prepare('INSERT INTO tickets_uploads (ticket_id, filepath) VALUES (?, ?)');
+            	        $stmt->execute([ $ticket_id, $relative_path ]);
             		}
             	}
             }

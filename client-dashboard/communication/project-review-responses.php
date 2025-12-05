@@ -20,8 +20,8 @@ include includes_path . 'page-setup.php';
     <div class="pagetitle">
       <nav>
         <ol class="breadcrumb">
-         <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/index.php">Home</a></li>
-         <li class="breadcrumb-item"><a href="<?php echo $base_url; ?>/communication/project-submit-ticket.php">Create New Project</a></li> 
+         <li class="breadcrumb-item"><a href="<?php echo site_menu_base; ?>client-dashboard/index.php">Home</a></li>
+         <li class="breadcrumb-item"><a href="<?php echo site_menu_base; ?>client-dashboard/communication/project-submit-ticket.php">Create New Project</a></li> 
        <li class="breadcrumb-item active">WebDev Projects</li>
      </ol>
    </nav>
