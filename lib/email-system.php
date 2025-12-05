@@ -111,41 +111,14 @@ function configure_smtp_mail($mail) {
     // Only configure if SMTP is enabled
     if (SMTP == true) {
         $mail->isSMTP();
-        
-        // For production, use Microsoft's direct SMTP endpoints to avoid DNS hijacking
-        // Some hosting providers redirect smtp.office365.com to their own servers
-        if (ENVIRONMENT === 'production') {
-            // Multiple Office 365 SMTP endpoints for failover
-            // All are official Microsoft servers
-            // Using multiple hosts allows PHPMailer to try each one
-            $mail->Host = 'smtp-mail.outlook.com;outlook.office365.com;smtp.office365.com';
-        } else {
-            $mail->Host = smtp_host;
-        }
-        
+        $mail->Host = smtp_host;
         $mail->SMTPAuth = true;
         $mail->Username = smtp_user;
         $mail->Password = smtp_pass;
         $mail->SMTPSecure = smtp_secure == 'tls' ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
         $mail->Port = smtp_port;
         
-        // Timeout settings to fail faster and try next host
-        $mail->Timeout = 10; // Connection timeout
-        $mail->SMTPKeepAlive = false; // Don't keep connection open
-        
-        // SSL/TLS options for security
-        // Verify we're actually connecting to Microsoft, not a hijacked server
-        $mail->SMTPOptions = array(
-            'ssl' => array(
-                'verify_peer' => true,
-                'verify_peer_name' => true,
-                'allow_self_signed' => false,
-                // Allow any of Microsoft's valid certificate names
-                'peer_name' => null, // Let it verify against actual certificate
-            )
-        );
-        
-        // Enable verbose debug output in development
+        // Enable verbose debug output in development only
         if (ENVIRONMENT === 'development') {
             $mail->SMTPDebug = 2; // Enable detailed debug output
             $mail->Debugoutput = function($str, $level) {
