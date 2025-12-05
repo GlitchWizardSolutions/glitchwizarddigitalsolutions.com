@@ -351,17 +351,17 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
             <thead>
                 <tr>
                     <td style="width: 30px;"><input type="checkbox" id="selectAll" title="Select All" style="cursor: pointer;"></td>
-                    <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=id'?>#<?=$order_by=='id' ? $table_icons[strtolower($order)] : ''?>
-                    <td colspan="2"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=first_name'?>">Client<?=$order_by=='first_name' ? $table_icons[strtolower($order)] : ''?></td>
+                    <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=id'?>">#<?=$order_by=='id' ? $table_icons[strtolower($order)] : ''?></a></td>
+                    <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=first_name'?>">Client<?=$order_by=='first_name' ? $table_icons[strtolower($order)] : ''?></a></td>
                     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=invoice_number'?>">Invoice #<?=$order_by=='invoice_number' ? $table_icons[strtolower($order)] : ''?></td>
                     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=total_items'?>">Items<?=$order_by=='total_items' ? $table_icons[strtolower($order)] : ''?></a></td>
-                    <td class="responsive-hidden">Domain</td>
+                    <td class="align-content-center responsive-hidden">Domain</td>
                     <td class="responsive-hidden">Category</td>
                <?php /*     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_methods'?>">Method(s)<?=$order_by=='payment_methods' ? $table_icons[strtolower($order)] : ''?></a></td> */ ?>
                     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_amount'?>">Amount<?=$order_by=='payment_amount' ? $table_icons[strtolower($order)] : ''?></a></td>
                     <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_status'?>">Status<?=$order_by=='payment_status' ? $table_icons[strtolower($order)] : ''?></td>
-                    <td>Seen</td>
-                    <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=due_date'?>">Due Date<?=$order_by=='due_date' ? $table_icons[strtolower($order)] : ''?></td>
+                    <td class="align-self-start">Seen</td>
+                    <td class="responsive-hidden align-self-end"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=due_date'?>">Due<?=$order_by=='due_date' ? $table_icons[strtolower($order)] : ''?></td>
                     <td class="align-center">Actions</td>
                 </tr>
             </thead>
@@ -373,8 +373,8 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                 <?php endif; ?>
                 <?php foreach ($invoices as $invoice): ?>
                 <tr>
-                    <td><input type="checkbox" name="invoice_ids[]" value="<?=$invoice['id']?>" class="invoice-checkbox" style="cursor: pointer;"></td>
-                    <td><?=$invoice['id']?></td>
+                    <td><input type="checkbox" name="invoice_ids[]" value="<?=$invoice['id']?>" class="invoice-checkbox" style="cursor: pointer;">&nbsp;</td>
+                  
                     <td class="img">
                         <div class="profile-img">
                             <span style="background-color:<?=color_from_string($invoice['first_name'])?>"><?=strtoupper(substr($invoice['first_name'], 0, 1))?></span>
