@@ -600,18 +600,17 @@ if (isset($_GET['id'])) {
                     <table style="width: 100%;">
                         <thead>
                             <tr>
-                                <td style="width: 25%;">Name</td>
-                                <td style="width: 35%;">Description</td>
-                                <td style="width: 15%;">Price</td>
-                                <td style="width: 10%;">Qty</td>
-                                <td style="width: 10%;">Total</td>
-                                <td style="width: 5%;"></td>
+                                <td style="width: 35%;">Name</td>
+                                <td style="width: 20%;">Price</td>
+                                <td style="width: 15%;">Qty</td>
+                                <td style="width: 20%;">Total</td>
+                                <td style="width: 10%;"></td>
                             </tr>
                         </thead>
                         <tbody class="invoice-items-tbody">
                             <?php if (empty($invoice_items)): ?>
                             <tr class="no-items-row">
-                                <td colspan="6" class="no-invoice-items-msg no-results" style="background: #ffebee; color: #c62828; font-weight: 500; padding: 30px; text-align: center;">
+                                <td colspan="5" class="no-invoice-items-msg no-results" style="background: #ffebee; color: #c62828; font-weight: 500; padding: 30px; text-align: center;">
                                     <i class="fa-solid fa-inbox" style="font-size: 48px; opacity: 0.3; display: block; margin-bottom: 10px;"></i>
                                     No items added yet. Click "Add Item" below to get started.
                                 </td>
@@ -620,11 +619,16 @@ if (isset($_GET['id'])) {
                             <?php foreach ($invoice_items as $item): ?>
                             <tr class="item-row">
                                 <td><input type="hidden" name="item_id[]" value="<?=$item['id']?>"><input name="item_name[]" type="text" placeholder="Item name" value="<?=htmlspecialchars($item['item_name'], ENT_QUOTES)?>" required style="width: 100%;"></td>
-                                <td><input name="item_description[]" type="text" placeholder="Description" maxlength="250" value="<?=htmlspecialchars($item['item_description'], ENT_QUOTES)?>" style="width: 100%;"></td>
                                 <td><input name="item_price[]" type="number" placeholder="0.00" value="<?=$item['item_price']?>" step="0.01" class="item-price" style="width: 100%;"></td>
                                 <td><input name="item_quantity[]" type="number" placeholder="1" value="<?=$item['item_quantity']?>" class="item-quantity" style="width: 100%;"></td>
                                 <td class="item-total" style="font-weight: bold; padding: 10px;">$<?=number_format($item['item_price'] * $item['item_quantity'], 2)?></td>
                                 <td style="text-align: center;"><svg class="delete-item" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="cursor: pointer; fill: #d32f2f;"><title>Delete Item</title><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg></td>
+                            </tr>
+                            <tr class="item-description-row">
+                                <td colspan="4" style="padding: 0 10px 10px 10px; border-bottom: 1px solid #e0e0e0;">
+                                    <input name="item_description[]" type="text" placeholder="Description (optional)" maxlength="250" value="<?=htmlspecialchars($item['item_description'], ENT_QUOTES)?>" style="width: 100%; border: 1px solid #ddd; padding: 6px; font-size: 13px; color: #666;">
+                                </td>
+                                <td style="border-bottom: 1px solid #e0e0e0;"></td>
                             </tr>
                             <?php endforeach; ?>
                             <?php endif; ?>
@@ -965,7 +969,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 newRow.className = 'item-row';
                 newRow.innerHTML = `
                     <td><input type="hidden" name="item_id[]" value="0"><input name="item_name[]" type="text" placeholder="Item name" required style="width: 100%;"></td>
-                    <td><input name="item_description[]" type="text" placeholder="Description" maxlength="250" style="width: 100%;"></td>
                     <td><input name="item_price[]" type="number" placeholder="0.00" step="0.01" value="0" class="item-price" style="width: 100%;"></td>
                     <td><input name="item_quantity[]" type="number" placeholder="1" value="1" class="item-quantity" style="width: 100%;"></td>
                     <td class="item-total" style="font-weight: bold; padding: 10px;">$0.00</td>
@@ -973,12 +976,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 tbody.appendChild(newRow);
                 
+                // Add description row
+                const descRow = document.createElement('tr');
+                descRow.className = 'item-description-row';
+                descRow.innerHTML = `
+                    <td colspan="4" style="padding: 0 10px 10px 10px; border-bottom: 1px solid #e0e0e0;">
+                        <input name="item_description[]" type="text" placeholder="Description (optional)" maxlength="250" style="width: 100%; border: 1px solid #ddd; padding: 6px; font-size: 13px; color: #666;">
+                    </td>
+                    <td style="border-bottom: 1px solid #e0e0e0;"></td>
+                `;
+                tbody.appendChild(descRow);
+                
                 // Attach delete handler to new row
                 const deleteBtn = newRow.querySelector('.delete-item');
                 if (deleteBtn) {
                     deleteBtn.addEventListener('click', function(e) {
                         e.preventDefault();
                         newRow.remove();
+                        descRow.remove();
                         calculateInvoiceTotals();
                     });
                 }
@@ -1029,7 +1044,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 newRow.className = 'item-row';
                 newRow.innerHTML = `
                     <td><input type="hidden" name="item_id[]" value="0"><input name="item_name[]" type="text" placeholder="Item name" value="${serviceName || ''}" required style="width: 100%;"></td>
-                    <td><input name="item_description[]" type="text" placeholder="Description" maxlength="250" value="${serviceDescription || ''}" style="width: 100%;"></td>
                     <td><input name="item_price[]" type="number" placeholder="0.00" step="0.01" value="${servicePrice || '0'}" class="item-price" style="width: 100%;"></td>
                     <td><input name="item_quantity[]" type="number" placeholder="1" value="1" class="item-quantity" style="width: 100%;"></td>
                     <td class="item-total" style="font-weight: bold; padding: 10px;">$${parseFloat(servicePrice || 0).toFixed(2)}</td>
@@ -1037,12 +1051,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 tbody.appendChild(newRow);
                 
+                // Add description row
+                const descRow = document.createElement('tr');
+                descRow.className = 'item-description-row';
+                descRow.innerHTML = `
+                    <td colspan="4" style="padding: 0 10px 10px 10px; border-bottom: 1px solid #e0e0e0;">
+                        <input name="item_description[]" type="text" placeholder="Description (optional)" maxlength="250" value="${serviceDescription || ''}" style="width: 100%; border: 1px solid #ddd; padding: 6px; font-size: 13px; color: #666;">
+                    </td>
+                    <td style="border-bottom: 1px solid #e0e0e0;"></td>
+                `;
+                tbody.appendChild(descRow);
+                
                 // Attach delete handler to new row
                 const deleteBtn = newRow.querySelector('.delete-item');
                 if (deleteBtn) {
                     deleteBtn.addEventListener('click', function(e) {
                         e.preventDefault();
                         newRow.remove();
+                        descRow.remove();
                         calculateInvoiceTotals();
                     });
                 }
@@ -1077,7 +1103,15 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.delete-item').forEach(function(element) {
         element.addEventListener('click', function(event) {
             event.preventDefault();
-            element.closest('tr').remove();
+            const itemRow = element.closest('tr');
+            const descRow = itemRow.nextElementSibling;
+            
+            // Remove both the item row and its description row
+            if (itemRow) itemRow.remove();
+            if (descRow && descRow.classList.contains('item-description-row')) {
+                descRow.remove();
+            }
+            
             calculateInvoiceTotals();
         });
     });
