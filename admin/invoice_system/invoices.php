@@ -358,7 +358,7 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                     <td class="responsive-hidden" style="text-align: center;">Domain</td>
                     <td class="responsive-hidden" style="text-align: center;">Category</td>
                <?php /*     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_methods'?>">Method(s)<?=$order_by=='payment_methods' ? $table_icons[strtolower($order)] : ''?></a></td> */ ?>
-                    <td class="responsive-hidden" style="text-align: center;"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_amount'?>">Amount<?=$order_by=='payment_amount' ? $table_icons[strtolower($order)] : ''?></a></td>
+                    <td class="responsive-hidden" style="text-align: right;"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_amount'?>">Amount<?=$order_by=='payment_amount' ? $table_icons[strtolower($order)] : ''?></a></td>
                     <td style="text-align: center;"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_status'?>">Status<?=$order_by=='payment_status' ? $table_icons[strtolower($order)] : ''?></td>
                     <td style="text-align: center;">Seen</td>
                     <td class="responsive-hidden" style="text-align: center;"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=due_date'?>">Due<?=$order_by=='due_date' ? $table_icons[strtolower($order)] : ''?></td>
@@ -382,9 +382,9 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                     </td>
                     <td><?=htmlspecialchars($invoice['first_name'] . ' ' . $invoice['last_name'], ENT_QUOTES)?></td>
                     <td class="alt responsive-hidden"><?=htmlspecialchars($invoice['invoice_number'], ENT_QUOTES)?><?php if ($invoice['recurrence']): ?> <span class="badge" style="background:#9b59b6;color:white;padding:2px 6px;border-radius:3px;font-size:10px;margin-left:4px;" title="Recurring: Every <?=$invoice['recurrence_period']?> <?=$invoice['recurrence_period_type']?>(s)"><i class="fa-solid fa-rotate"></i></span><?php endif; ?></td>
-                    <td class="alt responsive-hidden"><span class="grey small"><?=number_format($invoice['total_items'])?></span></td>
-                    <td class="alt responsive-hidden"><?=$invoice['domain'] ? '<span class="grey" style="font-size:11px;"><i class="fa-solid fa-globe"></i> ' . htmlspecialchars($invoice['domain'], ENT_QUOTES) . '</span>' : '<span class="grey" style="font-size:11px;">—</span>'?></td>
-                    <td class="alt responsive-hidden"><?=$invoice['project_type_name'] ? '<span class="grey" style="font-size:11px;">' . htmlspecialchars($invoice['project_type_name'], ENT_QUOTES) . '</span>' : '<span class="grey" style="font-size:11px;">—</span>'?></td>
+                    <td class="alt responsive-hidden" style="text-align: center;"><span class="grey small"><?=number_format($invoice['total_items'])?></span></td>
+                    <td class="alt responsive-hidden" style="text-align: center;"><?=$invoice['domain'] ? '<span class="grey" style="font-size:11px;"><i class="fa-solid fa-globe"></i> ' . htmlspecialchars($invoice['domain'], ENT_QUOTES) . '</span>' : '<span class="grey" style="font-size:11px;">—</span>'?></td>
+                    <td class="alt responsive-hidden" style="text-align: center;"><?=$invoice['project_type_name'] ? '<span class="grey" style="font-size:11px;">' . htmlspecialchars($invoice['project_type_name'], ENT_QUOTES) . '</span>' : '<span class="grey" style="font-size:11px;">—</span>'?></td>
                   <?php /*  <td class="alt responsive-hidden">
                         <?php if ($invoice['payment_methods']): ?>
                         <?php foreach (explode(',', $invoice['payment_methods']) as $method): ?>
@@ -392,7 +392,7 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                         <?php endforeach; ?>
                         <?php endif; ?>
                     </td> */ ?>
-                    <td class="responsive-hidden">
+                    <td class="responsive-hidden" style="text-align: right;">
                         <?php if ($invoice['payment_status'] == 'Balance' || $invoice['payment_status'] == 'Pending'): ?>
                         <?php 
                         $balance_amt = ($invoice['payment_amount']+$invoice['tax_total']) - $invoice['paid_total'];
@@ -405,7 +405,7 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                         <?=currency_code . number_format($invoice['payment_amount']+$invoice['tax_total'], 2)?>
                         <?php endif; ?>
                     </td>
-                    <td>
+                    <td style="text-align: center;">
                         <div class="invoice-detail">
                             <?php if ($invoice['payment_status'] == 'Paid'): ?>
                             <span class="green">Paid</span>
@@ -420,12 +420,12 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                             <?php elseif ($invoice['payment_status'] == 'Cancelled'): ?>
                             <span class="grey">Cancelled</span>
                             <?php elseif (($invoice['payment_status'] == 'Unpaid' || $invoice['payment_status'] == 'Balance') && $invoice['due_date'] < $current_date): ?>
-                            <span class="red">OVERDUE</span>
+                            <span class="red">LATE</span>
                             <?php else: ?>
                             <span class="blue">Unpaid</span>
                             <?php endif; ?>
                             </td>
-                            <td>
+                            <td style="text-align: center;">
                             <?php if ($invoice['viewed']): ?>
                             <div class="viewed">
                                 <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>The client has viewed the invoice.</title><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg>
@@ -452,7 +452,7 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
  <?php endif?>
                     <?php endif?>
                    <?php /* <td class="alt responsive-hidden"><?=time_elapsed_string($invoice['due_date'])?></td>*/ ?>
-                    <td class="actions">
+                    <td class="actions" style="text-align: center;">
                         <div class="table-dropdown">
                             <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/></svg>
                             <div class="table-dropdown-items">
