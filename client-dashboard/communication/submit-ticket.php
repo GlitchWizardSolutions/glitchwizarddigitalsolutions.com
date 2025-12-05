@@ -83,13 +83,14 @@ if (isset($_POST['title'], $_POST['ticket-message'], $_POST['priority'], $_POST[
                 // Generate a unique filename that preserves the original name
                 $counter = 0;
                 $filename = $original_name;
-                $upload_path = uploads_directory . $filename . '.' . $ext;
+                $upload_dir = communication_path . uploads_directory;
+                $upload_path = $upload_dir . $filename . '.' . $ext;
 
                 // Check if file exists and add numbering if needed
                 while (file_exists($upload_path)) {
                     $counter++;
                     $filename = $original_name . ' (' . $counter . ')';
-                    $upload_path = uploads_directory . $filename . '.' . $ext;
+                    $upload_path = $upload_dir . $filename . '.' . $ext;
                 }
 
             	// Check to make sure the file is valid
