@@ -28,14 +28,20 @@ $stmt = $pdo->prepare('SELECT * FROM client_pipeline_status WHERE acc_id = ?');
 $stmt->execute([$_SESSION['id']]);
 $pipeline = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Redirect if service not selected yet
-if (!$pipeline || empty($pipeline['service_selected'])) {
+// Redirect if no services selected (must have either a package OR standalone services)
+$has_package = !empty($pipeline['service_selected']);
+$has_standalone = ($pipeline['add_domain_email'] ?? 0) || ($pipeline['add_google_business'] ?? 0) || ($pipeline['add_diy_content_creation'] ?? 0);
+
+if (!$pipeline || (!$has_package && !$has_standalone)) {
     header('Location: guest-service-selection.php?error=select_service_first');
     exit;
 }
 
-// Get selected service details
-$selected_service = get_service_details($pdo, $pipeline['service_selected']);
+// Get selected service details (only if package was selected)
+$selected_service = null;
+if ($has_package) {
+    $selected_service = get_service_details($pdo, $pipeline['service_selected']);
+}
 
 // Check if form data exists in client_pipeline_forms
 $stmt = $pdo->prepare('
@@ -145,12 +151,36 @@ include includes_path . 'page-setup.php';
                                 <small class="text-muted">We'll help you choose the perfect domain if you're not sure</small>
                             </div>
 
-                            <!-- Color Preferences -->
+                            <!-- Branding & Content Availability -->
                             <div class="mb-3">
-                                <label for="color_preferences" class="form-label">Color Preferences</label>
-                                <input type="text" class="form-control" id="color_preferences" name="color_preferences" 
-                                       value="<?= htmlspecialchars($form_data['color_preferences'] ?? '', ENT_QUOTES) ?>"
-                                       placeholder="e.g., Blue and white, earthy tones, modern and minimalist">
+                                <label class="form-label">Do you have existing branding materials? <span class="text-danger">*</span></label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="has_branding" id="has_branding_yes" value="yes" 
+                                           <?= ($form_data['has_branding'] ?? '') === 'yes' ? 'checked' : '' ?> required>
+                                    <label class="form-check-label" for="has_branding_yes">
+                                        <strong>Yes</strong> - I have logos, brand colors, and content ready
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="has_branding" id="has_branding_partial" value="partial"
+                                           <?= ($form_data['has_branding'] ?? '') === 'partial' ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="has_branding_partial">
+                                        <strong>Partially</strong> - I have some materials but need help organizing
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="has_branding" id="has_branding_no" value="no"
+                                           <?= ($form_data['has_branding'] ?? '') === 'no' ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="has_branding_no">
+                                        <strong>No</strong> - I need help creating branding and content
+                                    </label>
+                                </div>
+                                <small class="text-muted">
+                                    This includes: logo, brand colors, website copy, images, business descriptions, etc.
+                                    <?php if (!$pipeline['add_diy_content_creation']): ?>
+                                    <br><strong class="text-warning">Note:</strong> If you need content creation help, consider adding "Do It For Me Content Creation" from the previous page.
+                                    <?php endif; ?>
+                                </small>
                             </div>
 
                             <!-- Additional Notes -->
@@ -179,30 +209,45 @@ include includes_path . 'page-setup.php';
                     <div class="card-body">
                         <h5 class="card-title">Your Selection</h5>
                         
+                        <?php if ($selected_service): ?>
                         <div class="mb-3">
                             <strong class="text-primary"><?= htmlspecialchars($selected_service['service_name']) ?></strong>
                             <div class="text-muted">$<?= number_format($selected_service['base_price'], 2) ?></div>
                         </div>
+                        <?php endif; ?>
+
+                        <?php if ($pipeline['add_domain_email']): ?>
+                        <div class="mb-3">
+                            <strong>Domain & Email Setup</strong>
+                            <div class="text-muted">$150.00</div>
+                        </div>
+                        <?php endif; ?>
+
+                        <?php if ($pipeline['add_google_business']): ?>
+                        <div class="mb-3">
+                            <strong>Google Business Profile</strong>
+                            <div class="text-muted">$350.00</div>
+                        </div>
+                        <?php endif; ?>
 
                         <?php if ($pipeline['add_diy_content_creation']): ?>
                         <div class="mb-3">
                             <strong>"Do It For Me" Content Creation</strong>
-                            <div class="text-muted">+$1,000.00</div>
+                            <div class="text-muted">$1,000.00</div>
                         </div>
                         <?php endif; ?>
-
-                        <div class="mb-3">
-                            <strong>Domain & Email Setup</strong>
-                            <div class="text-muted">+$150.00</div>
-                        </div>
 
                         <hr>
 
                         <?php
-                        $domain_price = 150;
+                        $package_price = $selected_service ? $selected_service['base_price'] : 0;
+                        $domain_price = $pipeline['add_domain_email'] ? 150 : 0;
+                        $google_price = $pipeline['add_google_business'] ? 350 : 0;
                         $diy_price = $pipeline['add_diy_content_creation'] ? 1000 : 0;
-                        $total = $selected_service['base_price'] + $domain_price + $diy_price;
-                        $deposit = $total * 0.50;
+                        $total = $package_price + $domain_price + $google_price + $diy_price;
+                        
+                        // 50% deposit only if website package selected, otherwise full amount
+                        $deposit = $selected_service ? ($total * 0.50) : $total;
                         ?>
 
                         <div class="d-flex justify-content-between mb-2">
@@ -210,17 +255,25 @@ include includes_path . 'page-setup.php';
                             <strong class="text-primary">$<?= number_format($total, 2) ?></strong>
                         </div>
 
+                        <?php if ($selected_service): ?>
                         <div class="alert alert-success mb-3">
                             <strong>50% Deposit:</strong>
                             <div class="h5 mb-0">$<?= number_format($deposit, 2) ?></div>
                         </div>
+                        <?php else: ?>
+                        <div class="alert alert-info mb-3">
+                            <strong>Payment Due:</strong>
+                            <div class="h5 mb-0">$<?= number_format($deposit, 2) ?></div>
+                            <small class="text-muted">Standalone services are paid in full</small>
+                        </div>
+                        <?php endif; ?>
 
                         <div class="alert alert-info">
                             <strong>Next Steps:</strong>
                             <ol class="mb-0 mt-2 ps-3 small">
                                 <li>Submit project details</li>
-                                <li>Receive deposit invoice via email</li>
-                                <li>Pay deposit to begin project</li>
+                                <li><?= $selected_service ? 'Receive deposit invoice' : 'Receive invoice' ?> via email</li>
+                                <li>Pay <?= $selected_service ? 'deposit' : 'invoice' ?> to begin <?= $selected_service ? 'project' : 'setup' ?></li>
                                 <li>Move to Onboarding phase</li>
                             </ol>
                         </div>

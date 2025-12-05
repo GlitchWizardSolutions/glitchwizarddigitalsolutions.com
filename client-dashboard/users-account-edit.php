@@ -4,7 +4,7 @@
 2025-06-21 Bug Fix Removed call to users-profile-process.
 */
 include 'assets/includes/user-config.php';
-include includes_path . 'page-setup.php';
+
 // output message (errors, etc)
 $msg = '';
 $success = '';
@@ -34,8 +34,8 @@ if (isset($_POST['newPassword'], $_POST['confirmPassword'])) {
 			// No errors occured, update the account...
 			// Hash the new password if it was posted and is not blank
 			$password = !empty($_POST['newPassword']) ? password_hash($_POST['newPassword'], PASSWORD_DEFAULT) : $account['password'];
-			// Update the account
-			$stmt = $pdo->prepare('UPDATE accounts SET password = ? WHERE id = ?');
+			// Update the account (and set password_changed flag)
+			$stmt = $pdo->prepare('UPDATE accounts SET password = ?, password_changed = 1 WHERE id = ?');
 			$stmt->execute([ $password, $_SESSION['id'] ]);
 				// Output success message
 				$success = 'You have successfully changed your password!';
@@ -45,6 +45,7 @@ if (isset($_POST['newPassword'], $_POST['confirmPassword'])) {
 			}
 }
 
+include includes_path . 'page-setup.php';
 ?>
 <main id="main" class="main">
     <div class="pagetitle">

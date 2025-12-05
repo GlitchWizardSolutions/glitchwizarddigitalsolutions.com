@@ -6,7 +6,14 @@
  ******************************************************************************/
 
 session_start();
-require_once '../../../private/config.php';
+require_once '../../../../private/config.php';
+
+// Load main.php to establish database connection
+require_once public_path . 'client-dashboard/assets/includes/main.php';
+
+// Load email system
+require_once public_path . 'lib/email-system.php';
+
 require_once '../../lib/service-catalog-functions.php';
 
 // Verify user is logged in

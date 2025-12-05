@@ -87,6 +87,25 @@ foreach ($website_packages as $pkg) {
                             <div class="mb-4">
                                 <label class="form-label fw-bold">Website Packages</label>
                                 
+                                <!-- No Package Option -->
+                                <div class="card mb-3" style="cursor: pointer; background-color: #f8f9fa;">
+                                    <div class="card-body py-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input package-radio" 
+                                                   type="radio" 
+                                                   name="service_selected" 
+                                                   id="no_package" 
+                                                   value=""
+                                                   data-price="0"
+                                                   <?= empty($pipeline['service_selected']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label w-100" for="no_package" style="cursor: pointer;">
+                                                <strong>No Package - Standalone Services Only</strong>
+                                                <small class="text-muted d-block">I only want to purchase standalone services (Domain/Email, Google Business Profile, etc.)</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <?php foreach ($main_packages as $index => $package): 
                                     $features = isset($package['features']) ? $package['features'] : [];
                                     $isSelected = $pipeline['service_selected'] === $package['service_slug'];
@@ -223,7 +242,9 @@ foreach ($website_packages as $pkg) {
                                 <?php endif; ?>
                                 
                                 <!-- DIY Content Creation Checkbox -->
-                                <?php if ($diy_pkg): ?>
+                                <?php if ($diy_pkg): 
+                                    $features = isset($diy_pkg['features']) ? $diy_pkg['features'] : [];
+                                ?>
                                 <div class="card mb-3" style="border-left: 4px solid #ffc107;">
                                     <div class="card-body">
                                         <div class="form-check">
@@ -233,16 +254,28 @@ foreach ($website_packages as $pkg) {
                                                    name="add_diy_content_creation"
                                                    value="1"
                                                    data-slug="content-creation-diy"
-                                                   data-price="<?= $diy_pkg['base_price'] ?>">
+                                                   data-price="<?= $diy_pkg['base_price'] ?>"
+                                                   <?= !empty($pipeline['add_diy_content_creation']) ? 'checked' : '' ?>>
                                             <label class="form-check-label w-100" for="add_diy">
                                                 <div class="d-flex justify-content-between align-items-start">
-                                                    <div>
+                                                    <div class="flex-grow-1">
                                                         <h6 class="mb-1"><?= htmlspecialchars($diy_pkg['service_name']) ?></h6>
-                                                        <p class="text-muted small mb-0"><?= htmlspecialchars($diy_pkg['service_description']) ?></p>
-                                                        <p class="small text-secondary mt-2 mb-0">
-                                                            <strong>What we'll do:</strong> Organize content, write professional copy, 
-                                                            create engaging descriptions.
-                                                        </p>
+                                                        <p class="text-muted small mb-2"><?= htmlspecialchars($diy_pkg['service_description']) ?></p>
+                                                        
+                                                        <?php if (!empty($features)): ?>
+                                                        <div class="mt-2">
+                                                            <strong class="text-secondary small">Includes:</strong>
+                                                            <ul class="mb-0 mt-1 small">
+                                                                <?php foreach ($features as $feature): ?>
+                                                                <li class="text-muted"><?= htmlspecialchars($feature) ?></li>
+                                                                <?php endforeach; ?>
+                                                            </ul>
+                                                        </div>
+                                                        <?php endif; ?>
+                                                        
+                                                        <div class="alert alert-warning mt-3 mb-0 py-2 small">
+                                                            <i class="bi bi-info-circle"></i> <strong>Note:</strong> This service requires a website package or Google Business Profile setup to be selected.
+                                                        </div>
                                                     </div>
                                                     <div class="text-end ms-3">
                                                         <h5 class="text-warning mb-0">$<?= number_format($diy_pkg['base_price'], 2) ?></h5>
@@ -402,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Check for selected website package
         packageRadios.forEach(radio => {
-            if (radio.checked) {
+            if (radio.checked && radio.value !== '') {
                 hasPackage = true;
                 const price = parseFloat(radio.dataset.price);
                 let name = radio.closest('.card-body').querySelector('h5').textContent.trim();
@@ -422,7 +455,8 @@ document.addEventListener('DOMContentLoaded', function() {
         serviceCheckboxes.forEach(checkbox => {
             if (checkbox.checked) {
                 const price = parseFloat(checkbox.dataset.price);
-                let name = checkbox.closest('.card-body').querySelector('h6').textContent.trim();
+                const h6Element = checkbox.closest('.card-body').querySelector('h6');
+                let name = h6Element ? h6Element.textContent.trim() : checkbox.nextElementSibling.textContent.trim();
                 selectedServices.push({
                     name: name,
                     price: price
@@ -465,20 +499,42 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form validation - require at least one service
     form.addEventListener('submit', function(e) {
         let hasSelection = false;
+        let hasPackageOrGoogle = false;
+        let hasDIY = false;
         
-        // Check if any package is selected
+        // Check if any package is selected (not "No Package")
         packageRadios.forEach(radio => {
-            if (radio.checked) hasSelection = true;
+            if (radio.checked) {
+                hasSelection = true;
+                if (radio.value !== '') {
+                    hasPackageOrGoogle = true;
+                }
+            }
         });
         
         // Check if any service checkbox is selected
         serviceCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) hasSelection = true;
+            if (checkbox.checked) {
+                hasSelection = true;
+                if (checkbox.id === 'add_google') {
+                    hasPackageOrGoogle = true;
+                }
+                if (checkbox.id === 'add_diy') {
+                    hasDIY = true;
+                }
+            }
         });
         
         if (!hasSelection) {
             e.preventDefault();
             alert('Please select at least one service (website package or standalone service) before continuing.');
+            return false;
+        }
+        
+        // Validate DIY Content Creation requires a package or Google Business Profile
+        if (hasDIY && !hasPackageOrGoogle) {
+            e.preventDefault();
+            alert('"Do It For Me Content Creation" requires a website package or Google Business Profile setup to be selected.');
             return false;
         }
     });
@@ -487,18 +543,20 @@ document.addEventListener('DOMContentLoaded', function() {
     packageRadios.forEach(radio => {
         radio.addEventListener('change', updatePricing);
         
-        // Make card clickable
+        // Make card clickable (if it has package-card class)
         const card = radio.closest('.package-card');
-        card.addEventListener('click', function(e) {
-            if (e.target.type !== 'radio') {
-                radio.checked = true;
-                updatePricing();
-                
-                // Update card borders
-                document.querySelectorAll('.package-card').forEach(c => c.classList.remove('border-primary'));
-                card.classList.add('border-primary');
-            }
-        });
+        if (card) {
+            card.addEventListener('click', function(e) {
+                if (e.target.type !== 'radio') {
+                    radio.checked = true;
+                    updatePricing();
+                    
+                    // Update card borders
+                    document.querySelectorAll('.package-card').forEach(c => c.classList.remove('border-primary'));
+                    card.classList.add('border-primary');
+                }
+            });
+        }
     });
     
     serviceCheckboxes.forEach(checkbox => {
