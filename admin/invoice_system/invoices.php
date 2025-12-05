@@ -354,15 +354,15 @@ $url = 'invoices.php?search_query=' . $search . '&datestart=' . $datestart . '&d
                     <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=id'?>">#<?=$order_by=='id' ? $table_icons[strtolower($order)] : ''?></a></td>
                     <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=first_name'?>">Client<?=$order_by=='first_name' ? $table_icons[strtolower($order)] : ''?></a></td>
                     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=invoice_number'?>">Invoice #<?=$order_by=='invoice_number' ? $table_icons[strtolower($order)] : ''?></td>
-                    <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=total_items'?>">Items<?=$order_by=='total_items' ? $table_icons[strtolower($order)] : ''?></a></td>
-                    <td class="align-content-center responsive-hidden">Domain</td>
-                    <td class="responsive-hidden">Category</td>
+                    <td class="responsive-hidden" style="text-align: center;"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=total_items'?>">Items<?=$order_by=='total_items' ? $table_icons[strtolower($order)] : ''?></a></td>
+                    <td class="responsive-hidden" style="text-align: center;">Domain</td>
+                    <td class="responsive-hidden" style="text-align: center;">Category</td>
                <?php /*     <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_methods'?>">Method(s)<?=$order_by=='payment_methods' ? $table_icons[strtolower($order)] : ''?></a></td> */ ?>
-                    <td class="responsive-hidden"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_amount'?>">Amount<?=$order_by=='payment_amount' ? $table_icons[strtolower($order)] : ''?></a></td>
-                    <td><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_status'?>">Status<?=$order_by=='payment_status' ? $table_icons[strtolower($order)] : ''?></td>
-                    <td class="align-self-start">Seen</td>
-                    <td class="responsive-hidden align-self-end"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=due_date'?>">Due<?=$order_by=='due_date' ? $table_icons[strtolower($order)] : ''?></td>
-                    <td class="align-center">Actions</td>
+                    <td class="responsive-hidden" style="text-align: center;"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_amount'?>">Amount<?=$order_by=='payment_amount' ? $table_icons[strtolower($order)] : ''?></a></td>
+                    <td style="text-align: center;"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=payment_status'?>">Status<?=$order_by=='payment_status' ? $table_icons[strtolower($order)] : ''?></td>
+                    <td style="text-align: center;">Seen</td>
+                    <td class="responsive-hidden" style="text-align: center;"><a href="<?=$url . '&order=' . ($order=='ASC'?'DESC':'ASC') . '&order_by=due_date'?>">Due<?=$order_by=='due_date' ? $table_icons[strtolower($order)] : ''?></td>
+                    <td style="text-align: center;">Actions</td>
                 </tr>
             </thead>
             <tbody>
