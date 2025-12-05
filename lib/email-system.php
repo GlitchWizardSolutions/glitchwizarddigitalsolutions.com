@@ -198,10 +198,14 @@ function send_email($email, $code, $username, $type) {
         }
         return true;
     } catch (Exception $e) {
-        if (function_exists('debug_log')) {
+        // Log error instead of echoing it
+        if (function_exists('critical_log')) {
+            critical_log('Email System', 'email-system.php', 'Send Email', "EMAIL ERROR for $email: " . $mail->ErrorInfo);
+        } elseif (function_exists('debug_log')) {
             debug_log('Email System', 'email-system.php', 'Send Email', "EMAIL ERROR: " . $mail->ErrorInfo);
+        } else {
+            error_log("Email System Error: Failed to send email to $email - " . $mail->ErrorInfo);
         }
-        echo 'error';
         return false;
     }
 }

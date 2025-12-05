@@ -144,6 +144,23 @@ function check_loggedin($pdo, $redirect_file = null) {
     
     // Check if user is already logged in
     if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === TRUE) {
+        // Ensure session has access_level (backwards compatibility for old sessions)
+        if (!isset($_SESSION['access_level']) || empty($_SESSION['access_level'])) {
+            $stmt = $pdo->prepare('SELECT access_level, full_name, document_path FROM accounts WHERE id = ?');
+            $stmt->execute([$_SESSION['id']]);
+            $account_data = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($account_data) {
+                $_SESSION['access_level'] = $account_data['access_level'] ?? 'Guest';
+                if (!isset($_SESSION['full_name'])) $_SESSION['full_name'] = $account_data['full_name'] ?? '';
+                if (!isset($_SESSION['document_path'])) $_SESSION['document_path'] = $account_data['document_path'] ?? '';
+            } else {
+                // Account not found - force re-login
+                session_destroy();
+                header('Location: ' . $redirect_file);
+                exit;
+            }
+        }
+        
         // Update last seen timestamp
         $date = date('Y-m-d\TH:i:s');
         $stmt = $pdo->prepare('UPDATE accounts SET last_seen = ? WHERE id = ?');

@@ -93,9 +93,9 @@ function createUserAccount($pdo, $data) {
         $date = date('Y-m-d\TH:i:s');
         $ip = getClientIP();
 
-        $stmt = $pdo->prepare('INSERT INTO accounts (full_name, username, password, email, activation_code, role, registered, last_seen, approved, ip) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $stmt = $pdo->prepare('INSERT INTO accounts (full_name, username, password, email, activation_code, role, access_level, registered, last_seen, approved, ip) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
 
-        if ($stmt->execute([$data['full_name'], $data['username'], $password, $data['email'], $activation_code, $role, $date, $date, 'Approved', $ip])) {
+        if ($stmt->execute([$data['full_name'], $data['username'], $password, $data['email'], $activation_code, $role, 'Guest', $date, $date, 'Approved', $ip])) {
             return $pdo->lastInsertId();
         }
 
@@ -127,9 +127,11 @@ function handlePostRegistration($data, $userId) {
         if (auto_login_after_register) {
             session_regenerate_id(true);
             $_SESSION['loggedin'] = true;
+            $_SESSION['sec-username'] = $data['username'];
             $_SESSION['name'] = $data['username'];
             $_SESSION['id'] = $userId;
             $_SESSION['role'] = 'Member';
+            $_SESSION['access_level'] = 'Guest';
             $_SESSION['email'] = $data['email'];
             $_SESSION['full_name'] = $data['full_name'];
 

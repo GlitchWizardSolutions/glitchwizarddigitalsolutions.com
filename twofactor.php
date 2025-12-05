@@ -27,7 +27,7 @@ $msg = '';
 // Verify the ID and email provided
 if (isset($_SESSION['tfa_id'])) {
     // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
-    $stmt = $pdo->prepare('SELECT email, tfa_code, username, id, role FROM accounts WHERE id = ?');
+    $stmt = $pdo->prepare('SELECT email, tfa_code, username, id, role, access_level, full_name, document_path FROM accounts WHERE id = ?');
     $stmt->execute([ $_SESSION['tfa_id'] ]);
     $account = $stmt->fetch(PDO::FETCH_ASSOC);
     // If the account exists with the ID provided...
@@ -45,10 +45,14 @@ if (isset($_SESSION['tfa_id'])) {
                 // Authenticate the user
                 session_regenerate_id();
                 $_SESSION['loggedin'] = TRUE;
+                $_SESSION['sec-username'] = $account['username'];
                 $_SESSION['name'] = $account['username'];
                 $_SESSION['id'] = $account['id'];
                 $_SESSION['role'] = $account['role'];
+                $_SESSION['access_level'] = $account['access_level'];
                 $_SESSION['email'] = $account['email'];
+                $_SESSION['full_name'] = $account['full_name'];
+                $_SESSION['document_path'] = $account['document_path'];
                 // Redirect to dashboard home page
                 header('Location: client-dashboard/index.php');
                 exit;
@@ -81,7 +85,9 @@ include includes_path . 'public-page-setup.php';
 					<i class="fas fa-lock"></i>
 				</label>
 				<input type="text" name="code" placeholder="Your Code" id="code" required>
+				<?php if (!empty($msg)): ?>
 				<div class="msg"><?=$msg?></div>
+				<?php endif; ?>
 					<input type="submit" value="Submit">
 			</form>
 		</div>

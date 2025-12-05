@@ -3,6 +3,15 @@
 //Updated 5/24/25 Cleaned up code.
 include 'assets/includes/user-config.php';
 
+// Ensure session has access_level (safety check)
+if (!isset($_SESSION['access_level']) || empty($_SESSION['access_level'])) {
+    // Fetch from database if missing
+    $stmt = $pdo->prepare('SELECT access_level FROM accounts WHERE id = ?');
+    $stmt->execute([$_SESSION['id']]);
+    $access_data = $stmt->fetch(PDO::FETCH_ASSOC);
+    $_SESSION['access_level'] = $access_data['access_level'] ?? 'Guest';
+}
+
 // Get account info for password_changed flag
 $stmt = $pdo->prepare('SELECT password_changed FROM accounts WHERE id = ?');
 $stmt->execute([$_SESSION['id']]);
