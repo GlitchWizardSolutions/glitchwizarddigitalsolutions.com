@@ -112,11 +112,13 @@ function configure_smtp_mail($mail) {
     if (SMTP == true) {
         $mail->isSMTP();
         
-        // For production, try alternate Office 365 SMTP servers if primary fails
-        // This handles DNS resolution issues on some hosting providers
+        // For production, use Microsoft's direct SMTP endpoints to avoid DNS hijacking
+        // Some hosting providers redirect smtp.office365.com to their own servers
         if (ENVIRONMENT === 'production') {
-            // Try outlook.office365.com as alternate (same service, different endpoint)
-            $mail->Host = 'outlook.office365.com';
+            // Multiple Office 365 SMTP endpoints for failover
+            // All are official Microsoft servers
+            // Using multiple hosts allows PHPMailer to try each one
+            $mail->Host = 'smtp-mail.outlook.com;outlook.office365.com;smtp.office365.com';
         } else {
             $mail->Host = smtp_host;
         }
@@ -127,13 +129,19 @@ function configure_smtp_mail($mail) {
         $mail->SMTPSecure = smtp_secure == 'tls' ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
         $mail->Port = smtp_port;
         
-        // SSL/TLS options to handle certificate verification
-        // Ensures we're connecting to the correct Microsoft server
+        // Timeout settings to fail faster and try next host
+        $mail->Timeout = 10; // Connection timeout
+        $mail->SMTPKeepAlive = false; // Don't keep connection open
+        
+        // SSL/TLS options for security
+        // Verify we're actually connecting to Microsoft, not a hijacked server
         $mail->SMTPOptions = array(
             'ssl' => array(
                 'verify_peer' => true,
                 'verify_peer_name' => true,
                 'allow_self_signed' => false,
+                // Allow any of Microsoft's valid certificate names
+                'peer_name' => null, // Let it verify against actual certificate
             )
         );
         
