@@ -41,10 +41,15 @@ if (isset($_GET['cron_secret']) && $_GET['cron_secret'] == cron_secret) {
             $stmt->execute([ $invoice['client_id'] ]);
             $client = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            // Send email
+            // Send email and check result
             if ($client) {
-                send_client_invoice_email($invoice, $client);
-                $output[] = '  → Email sent to: ' . $client['email'];
+                $email_sent = send_client_invoice_email($invoice, $client);
+                if ($email_sent) {
+                    $output[] = '  → Email sent to: ' . $client['email'];
+                } else {
+                    $output[] = '  → ⚠️ FAILED to send email to: ' . $client['email'];
+                    $output[] = '      Check error log for details';
+                }
             } else {
                 $output[] = '  → ERROR: Client not found (ID: ' . $invoice['client_id'] . ')';
             }
@@ -71,9 +76,14 @@ if (isset($_GET['cron_secret']) && $_GET['cron_secret'] == cron_secret) {
         $client = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($client) {
-            // Send email
-            send_client_invoice_email($invoice, $client, 'Payment Reminder');
-            $output[] = '  → Reminder sent for invoice #' . $invoice['invoice_number'] . ' to: ' . $client['email'];
+            // Send email and check result
+            $email_sent = send_client_invoice_email($invoice, $client, 'Payment Reminder');
+            if ($email_sent) {
+                $output[] = '  → Reminder sent for invoice #' . $invoice['invoice_number'] . ' to: ' . $client['email'];
+            } else {
+                $output[] = '  → ⚠️ FAILED to send reminder for invoice #' . $invoice['invoice_number'] . ' to: ' . $client['email'];
+                $output[] = '      Check error log for details';
+            }
         } else {
             $output[] = '  → ERROR: Client not found for invoice #' . $invoice['invoice_number'];
         }

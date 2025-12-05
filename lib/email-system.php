@@ -397,7 +397,15 @@ function send_client_invoice_email($invoice, $client, $subject = '') {
         $mail->send();
         return true;
     } catch (Exception $e) {
-        error_log("INVOICE EMAIL ERROR: " . $mail->ErrorInfo);
+        // Log detailed error information
+        $error_msg = "INVOICE EMAIL ERROR for invoice #{$invoice['invoice_number']} to {$client['email']}: " . $mail->ErrorInfo;
+        error_log($error_msg);
+        
+        // Also log to critical log if available
+        if (function_exists('critical_log')) {
+            critical_log('Email System', 'email-system.php', 'Invoice Email', $error_msg);
+        }
+        
         return false;
     }
 }
