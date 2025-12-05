@@ -146,8 +146,12 @@ if (isset($_POST['newPassword'], $_POST['confirmPassword'])) {
 			// No errors occured, update the account...
 			// Hash the new password if it was posted and is not blank
 			$password = !empty($_POST['newPassword']) ? password_hash($_POST['newPassword'], PASSWORD_DEFAULT) : $account['password'];
-			// Update the account
-			$stmt = $pdo->prepare('UPDATE accounts SET password = ? WHERE id = ?');
+			// Update the account (and set password_changed flag if password was changed)
+			if (!empty($_POST['newPassword'])) {
+				$stmt = $pdo->prepare('UPDATE accounts SET password = ?, password_changed = 1 WHERE id = ?');
+			} else {
+				$stmt = $pdo->prepare('UPDATE accounts SET password = ? WHERE id = ?');
+			}
 			$stmt->execute([ $password, $_SESSION['id'] ]);
 				// Output success message
 				$success_msg = 'You have successfully changed your password!';
