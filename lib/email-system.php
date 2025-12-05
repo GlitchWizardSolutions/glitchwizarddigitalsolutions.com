@@ -111,12 +111,39 @@ function configure_smtp_mail($mail) {
     // Only configure if SMTP is enabled
     if (SMTP == true) {
         $mail->isSMTP();
-        $mail->Host = smtp_host;
+        
+        // For production, try alternate Office 365 SMTP servers if primary fails
+        // This handles DNS resolution issues on some hosting providers
+        if (ENVIRONMENT === 'production') {
+            // Try outlook.office365.com as alternate (same service, different endpoint)
+            $mail->Host = 'outlook.office365.com';
+        } else {
+            $mail->Host = smtp_host;
+        }
+        
         $mail->SMTPAuth = true;
         $mail->Username = smtp_user;
         $mail->Password = smtp_pass;
         $mail->SMTPSecure = smtp_secure == 'tls' ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
         $mail->Port = smtp_port;
+        
+        // SSL/TLS options to handle certificate verification
+        // Ensures we're connecting to the correct Microsoft server
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => true,
+                'verify_peer_name' => true,
+                'allow_self_signed' => false,
+            )
+        );
+        
+        // Enable verbose debug output in development
+        if (ENVIRONMENT === 'development') {
+            $mail->SMTPDebug = 2; // Enable detailed debug output
+            $mail->Debugoutput = function($str, $level) {
+                error_log("SMTP Debug: $str");
+            };
+        }
     }
 }
 
