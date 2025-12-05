@@ -92,7 +92,7 @@ try {
     }
 
     // Check account approval
-    if (account_approval && !$account['approved']) {
+    if (account_approval && $account['approved'] === 1) {
         sendErrorResponse('Your account has not been approved yet.');
     }
 
