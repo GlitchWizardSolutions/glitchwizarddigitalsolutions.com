@@ -630,21 +630,83 @@ if (isset($_GET['id'])) {
                             <?php endif; ?>
                         </tbody>
                     </table>
+                    
+                    <!-- Service Catalog Quick Add -->
+                    <div style="margin-top: 15px; padding: 15px; background: #f5f5f5; border-radius: 6px; border: 1px solid #ddd;">
+                        <div style="display: flex; gap: 10px; align-items: end;">
+                            <div style="flex: 2;">
+                                <label for="service_catalog_select" style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">
+                                    <i class="fa-solid fa-book"></i> Quick Add from Service Catalog
+                                </label>
+                                <select id="service_catalog_select" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                    <option value="">-- Select a service to add --</option>
+                                    <optgroup label="Website Packages">
+                                        <?php 
+                                        $website_packages = get_website_packages($pdo);
+                                        foreach ($website_packages as $pkg): 
+                                        ?>
+                                        <option value="<?=htmlspecialchars($pkg['service_slug'])?>" 
+                                                data-name="<?=htmlspecialchars($pkg['service_name'])?>"
+                                                data-price="<?=$pkg['base_price']?>"
+                                                data-description="<?=htmlspecialchars(isset($pkg['service_description']) ? $pkg['service_description'] : '')?>">
+                                            <?=htmlspecialchars($pkg['service_name'])?> - $<?=number_format($pkg['base_price'], 2)?>
+                                        </option>
+                                        <?php endforeach; ?>
+                                    </optgroup>
+                                    <optgroup label="Hosting Plans">
+                                        <?php 
+                                        // Get hosting options grouped by tier
+                                        for ($tier = 1; $tier <= 4; $tier++):
+                                            $hosting_options = get_hosting_options($pdo, "tier{$tier}");
+                                            if (!empty($hosting_options)):
+                                        ?>
+                                            <optgroup label="  Tier <?=$tier?> Hosting">
+                                                <?php foreach ($hosting_options as $host): ?>
+                                                <option value="<?=htmlspecialchars($host['service_slug'])?>"
+                                                        data-name="<?=htmlspecialchars($host['service_name'])?>"
+                                                        data-price="<?=$host['base_price']?>"
+                                                        data-description="<?=htmlspecialchars(isset($host['service_description']) ? $host['service_description'] : '')?>">
+                                                    <?=htmlspecialchars($host['service_name'])?> - $<?=number_format($host['base_price'], 2)?>
+                                                </option>
+                                                <?php endforeach; ?>
+                                            </optgroup>
+                                        <?php 
+                                            endif;
+                                        endfor; 
+                                        ?>
+                                    </optgroup>
+                                    <optgroup label="Add-Ons">
+                                        <?php 
+                                        $addons = get_services_by_category($pdo, 'addon');
+                                        foreach ($addons as $addon): 
+                                        ?>
+                                        <option value="<?=htmlspecialchars($addon['service_slug'])?>"
+                                                data-name="<?=htmlspecialchars($addon['service_name'])?>"
+                                                data-price="<?=$addon['base_price']?>"
+                                                data-description="<?=htmlspecialchars(isset($addon['service_description']) ? $addon['service_description'] : '')?>">
+                                            <?=htmlspecialchars($addon['service_name'])?> - $<?=number_format($addon['base_price'], 2)?>
+                                        </option>
+                                        <?php endforeach; ?>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <button type="button" id="add_catalog_item_btn" class="btn btn-success" style="height: 38px; white-space: nowrap;">
+                                <i class="fa-solid fa-plus"></i> Add Selected Service
+                            </button>
+                        </div>
+                        <small style="display: block; margin-top: 8px; color: #666;">
+                            <i class="fa-solid fa-info-circle"></i> Select a service from your catalog to auto-fill name, description, and price. You can still edit manually after adding.
+                        </small>
+                    </div>
+                    
                     <div style="margin-top: 15px; display: flex; gap: 10px;">
                         <a href="#" class="add-item btn btn-primary" style="flex: 1;">
-                            <i class="fa-solid fa-plus"></i>&nbsp; Add Item
+                            <i class="fa-solid fa-plus"></i>&nbsp; Add Blank Item
                         </a>
                         <div style="flex: 1; text-align: right; font-size: 18px; font-weight: bold; padding: 10px 15px; background: #e3f2fd; border-radius: 6px; color: #1976d2;">
                             Subtotal: <span class="invoice-subtotal">$0.00</span>
                         </div>
                     </div>
-                </div>
-
-                <!-- Future: Service Selector (Coming Soon) -->
-                <div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-left: 4px solid #4caf50; border-radius: 4px;">
-                    <p style="margin: 0; color: #2e7d32; font-size: 14px;">
-                        <i class="fa-solid fa-lightbulb"></i> <strong>Coming Soon:</strong> Select from your saved services catalog to quickly add items with pre-filled prices and descriptions.
-                    </p>
                 </div>
             </div>
         </div>
@@ -929,6 +991,84 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (nameInput) {
                     nameInput.focus();
                 }
+            }
+        });
+    }
+    
+    // Service Catalog Quick Add functionality
+    const addCatalogItemBtn = document.getElementById('add_catalog_item_btn');
+    const serviceCatalogSelect = document.getElementById('service_catalog_select');
+    
+    if (addCatalogItemBtn && serviceCatalogSelect) {
+        addCatalogItemBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            
+            const selectedOption = serviceCatalogSelect.options[serviceCatalogSelect.selectedIndex];
+            
+            if (!selectedOption.value) {
+                alert('Please select a service from the catalog first.');
+                serviceCatalogSelect.focus();
+                return;
+            }
+            
+            const tbody = document.querySelector('.invoice-items-tbody');
+            if (tbody) {
+                // Remove "no items" row if it exists
+                const noItemsRow = tbody.querySelector('.no-items-row');
+                if (noItemsRow) {
+                    noItemsRow.remove();
+                }
+                
+                // Get service data from option attributes
+                const serviceName = selectedOption.getAttribute('data-name');
+                const servicePrice = selectedOption.getAttribute('data-price');
+                const serviceDescription = selectedOption.getAttribute('data-description');
+                
+                // Add new item row with pre-filled data
+                const newRow = document.createElement('tr');
+                newRow.className = 'item-row';
+                newRow.innerHTML = `
+                    <td><input type="hidden" name="item_id[]" value="0"><input name="item_name[]" type="text" placeholder="Item name" value="${serviceName || ''}" required style="width: 100%;"></td>
+                    <td><input name="item_description[]" type="text" placeholder="Description" maxlength="250" value="${serviceDescription || ''}" style="width: 100%;"></td>
+                    <td><input name="item_price[]" type="number" placeholder="0.00" step="0.01" value="${servicePrice || '0'}" class="item-price" style="width: 100%;"></td>
+                    <td><input name="item_quantity[]" type="number" placeholder="1" value="1" class="item-quantity" style="width: 100%;"></td>
+                    <td class="item-total" style="font-weight: bold; padding: 10px;">$${parseFloat(servicePrice || 0).toFixed(2)}</td>
+                    <td style="text-align: center;"><svg class="delete-item" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="cursor: pointer; fill: #d32f2f;"><title>Delete Item</title><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg></td>
+                `;
+                tbody.appendChild(newRow);
+                
+                // Attach delete handler to new row
+                const deleteBtn = newRow.querySelector('.delete-item');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        newRow.remove();
+                        calculateInvoiceTotals();
+                    });
+                }
+                
+                // Attach price/quantity change handlers
+                const priceInput = newRow.querySelector('.item-price');
+                const qtyInput = newRow.querySelector('.item-quantity');
+                if (priceInput && qtyInput) {
+                    priceInput.addEventListener('input', calculateInvoiceTotals);
+                    qtyInput.addEventListener('input', calculateInvoiceTotals);
+                }
+                
+                // Recalculate totals
+                calculateInvoiceTotals();
+                
+                // Reset the select dropdown
+                serviceCatalogSelect.selectedIndex = 0;
+                
+                // Show success feedback
+                const originalText = addCatalogItemBtn.innerHTML;
+                addCatalogItemBtn.innerHTML = '<i class="fa-solid fa-check"></i> Added!';
+                addCatalogItemBtn.style.background = '#4caf50';
+                setTimeout(function() {
+                    addCatalogItemBtn.innerHTML = originalText;
+                    addCatalogItemBtn.style.background = '';
+                }, 1500);
             }
         });
     }
