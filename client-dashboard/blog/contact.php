@@ -97,6 +97,8 @@ if (isset($_POST['send'])) {
 ?>
                         <form method="post" action="">
 <?php
+// Check if user is logged in (from blog system)
+$logged = isset($logged) ? $logged : 'No';
 if ($logged == 'No') {
 ?>
                             <label for="name"><i class="fa fa-user"></i> Name:</label>
