@@ -7,7 +7,7 @@
 if (!session_id()) {
     session_start();
 }
-require  '../../private/config.php';
+require __DIR__ . '/../../../../private/config.php';
 
 // Load unified email system
 require_once public_path . 'lib/email-system.php';
