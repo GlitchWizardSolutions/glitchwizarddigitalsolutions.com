@@ -3,6 +3,9 @@
 // JSON API HANDLERS - Must run BEFORE any HTML output or includes
 // ============================================================================
 
+// Start output buffering for ALL requests to catch any stray output
+ob_start();
+
 // Load minimal config for JSON APIs
 if (isset($_FILES['newsletter_image']) || isset($_GET['list_images']) || isset($_POST['subject']) || isset($_FILES['attachments']) || isset($_GET['newsletter'])) {
     session_start();
@@ -18,6 +21,7 @@ if (isset($_FILES['newsletter_image']) || isset($_GET['list_images']) || isset($
 if (isset($_POST['subject'])) {
     // Validate recipients
     if (!isset($_POST['recipients']) || !is_array($_POST['recipients']) || empty($_POST['recipients'])) {
+        ob_end_clean();
         header('Content-Type: application/json');
         exit(json_encode(['status' => 'error', 'message' => 'No recipients selected']));
     }
@@ -89,6 +93,7 @@ if (isset($_POST['subject'])) {
     }
     
     // Return results as JSON
+    ob_end_clean();
     header('Content-Type: application/json');
     if ($failed_count == 0) {
         exit(json_encode([
@@ -106,11 +111,24 @@ if (isset($_POST['subject'])) {
 
 // Get newsletter by ID (for loading templates)
 if (isset($_GET['newsletter'])) {
-    $stmt = $pdo->prepare('SELECT content FROM newsletters WHERE id = ?');
-    $stmt->execute([ $_GET['newsletter'] ]);
-    $newsletter = $stmt->fetch(PDO::FETCH_ASSOC);
-    header('Content-Type: application/json');
-    exit(json_encode($newsletter));
+    if (!isset($pdo)) {
+        ob_end_clean();
+        header('Content-Type: application/json');
+        exit(json_encode(['error' => 'Database connection not available']));
+    }
+    
+    try {
+        $stmt = $pdo->prepare('SELECT content FROM newsletters WHERE id = ?');
+        $stmt->execute([ $_GET['newsletter'] ]);
+        $newsletter = $stmt->fetch(PDO::FETCH_ASSOC);
+        ob_end_clean();
+        header('Content-Type: application/json');
+        exit(json_encode($newsletter));
+    } catch (Exception $e) {
+        ob_end_clean();
+        header('Content-Type: application/json');
+        exit(json_encode(['error' => 'Database error: ' . $e->getMessage()]));
+    }
 }
 
 // Handle file attachments upload
@@ -139,6 +157,7 @@ if (isset($_FILES['attachments']) && is_array($_FILES['attachments']['name'])) {
             }
         }
     }
+    ob_end_clean();
     header('Content-Type: application/json');
     exit(json_encode($attachments));
 }
@@ -157,6 +176,7 @@ if (isset($_FILES['newsletter_image'])) {
     $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
     
     if (!in_array($file['type'], $allowed_types)) {
+        ob_end_clean();
         header('Content-Type: application/json');
         exit(json_encode(['error' => 'Invalid file type. Only images are allowed.']));
     }
@@ -212,9 +232,11 @@ if (isset($_FILES['newsletter_image'])) {
                 default:
                     // Fallback to original upload if type not supported
                     if (move_uploaded_file($file['tmp_name'], $path)) {
+                        ob_end_clean();
                         header('Content-Type: application/json');
                         exit(json_encode(['location' => $path]));
                     }
+                    ob_end_clean();
                     header('Content-Type: application/json');
                     exit(json_encode(['error' => 'Failed to upload image']));
             }
@@ -256,6 +278,7 @@ if (isset($_FILES['newsletter_image'])) {
             // Use BASE_URL for absolute URL
             $base_url = defined('BASE_URL') ? BASE_URL : 'https://glitchwizarddigitalsolutions.com/';
             
+            ob_end_clean();
             header('Content-Type: application/json');
             exit(json_encode([
                 'location' => $base_url . 'admin/newsletter_system/' . $path,
@@ -267,12 +290,14 @@ if (isset($_FILES['newsletter_image'])) {
             // SVG - just move it without processing
             if (move_uploaded_file($file['tmp_name'], $path)) {
                 $base_url = defined('BASE_URL') ? BASE_URL : 'https://glitchwizarddigitalsolutions.com/';
+                ob_end_clean();
                 header('Content-Type: application/json');
                 exit(json_encode(['location' => $base_url . 'admin/newsletter_system/' . $path]));
             }
         }
     }
     
+    ob_end_clean();
     header('Content-Type: application/json');
     exit(json_encode(['error' => 'Failed to upload image']));
 }
@@ -309,11 +334,13 @@ if (isset($_GET['list_images'])) {
         return $b['modified'] - $a['modified'];
     });
     
+    ob_end_clean();
     header('Content-Type: application/json');
     exit(json_encode($images));
 }
 
 // Normal page load - load full admin config
+ob_end_flush();
 require 'assets/includes/admin_config.php';
 
 // Now include components for HTML rendering
