@@ -84,7 +84,7 @@ if (!function_exists('generateSeoURL')) {
 }
 
 if (!function_exists('cleanup_unused_images')) {
-    function cleanup_unused_images($content, $featured_image = null) {
+    function cleanup_unused_images($content, $featured_image = null, $exclude_post_id = null) {
         global $blog_pdo;
         
         // Extract image URLs from content
@@ -117,15 +117,26 @@ if (!function_exists('cleanup_unused_images')) {
         // Check each image to see if it's used elsewhere
         foreach ($images_in_content as $image_filename) {
             // Check if image is used in other posts
-            $stmt = $blog_pdo->prepare("
-                SELECT COUNT(*) as usage_count FROM posts 
-                WHERE (content LIKE ? OR image LIKE ?) AND id != ?
-            ");
-            $stmt->execute([
-                '%' . $image_filename . '%',
-                '%' . $image_filename . '%',
-                0 // Since we're deleting, no specific post ID to exclude
-            ]);
+            if ($exclude_post_id !== null) {
+                $stmt = $blog_pdo->prepare("
+                    SELECT COUNT(*) as usage_count FROM posts 
+                    WHERE (content LIKE ? OR image LIKE ?) AND id != ?
+                ");
+                $stmt->execute([
+                    '%' . $image_filename . '%',
+                    '%' . $image_filename . '%',
+                    $exclude_post_id
+                ]);
+            } else {
+                $stmt = $blog_pdo->prepare("
+                    SELECT COUNT(*) as usage_count FROM posts 
+                    WHERE (content LIKE ? OR image LIKE ?)
+                ");
+                $stmt->execute([
+                    '%' . $image_filename . '%',
+                    '%' . $image_filename . '%'
+                ]);
+            }
             $usage = $stmt->fetch(PDO::FETCH_ASSOC);
             
             // Also check blog templates
