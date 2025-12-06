@@ -18,6 +18,12 @@ if ($is_json_api) {
     session_start();
     require_once '../../../private/config.php';
     
+    // Ensure Graph API email functions are loaded
+    $graph_email_file = dirname(dirname(dirname(__DIR__))) . '/public_html/lib/graph-email-system.php';
+    if (file_exists($graph_email_file)) {
+        require_once $graph_email_file;
+    }
+    
     // Create database connection for JSON APIs
     if (!isset($pdo)) {
         $pdo = pdo_connect_mysql();
