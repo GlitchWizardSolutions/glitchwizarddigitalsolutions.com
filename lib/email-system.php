@@ -3,12 +3,14 @@
  * UNIFIED EMAIL SYSTEM
  * 
  * Consolidated email handler for all application emails
- * Replaces multiple duplicate email-process.php files
+ * Routes emails through Microsoft Graph API or SMTP based on configuration
  * 
  * LOCATION: /public_html/lib/email-system.php
  * CREATED: 2025-11-19
+ * UPDATED: 2025-12-05 - Added Graph API routing
  * 
  * FUNCTIONS:
+ * - send_unified_email() - NEW: Routes to Graph API or SMTP
  * - send_email() - General purpose emails (2FA, activation, password reset)
  * - send_ticket_email() - Ticketing system emails
  * - send_client_invoice_email() - Client invoice emails
@@ -20,6 +22,115 @@
  * 
  * Then call any email function directly.
  ******************************************************************************/
+
+/**
+ * UNIFIED EMAIL SENDER
+ * Sends emails via Microsoft Graph API (SMTP blocked by hosting provider)
+ * 
+ * @param string $to_email Recipient email address
+ * @param string $to_name Recipient display name
+ * @param string $subject Email subject
+ * @param string $body_html HTML email body
+ * @param string $from_email Sender email (optional, uses mail_from if null)
+ * @param string $from_name Sender display name (optional, uses mail_name if null)
+ * @param string $reply_to_email Reply-To address (optional)
+ * @param string $reply_to_name Reply-To name (optional)
+ * @return bool Success status
+ */
+function send_unified_email(
+    $to_email,
+    $to_name,
+    $subject,
+    $body_html,
+    $from_email = null,
+    $from_name = null,
+    $reply_to_email = null,
+    $reply_to_name = null
+) {
+    // Load Graph API email system
+    require_once __DIR__ . '/graph-email-system.php';
+    
+    // If no reply-to specified, default to support@
+    if (!$reply_to_email) {
+        $reply_to_email = 'support@glitchwizardsolutions.com';
+        $reply_to_name = 'GlitchWizard Support';
+    }
+    
+    return send_email_via_graph(
+        $to_email,
+        $to_name,
+        $subject,
+        $body_html,
+        $from_email,
+        $from_name,
+        $reply_to_email,
+        $reply_to_name
+    );
+}
+
+/**
+ * Send email via SMTP (PHPMailer)
+ * Fallback method when Graph API is not enabled
+ * 
+ * @param string $to_email Recipient email
+ * @param string $to_name Recipient name
+ * @param string $subject Email subject
+ * @param string $body_html HTML body
+ * @param string $from_email Sender email
+ * @param string $from_name Sender name
+ * @param string $reply_to_email Reply-To email
+ * @param string $reply_to_name Reply-To name
+ * @return bool Success status
+ */
+function send_email_via_smtp(
+    $to_email,
+    $to_name,
+    $subject,
+    $body_html,
+    $from_email = null,
+    $from_name = null,
+    $reply_to_email = null,
+    $reply_to_name = null
+) {
+    try {
+        $mail = new PHPMailer(true);
+        
+        // SMTP configuration
+        $mail->isSMTP();
+        $mail->Host = smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = smtp_user;
+        $mail->Password = smtp_pass;
+        $mail->SMTPSecure = smtp_secure;
+        $mail->Port = smtp_port;
+        
+        // From/To
+        $from_email = $from_email ?? mail_from;
+        $from_name = $from_name ?? mail_name;
+        $mail->setFrom($from_email, $from_name);
+        $mail->addAddress($to_email, $to_name);
+        
+        // Reply-To if provided
+        if ($reply_to_email) {
+            $mail->addReplyTo($reply_to_email, $reply_to_name ?? '');
+        }
+        
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $body_html;
+        $mail->CharSet = 'UTF-8';
+        
+        return $mail->send();
+        
+    } catch (Exception $e) {
+        if (function_exists('critical_log')) {
+            critical_log('Email System', 'send_email_via_smtp', 'Send Failed', 
+                "SMTP Error: {$mail->ErrorInfo}");
+        }
+        return false;
+    }
+}
 
 // Load PHPMailer library ONCE at the top
 if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
