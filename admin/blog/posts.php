@@ -59,6 +59,9 @@ if (isset($_GET['edit-id'])) {
 		$time = date('H:i');
         
         if (@$_FILES['image']['name'] != '') {
+            // Store old image for cleanup
+            $old_image = $row['image'];
+            
             $target_dir    = "../../client-dashboard/blog/uploads/posts/";
             $target_file   = $target_dir . basename($_FILES["image"]["name"]);
             $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
@@ -81,12 +84,31 @@ if (isset($_GET['edit-id'])) {
             }
             
             if ($uploadOk == 1) {
-                $string = "0123456789wsderfgtyhjuk";
-                $new_string = str_shuffle($string);
-                $imageFileType = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
-                $location = "../../client-dashboard/blog/uploads/posts/image_$new_string.$imageFileType";
+                // Keep original filename, add number if duplicate
+                $original_name = pathinfo($_FILES["image"]["name"], PATHINFO_FILENAME);
+                $extension = $imageFileType;
+                $upload_dir = "../../client-dashboard/blog/uploads/posts/";
+                
+                // Sanitize filename: remove special characters, keep alphanumeric, dash, underscore
+                $safe_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $original_name);
+                
+                $filename = $safe_name . '.' . $extension;
+                $counter = 1;
+                
+                // Check if file exists, add (1), (2), etc. if needed
+                while (file_exists($upload_dir . $filename)) {
+                    $filename = $safe_name . '_(' . $counter . ').' . $extension;
+                    $counter++;
+                }
+                
+                $location = $upload_dir . $filename;
                 move_uploaded_file($_FILES["image"]["tmp_name"], $location);
-                $image = 'client-dashboard/blog/uploads/posts/image_' . $new_string . '.' . $imageFileType;
+                $image = 'client-dashboard/blog/uploads/posts/' . $filename;
+                
+                // Clean up old featured image if it was replaced
+                if (!empty($old_image) && $old_image != $image) {
+                    cleanup_unused_images('', $old_image, $id);
+                }
             }
         }
         
