@@ -7,6 +7,13 @@ Ensure you change the cron_secret constant in the config file as this will preve
 set_time_limit(0);
 require 'assets/includes/admin_config.php';
 include 'functions.php';
+
+// Ensure Graph API email functions are loaded
+$graph_email_file = __DIR__ . '/../../lib/graph-email-system.php';
+if (file_exists($graph_email_file)) {
+    require_once $graph_email_file;
+}
+
 // Ensure the cron secret reflects the one in the configuration file
 if (isset($_GET['cron_secret']) && $_GET['cron_secret'] == cron_secret) {
     try {

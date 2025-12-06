@@ -2,6 +2,12 @@
 require 'assets/includes/admin_config.php';
 include_once '../assets/includes/components.php';
 
+// Ensure Graph API email functions are loaded
+$graph_email_file = __DIR__ . '/../../lib/graph-email-system.php';
+if (file_exists($graph_email_file)) {
+    require_once $graph_email_file;
+}
+
 // Num format function for newsletter system
 if (!function_exists('num_format')) {
     function num_format($num, $decimals = 0, $decimal_separator = '.', $thousands_separator = ',') {
