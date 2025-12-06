@@ -19,7 +19,7 @@ if ($is_json_api) {
     require_once '../../../private/config.php';
     
     // Ensure Graph API email functions are loaded
-    $graph_email_file = dirname(dirname(dirname(__DIR__))) . '/public_html/lib/graph-email-system.php';
+    $graph_email_file = __DIR__ . '/../../lib/graph-email-system.php';
     if (file_exists($graph_email_file)) {
         require_once $graph_email_file;
     }
