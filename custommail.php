@@ -1,4 +1,7 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 require_once __DIR__ . '/../private/config.php';
 ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
 echo 'Fix your code, in custommail.php';
@@ -9,6 +12,10 @@ echo 'Fix your code, in custommail.php';
 // Send ticket email function
 function send_ticket_email($email, $id, $title, $msg, $priority, $category, $private, $status, $type = 'create', $name = '', $user_email = '') {
     if (!mail_enabled) return;
+    
+    // Extract username from email or use name parameter
+    $username = !empty($name) ? $name : explode('@', $email)[0];
+    
     // Welcome
 	$subject = 'Welcome to your Portal, ' . $username . '!';
     // Action required
@@ -25,6 +32,7 @@ function send_ticket_email($email, $id, $title, $msg, $priority, $category, $pri
     require_once 'lib/phpmailer/Exception.php';
     require_once 'lib/phpmailer/PHPMailer.php';
     require_once 'lib/phpmailer/SMTP.php';
+    
     // Create an instance; passing `true` enables exceptions
     $mail = new PHPMailer(true);
     try {
