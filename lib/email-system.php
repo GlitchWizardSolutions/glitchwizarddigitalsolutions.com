@@ -18,6 +18,10 @@
  * 
  * USAGE:
  * Include this file once in your config or main includes:
+ *   require_once public_path . 'lib/email-system.php';
+ * 
+ * Then call any email function directly.
+ ******************************************************************************/
 
 // Load Graph API email system (always needed)
 $graph_email_file = __DIR__ . '/graph-email-system.php';
@@ -26,10 +30,6 @@ if (!file_exists($graph_email_file)) {
     die("Email system error: Graph API module not found");
 }
 require_once $graph_email_file;
- *   require_once public_path . 'lib/email-system.php';
- * 
- * Then call any email function directly.
- ******************************************************************************/
 
 /**
  * UNIFIED EMAIL SENDER
