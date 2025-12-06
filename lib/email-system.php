@@ -294,41 +294,49 @@ function send_email($email, $code, $username, $type) {
     include $body_template;
     $email_template = ob_get_clean();
     
-    // Create PHPMailer instance
-    $mail = new PHPMailer(true);
-    
+    // Use Graph API to send email
     try {
-        // Configure SMTP
-        configure_smtp_mail($mail);
+        $body_html = append_email_signature($email_template, 'html', mail_from);
         
-        // Recipients
-        $mail->setFrom(mail_from, no_reply_mail_name);
-        $mail->addAddress($email);
-        // Only add reply-to if configured (not empty)
-        if (!empty(reply_to_email)) {
-            $mail->addReplyTo(reply_to_email, reply_to_name);
+        // Determine reply-to based on context
+        $reply_to_email = !empty(reply_to_email) ? reply_to_email : null;
+        $reply_to_name_val = !empty(reply_to_name) ? reply_to_name : null;
+        
+        // Send via Graph API
+        $result = send_email_via_graph(
+            $email,                  // To
+            $username,               // To name
+            $subject,                // Subject
+            $body_html,              // HTML body
+            mail_from,               // From
+            no_reply_mail_name,      // From name
+            $reply_to_email,         // Reply-To
+            $reply_to_name_val       // Reply-To name
+        );
+        
+        if ($result) {
+            if (function_exists('debug_log')) {
+                debug_log('Email System', 'email-system.php', 'Send Email', "Email sent successfully to $email via Graph API");
+            }
+            return true;
+        } else {
+            if (function_exists('critical_log')) {
+                critical_log('Email System', 'email-system.php', 'Send Email', "EMAIL ERROR for $email: Graph API send failed");
+            } elseif (function_exists('debug_log')) {
+                debug_log('Email System', 'email-system.php', 'Send Email', "EMAIL ERROR: Graph API send failed");
+            } else {
+                error_log("Email System Error: Failed to send email to $email - Graph API failed");
+            }
+            return false;
         }
-        
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body = append_email_signature($email_template, 'html', mail_from);
-        $mail->AltBody = append_email_signature(strip_tags($email_template), 'text', mail_from);
-        
-        // Send mail
-        $mail->send();
-        if (function_exists('debug_log')) {
-            debug_log('Email System', 'email-system.php', 'Send Email', "Email sent successfully to $email");
-        }
-        return true;
     } catch (Exception $e) {
         // Log error instead of echoing it
         if (function_exists('critical_log')) {
-            critical_log('Email System', 'email-system.php', 'Send Email', "EMAIL ERROR for $email: " . $mail->ErrorInfo);
+            critical_log('Email System', 'email-system.php', 'Send Email', "EMAIL ERROR for $email: " . $e->getMessage());
         } elseif (function_exists('debug_log')) {
-            debug_log('Email System', 'email-system.php', 'Send Email', "EMAIL ERROR: " . $mail->ErrorInfo);
+            debug_log('Email System', 'email-system.php', 'Send Email', "EMAIL ERROR: " . $e->getMessage());
         } else {
-            error_log("Email System Error: Failed to send email to $email - " . $mail->ErrorInfo);
+            error_log("Email System Error: Failed to send email to $email - " . $e->getMessage());
         }
         return false;
     }
@@ -409,37 +417,40 @@ function send_ticket_email($email, $id, $title, $msg, $priority, $category, $pri
     include tickets_directory_url . 'ticket-email-template.php';
     $ticket_email_template = ob_get_clean();
     
-    // Create PHPMailer instance
-    $mail = new PHPMailer(true);
-    
+    // Use Graph API to send email
     try {
-        // Configure SMTP
-        configure_smtp_mail($mail);
+        $body_html = append_email_signature($ticket_email_template, 'html', mail_from);
         
-        // Recipients
-        $mail->setFrom(mail_from, no_reply_mail_name);
-        $mail->addAddress($email);
-        // Only add reply-to if configured (not empty)
-        if (!empty(reply_to_email)) {
-            $mail->addReplyTo(reply_to_email, reply_to_name);
+        // Determine reply-to based on context
+        $reply_to_email = !empty(reply_to_email) ? reply_to_email : null;
+        $reply_to_name_val = !empty(reply_to_name) ? reply_to_name : null;
+        
+        // Send via Graph API
+        $result = send_email_via_graph(
+            $email,                  // To
+            '',                      // To name
+            $subject,                // Subject
+            $body_html,              // HTML body
+            mail_from,               // From
+            no_reply_mail_name,      // From name
+            $reply_to_email,         // Reply-To
+            $reply_to_name_val       // Reply-To name
+        );
+        
+        if ($result) {
+            $success_msg = "Ticket email sent successfully to $email via Graph API";
+            file_put_contents($debug_log, date('Y-m-d H:i:s') . " " . $success_msg . "\n", FILE_APPEND);
+            return true;
+        } else {
+            $error_msg = "TICKET EMAIL ERROR: Graph API send failed";
+            file_put_contents($debug_log, date('Y-m-d H:i:s') . " " . $error_msg . "\n", FILE_APPEND);
+            error_log($error_msg);
+            return false;
         }
-        
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body = append_email_signature($ticket_email_template, 'html', mail_from);
-        $mail->AltBody = append_email_signature(strip_tags($ticket_email_template), 'text', mail_from);
-        
-        // Send mail
-        $mail->send();
-        $success_msg = "Ticket email sent successfully to $email";
-        file_put_contents($debug_log, date('Y-m-d H:i:s') . " " . $success_msg . "\n", FILE_APPEND);
-        return true;
     } catch (Exception $e) {
-        $error_msg = "TICKET EMAIL ERROR: " . $mail->ErrorInfo . " | EXCEPTION: " . $e->getMessage();
+        $error_msg = "TICKET EMAIL ERROR: " . $e->getMessage();
         file_put_contents($debug_log, date('Y-m-d H:i:s') . " " . $error_msg . "\n", FILE_APPEND);
         error_log($error_msg);
-        echo 'Error: Message could not be sent. Mailer Error: ' . $mail->ErrorInfo;
         return false;
     }
 }
