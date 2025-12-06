@@ -79,7 +79,7 @@ function get_csp_header_with_nonce() {
     if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
         // Development: Allow unsafe-eval for debugging, use nonce for inline content
         return "Content-Security-Policy: default-src 'self' 'unsafe-eval'; " .
-               "script-src 'self' 'unsafe-eval' 'nonce-$nonce' https://www.googletagmanager.com https://static.cloudflareinsights.com https://www.paypal.com; " .
+               "script-src 'self' 'unsafe-eval' 'nonce-$nonce' https://www.googletagmanager.com https://static.cloudflareinsights.com https://www.paypal.com https://cdnjs.cloudflare.com; " .
                "style-src 'self' 'unsafe-inline' 'nonce-$nonce' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " .
                "img-src 'self' data: https: http:; " .
                "font-src 'self' https://fonts.gstatic.com; " .
@@ -89,7 +89,7 @@ function get_csp_header_with_nonce() {
     } else {
         // Production: Strict CSP with nonce for inline content
         return "Content-Security-Policy: default-src 'self'; " .
-               "script-src 'self' 'nonce-$nonce' https://www.googletagmanager.com https://static.cloudflareinsights.com https://www.paypal.com; " .
+               "script-src 'self' 'nonce-$nonce' https://www.googletagmanager.com https://static.cloudflareinsights.com https://www.paypal.com https://cdnjs.cloudflare.com; " .
                "style-src 'self' 'nonce-$nonce' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " .
                "img-src 'self' data: https:; " .
                "font-src 'self' https://fonts.gstatic.com; " .
