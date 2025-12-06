@@ -1,10 +1,13 @@
 <?php
+// Start output buffering BEFORE any includes
+ob_start();
+
 require 'assets/includes/admin_config.php';
 
 // Handle image uploads for newsletter editor BEFORE any HTML output
 if (isset($_FILES['newsletter_image'])) {
-    // Prevent any HTML output
-    ob_clean();
+    // Clear any output from includes
+    ob_end_clean();
     
     $upload_dir = 'uploads/';
     
@@ -139,6 +142,9 @@ if (isset($_FILES['newsletter_image'])) {
 
 // Get list of uploaded images for the image browser
 if (isset($_GET['list_images'])) {
+    // Clear any output from includes
+    ob_end_clean();
+    
     $upload_dir = 'uploads/';
     $images = [];
     
@@ -167,6 +173,11 @@ if (isset($_GET['list_images'])) {
     
     header('Content-Type: application/json');
     exit(json_encode($images));
+}
+
+// If we got here, we're rendering HTML, so end the output buffer normally
+if (ob_get_level() > 0) {
+    ob_end_flush();
 }
 
 // Now include components for HTML rendering (after all JSON API handlers)
