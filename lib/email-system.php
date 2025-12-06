@@ -20,7 +20,12 @@
  * Include this file once in your config or main includes:
 
 // Load Graph API email system (always needed)
-require_once __DIR__ . '/graph-email-system.php';
+$graph_email_file = __DIR__ . '/graph-email-system.php';
+if (!file_exists($graph_email_file)) {
+    error_log("CRITICAL: graph-email-system.php not found at: $graph_email_file");
+    die("Email system error: Graph API module not found");
+}
+require_once $graph_email_file;
  *   require_once public_path . 'lib/email-system.php';
  * 
  * Then call any email function directly.
