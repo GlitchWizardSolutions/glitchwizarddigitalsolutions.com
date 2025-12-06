@@ -11,6 +11,11 @@ if (isset($_FILES['newsletter_image']) || isset($_GET['list_images']) || isset($
     session_start();
     require_once '../../../private/config.php';
     
+    // Create database connection for JSON APIs
+    if (!isset($pdo)) {
+        $pdo = pdo_connect_mysql();
+    }
+    
     // Also load functions for email sending
     if (isset($_POST['subject'])) {
         require_once 'functions.php';
