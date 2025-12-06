@@ -31,15 +31,16 @@ if ($is_json_api) {
 
 // Handle email sending (POST with subject)
 if (isset($_POST['subject'])) {
-    // Validate recipients
-    if (!isset($_POST['recipients']) || !is_array($_POST['recipients']) || empty($_POST['recipients'])) {
-        ob_end_clean();
-        header('Content-Type: application/json');
-        exit(json_encode(['status' => 'error', 'message' => 'No recipients selected']));
-    }
-    
-    // Get placeholders
-    $placeholders = $pdo->query('SELECT * FROM custom_placeholders')->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        // Validate recipients
+        if (!isset($_POST['recipients']) || !is_array($_POST['recipients']) || empty($_POST['recipients'])) {
+            ob_end_clean();
+            header('Content-Type: application/json');
+            exit(json_encode(['status' => 'error', 'message' => 'No recipients selected']));
+        }
+        
+        // Get placeholders
+        $placeholders = $pdo->query('SELECT * FROM custom_placeholders')->fetchAll(PDO::FETCH_ASSOC);
     
     // Get attachments and convert to absolute paths
     $attachments = isset($_POST['attachments']) ? $_POST['attachments'] : [];
@@ -107,16 +108,30 @@ if (isset($_POST['subject'])) {
     // Return results as JSON
     ob_end_clean();
     header('Content-Type: application/json');
-    if ($failed_count == 0) {
+    echo json_encode([
+        'status' => $failed_count == 0 ? 'success' : 'partial',
+        'message' => $failed_count == 0 
+            ? 'Successfully sent to ' . $success_count . ' recipient' . ($success_count != 1 ? 's' : '') . '!'
+            : 'Sent to ' . $success_count . ' recipient(s), but ' . $failed_count . ' failed.',
+        'errors' => $failed_count > 0 ? $errors : []
+    ]);
+    exit;
+    
+    } catch (Exception $e) {
+        ob_end_clean();
+        header('Content-Type: application/json');
         exit(json_encode([
-            'status' => 'success',
-            'message' => 'Successfully sent to ' . $success_count . ' recipient' . ($success_count != 1 ? 's' : '') . '!'
+            'status' => 'error',
+            'message' => 'Fatal error: ' . $e->getMessage(),
+            'trace' => ENVIRONMENT === 'development' ? $e->getTraceAsString() : null
         ]));
-    } else {
+    } catch (Error $e) {
+        ob_end_clean();
+        header('Content-Type: application/json');
         exit(json_encode([
-            'status' => 'partial',
-            'message' => 'Sent to ' . $success_count . ' recipient(s), but ' . $failed_count . ' failed.',
-            'errors' => $errors
+            'status' => 'error',
+            'message' => 'Fatal error: ' . $e->getMessage(),
+            'trace' => ENVIRONMENT === 'development' ? $e->getTraceAsString() : null
         ]));
     }
 }
