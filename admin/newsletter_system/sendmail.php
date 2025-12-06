@@ -104,6 +104,45 @@ if (isset($_POST['subject'])) {
     }
 }
 
+// Get newsletter by ID (for loading templates)
+if (isset($_GET['newsletter'])) {
+    $stmt = $pdo->prepare('SELECT content FROM newsletters WHERE id = ?');
+    $stmt->execute([ $_GET['newsletter'] ]);
+    $newsletter = $stmt->fetch(PDO::FETCH_ASSOC);
+    header('Content-Type: application/json');
+    exit(json_encode($newsletter));
+}
+
+// Handle file attachments upload
+if (isset($_FILES['attachments']) && is_array($_FILES['attachments']['name'])) {
+    $attachments = [];
+    $directory = '../attachments/';
+    
+    if (!is_dir($directory)) {
+        mkdir($directory, 0755, true);
+    }
+    
+    foreach ($_FILES['attachments']['name'] as $key => $name) {
+        if (!empty($name) && $_FILES['attachments']['error'][$key] == 0) {
+            $tmp_name = $_FILES['attachments']['tmp_name'][$key];
+            $fileInfo = pathinfo($name);
+            $filename = $fileInfo['filename'];
+            $extension = isset($fileInfo['extension']) ? '.' . $fileInfo['extension'] : '';
+            $path = $directory . $filename . $extension;
+            $counter = 1;
+            while (file_exists($path)) {
+                $path = $directory . $filename . '-' . $counter . $extension;
+                $counter++;
+            }
+            if (move_uploaded_file($tmp_name, $path)) {
+                $attachments[] = str_replace('../', '', $path);
+            }
+        }
+    }
+    header('Content-Type: application/json');
+    exit(json_encode($attachments));
+}
+
 // Handle image uploads for newsletter editor BEFORE loading anything else
 if (isset($_FILES['newsletter_image'])) {
     
@@ -283,46 +322,6 @@ include_once '../assets/includes/components.php';
 // Get all placeholders for HTML rendering
 $placeholders = $pdo->query('SELECT * FROM custom_placeholders')->fetchAll(PDO::FETCH_ASSOC);
 
-// iterate attachments and move files to the attachments directory
-if (isset($_FILES['attachments']) && is_array($_FILES['attachments']['name'])) {
-    $attachments = [];
-    $directory = '../attachments/';
-    
-    // Create directory if it doesn't exist
-    if (!is_dir($directory)) {
-        mkdir($directory, 0755, true);
-    }
-    
-    foreach ($_FILES['attachments']['name'] as $key => $name) {
-        if (!empty($name) && $_FILES['attachments']['error'][$key] == 0) {
-            $tmp_name = $_FILES['attachments']['tmp_name'][$key];
-            $fileInfo = pathinfo($name);
-            $filename = $fileInfo['filename'];
-            $extension = isset($fileInfo['extension']) ? '.' . $fileInfo['extension'] : '';
-            $path = $directory . $filename . $extension;
-            $counter = 1;
-            while (file_exists($path)) {
-                $path = $directory . $filename . '-' . $counter . $extension;
-                $counter++;
-            }
-            if (move_uploaded_file($tmp_name, $path)) {
-                $attachments[] = str_replace('../', '', $path);
-            }
-        }
-    }
-    // output as json
-    header('Content-Type: application/json');
-    exit(json_encode($attachments));
-}
-// Get newsletter by ID
-if (isset($_GET['newsletter'])) {
-    $stmt = $pdo->prepare('SELECT content FROM newsletters WHERE id = ?');
-    $stmt->execute([ $_GET['newsletter'] ]);
-    $newsletter = $stmt->fetch(PDO::FETCH_ASSOC);
-    // output as json
-    header('Content-Type: application/json');
-    exit(json_encode($newsletter));
-}
 // Retrieve subscribers from the database
 $stmt = $pdo->prepare('SELECT * FROM subscribers WHERE status = "Subscribed" AND confirmed = 1 ORDER BY email ASC');
 $stmt->execute();
