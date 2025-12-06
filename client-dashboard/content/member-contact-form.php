@@ -1,5 +1,5 @@
 <?php
-include 'assets/includes/user-config.php'; 
+require_once __DIR__ . '/../assets/includes/user-config.php'; 
 // output message (errors, etc)
 $msg = '';
 include includes_path . 'page-setup.php';  
