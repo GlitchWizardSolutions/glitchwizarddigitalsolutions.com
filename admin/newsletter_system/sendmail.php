@@ -114,7 +114,7 @@ if (isset($_GET['newsletter'])) {
     if (!isset($pdo)) {
         ob_end_clean();
         header('Content-Type: application/json');
-        exit(json_encode(['error' => 'Database connection not available']));
+        exit(json_encode(['error' => 'Database connection not available', 'debug' => 'pdo not set']));
     }
     
     try {
@@ -126,14 +126,21 @@ if (isset($_GET['newsletter'])) {
         header('Content-Type: application/json');
         
         if ($newsletter && isset($newsletter['content'])) {
-            exit(json_encode(['content' => $newsletter['content']]));
+            exit(json_encode([
+                'content' => $newsletter['content'],
+                'debug' => 'found'
+            ]));
         } else {
-            exit(json_encode(['content' => '']));
+            exit(json_encode([
+                'content' => '',
+                'debug' => 'not found',
+                'id' => $_GET['newsletter']
+            ]));
         }
     } catch (Exception $e) {
         ob_end_clean();
         header('Content-Type: application/json');
-        exit(json_encode(['error' => 'Database error: ' . $e->getMessage()]));
+        exit(json_encode(['error' => 'Database error: ' . $e->getMessage(), 'debug' => 'exception']));
     }
 }
 
@@ -821,9 +828,22 @@ tinymce.init({
                         type: 'menuitem',
                         text: newsletter.title,
                         onAction: function () {
-                            fetch('sendmail.php?newsletter=' + newsletter.id).then(response => response.json()).then(data => {
-                                editor.setContent(data.content);
-                            });
+                            fetch('sendmail.php?newsletter=' + newsletter.id)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.error) {
+                                        alert('Error loading template: ' + data.error);
+                                    } else if (data.content !== undefined) {
+                                        editor.setContent(data.content);
+                                    } else {
+                                        console.error('Unexpected response:', data);
+                                        alert('Error: Template content not found');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Fetch error:', error);
+                                    alert('Error loading template: ' + error.message);
+                                });
                         }
                     };
                 });
