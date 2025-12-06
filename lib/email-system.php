@@ -18,6 +18,9 @@
  * 
  * USAGE:
  * Include this file once in your config or main includes:
+
+// Load Graph API email system (always needed)
+require_once __DIR__ . '/graph-email-system.php';
  *   require_once public_path . 'lib/email-system.php';
  * 
  * Then call any email function directly.
@@ -47,9 +50,6 @@ function send_unified_email(
     $reply_to_email = null,
     $reply_to_name = null
 ) {
-    // Load Graph API email system
-    require_once __DIR__ . '/graph-email-system.php';
-    
     // If no reply-to specified, default to support@
     if (!$reply_to_email) {
         $reply_to_email = 'support@glitchwizardsolutions.com';
