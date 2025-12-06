@@ -3,11 +3,18 @@
 // JSON API HANDLERS - Must run BEFORE any HTML output or includes
 // ============================================================================
 
+// Disable error display for JSON APIs to prevent HTML output
+$is_json_api = isset($_FILES['newsletter_image']) || isset($_GET['list_images']) || isset($_POST['subject']) || isset($_FILES['attachments']) || isset($_GET['newsletter']);
+if ($is_json_api) {
+    ini_set('display_errors', '0');
+    error_reporting(E_ALL);
+}
+
 // Start output buffering for ALL requests to catch any stray output
 ob_start();
 
 // Load minimal config for JSON APIs
-if (isset($_FILES['newsletter_image']) || isset($_GET['list_images']) || isset($_POST['subject']) || isset($_FILES['attachments']) || isset($_GET['newsletter'])) {
+if ($is_json_api) {
     session_start();
     require_once '../../../private/config.php';
     
