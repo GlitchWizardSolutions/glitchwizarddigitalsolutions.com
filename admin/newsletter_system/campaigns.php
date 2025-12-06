@@ -343,7 +343,6 @@ $url = 'campaigns.php?search_query=' . $search . (isset($_GET['status']) ? '&sta
 
 <?=template_admin_footer('
 <link href="' . $base_url . '/newsletter_system/admin.css" rel="stylesheet" type="text/css">
-<script src="' . $base_url . '/newsletter_system/admin.js"></script>
 <script>
 if (typeof initTableDropdown === "function") initTableDropdown();
 </script>
