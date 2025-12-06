@@ -1,9 +1,11 @@
 <?php
 require 'assets/includes/admin_config.php';
-include_once '../assets/includes/components.php';
 
-// Handle image uploads for newsletter editor
+// Handle image uploads for newsletter editor BEFORE any HTML output
 if (isset($_FILES['newsletter_image'])) {
+    // Prevent any HTML output
+    ob_clean();
+    
     $upload_dir = 'uploads/';
     
     // Create directory if it doesn't exist
@@ -166,6 +168,9 @@ if (isset($_GET['list_images'])) {
     header('Content-Type: application/json');
     exit(json_encode($images));
 }
+
+// Now include components for HTML rendering (after all JSON API handlers)
+include_once '../assets/includes/components.php';
 
 // Get all placeholders
 $placeholders = $pdo->query('SELECT * FROM custom_placeholders')->fetchAll(PDO::FETCH_ASSOC);
