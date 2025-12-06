@@ -5,6 +5,18 @@ require 'assets/includes/admin_config.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Get username from session or account
+$uname = $_SESSION['name'] ?? '';
+if (empty($uname)) {
+    // Fetch from account if not in session
+    if (isset($_SESSION['id'])) {
+        $stmt = $pdo->prepare('SELECT username FROM accounts WHERE id = ?');
+        $stmt->execute([$_SESSION['id']]);
+        $account_data = $stmt->fetch(PDO::FETCH_ASSOC);
+        $uname = $account_data['username'] ?? '';
+    }
+}
+
 // Debug: Check if blog_pdo is available
 if (!isset($blog_pdo)) {
     error_log('DATABASE DEBUG - blog_pdo is not set');
@@ -12,6 +24,12 @@ if (!isset($blog_pdo)) {
 } else {
     error_log('DATABASE DEBUG - blog_pdo is available');
 }
+
+// Debug: Log if form was submitted
+error_log('DEBUG - Request method: ' . $_SERVER['REQUEST_METHOD']);
+error_log('DEBUG - POST keys: ' . (empty($_POST) ? 'EMPTY' : implode(', ', array_keys($_POST))));
+error_log('DEBUG - Is add set? ' . (isset($_POST['add']) ? 'YES' : 'NO'));
+error_log('DEBUG - POST add value: ' . (isset($_POST['add']) ? $_POST['add'] : 'NOT SET'));
 
 if (isset($_POST['add'])) {
     // Debug: Log all POST data
@@ -106,6 +124,11 @@ if (isset($_POST['add'])) {
                     $from     = $settings['email'];
                     $sitename = $settings['sitename'];
 
+                    // Debug: Log original content before conversion
+                    error_log('EMAIL DEBUG - Original content length: ' . strlen($content));
+                    error_log('EMAIL DEBUG - site_url setting: ' . $settings['site_url']);
+                    error_log('EMAIL DEBUG - First 500 chars of content: ' . substr($content, 0, 500));
+                    
                     // Convert relative image paths to absolute URLs in content
                     $email_content = preg_replace_callback(
                         '/<img([^>]*)src=["\'](?!http)([^"\']+)["\']([^>]*)>/i',
@@ -114,14 +137,68 @@ if (isset($_POST['add'])) {
                             $src = $matches[2];
                             $after = $matches[3];
                             
-                            // Remove leading slashes and construct full URL
+                            error_log('EMAIL DEBUG - Found RELATIVE image src: ' . $src);
+                            
+                            // Remove leading slashes
                             $src = ltrim($src, '/');
-                            $full_url = rtrim($settings['site_url'], '/') . '/' . $src;
+                            
+                            // Check if src already starts with the blog path to avoid duplication
+                            $blog_path = 'client-dashboard/blog/';
+                            if (strpos($src, $blog_path) === 0) {
+                                // Image path already has blog path, use main domain
+                                $domain = parse_url($settings['site_url'], PHP_URL_SCHEME) . '://' . parse_url($settings['site_url'], PHP_URL_HOST);
+                                $full_url = rtrim($domain, '/') . '/' . $src;
+                            } else {
+                                // Image path doesn't have blog path, append to site_url
+                                $full_url = rtrim($settings['site_url'], '/') . '/' . $src;
+                            }
+                            
+                            error_log('EMAIL DEBUG - Converted to: ' . $full_url);
                             
                             return '<img' . $before . 'src="' . $full_url . '"' . $after . '>';
                         },
                         $content
                     );
+                    
+                    // Also convert localhost URLs to production URLs for emails
+                    if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
+                        $email_content = preg_replace_callback(
+                            '/<img([^>]*)src=["\']http:\/\/localhost:3000\/public_html\/([^"\']+)["\']([^>]*)>/i',
+                            function($matches) {
+                                $before = $matches[1];
+                                $path = $matches[2];
+                                $after = $matches[3];
+                                
+                                error_log('EMAIL DEBUG - Found LOCALHOST image: ' . $path);
+                                
+                                $production_url = 'https://glitchwizarddigitalsolutions.com/' . $path;
+                                
+                                error_log('EMAIL DEBUG - Converted localhost to: ' . $production_url);
+                                
+                                return '<img' . $before . 'src="' . $production_url . '"' . $after . '>';
+                            },
+                            $email_content
+                        );
+                    }
+                    
+                    error_log('EMAIL DEBUG - Converted content length: ' . strlen($email_content));
+                    error_log('EMAIL DEBUG - Number of images found: ' . substr_count(strtolower($email_content), '<img'));
+
+                    // Prepare featured image for email
+                    $featured_image_html = '';
+                    if (!empty($image)) {
+                        $image_url = $image;
+                        // Convert localhost to production if in development
+                        if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
+                            $image_url = str_replace('http://localhost:3000/public_html/', 'https://glitchwizarddigitalsolutions.com/', $image_url);
+                        }
+                        // Ensure it's an absolute URL
+                        if (strpos($image_url, 'http') !== 0) {
+                            $image_url = 'https://glitchwizarddigitalsolutions.com/' . ltrim($image_url, '/');
+                        }
+                        $featured_image_html = '<p style="text-align: center;"><img src="' . $image_url . '" alt="' . htmlspecialchars($title) . '" style="max-width: 100%; height: auto; border-radius: 8px;"></p>';
+                        error_log('EMAIL DEBUG - Featured image URL: ' . $image_url);
+                    }
 
                     $stmt = $blog_pdo->query("SELECT * FROM `newsletter`");
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -131,12 +208,14 @@ if (isset($_POST['add'])) {
 <html>
 <body>
   <b><h1>' . $settings['sitename'] . '</h1><b/>
-  <h2>New post: <b><a href="' . $settings['site_url'] . '/post.php?id=' . $post_id . '" title="Read more">' . $title . '</a></b></h2><br />
+  <h2>New post: <b><a href="' . rtrim($settings['site_url'], '/') . '/post.php?id=' . $post_id . '" title="Read more">' . $title . '</a></b></h2><br />
+
+  ' . $featured_image_html . '
 
   ' . html_entity_decode($email_content) . '
 
   <hr />
-  <i>If you do not want to receive more notifications, you can <a href="' . $settings['site_url'] . '/unsubscribe?email=' . $to . '">Unsubscribe</a></i>
+  <i>If you do not want to receive more notifications, you can <a href="' . rtrim($settings['site_url'], '/') . '/unsubscribe?email=' . $to . '">Unsubscribe</a></i>
 </body>
 </html>
 ';
@@ -494,11 +573,12 @@ window.addEventListener('load', function() {
             }
         });
     }
-});
+    });
 });
 
 // Initialize character counter on page load
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded fired');
     countText(); // Set initial count
 
     // Reset button state if there are error messages (page reloaded with validation errors)
@@ -512,34 +592,51 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const form = document.querySelector('form[name="post_form"]');
+    console.log('Form found:', form ? 'YES' : 'NO');
+    
     if (form) {
         form.addEventListener('submit', function(e) {
-            // Show loading state
-            const submitBtn = form.querySelector('input[type="submit"]');
-            if (submitBtn) {
-                submitBtn.value = 'Saving...';
-                submitBtn.disabled = true;
-            }
-
+            console.log('Form submit event triggered');
+            
             // Ensure TinyMCE content is saved to textarea before form submission
             if (typeof tinymce !== 'undefined') {
-                tinymce.triggerSave();
+                console.log('TinyMCE is defined');
+                const editor = tinymce.get('content');
+                if (editor) {
+                    console.log('TinyMCE editor found, saving content');
+                    editor.save();
+                } else {
+                    console.log('TinyMCE editor NOT found for #content');
+                }
+            } else {
+                console.log('TinyMCE is NOT defined');
             }
 
             // Check if content is empty
             const contentTextarea = document.getElementById('content');
-            if (!contentTextarea || !contentTextarea.value.trim()) {
+            console.log('Content textarea found:', contentTextarea ? 'YES' : 'NO');
+            console.log('Content value:', contentTextarea ? contentTextarea.value.substring(0, 50) : 'N/A');
+            console.log('Content length:', contentTextarea ? contentTextarea.value.length : 0);
+            
+            if (contentTextarea && contentTextarea.value.trim().length === 0) {
+                console.log('Content is empty, preventing submission');
                 e.preventDefault();
                 alert('Please enter some content for the post.');
-
-                // Reset button state
-                if (submitBtn) {
-                    submitBtn.value = 'Add Post';
-                    submitBtn.disabled = false;
-                }
                 return false;
             }
+
+            console.log('Validation passed, form will submit');
+            
+            // DON'T disable the button - it prevents the button name from being sent in POST!
+            // Instead, just change the text to show it's processing
+            const submitBtn = form.querySelector('input[type="submit"]');
+            if (submitBtn) {
+                submitBtn.value = 'Saving...';
+                // Remove: submitBtn.disabled = true;
+            }
         });
+    } else {
+        console.log('ERROR: Form not found!');
     }
 });
 </script>

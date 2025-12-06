@@ -42,6 +42,11 @@ if (isset($_POST['send_mass_message'])) {
     $from = $settings['email'];
     $sitename = $settings['sitename'];
     
+    // Debug: Log before conversion
+    error_log('NEWSLETTER DEBUG - Original content length: ' . strlen($content));
+    error_log('NEWSLETTER DEBUG - site_url: ' . $settings['site_url']);
+    error_log('NEWSLETTER DEBUG - Images in original: ' . substr_count(strtolower($content), '<img'));
+    
     // Convert relative image paths to absolute URLs
     $content = preg_replace_callback(
         '/<img([^>]*)src=["\'](?!http)([^"\']+)["\']([^>]*)>/i',
@@ -50,14 +55,52 @@ if (isset($_POST['send_mass_message'])) {
             $src = $matches[2];
             $after = $matches[3];
             
-            // Remove leading slashes and construct full URL
+            error_log('NEWSLETTER DEBUG - Found RELATIVE image src: ' . $src);
+            
+            // Remove leading slashes
             $src = ltrim($src, '/');
-            $full_url = rtrim($settings['site_url'], '/') . '/' . $src;
+            
+            // Check if src already starts with the blog path to avoid duplication
+            $blog_path = 'client-dashboard/blog/';
+            if (strpos($src, $blog_path) === 0) {
+                // Image path already has blog path, use main domain
+                $domain = parse_url($settings['site_url'], PHP_URL_SCHEME) . '://' . parse_url($settings['site_url'], PHP_URL_HOST);
+                $full_url = rtrim($domain, '/') . '/' . $src;
+            } else {
+                // Image path doesn't have blog path, append to site_url
+                $full_url = rtrim($settings['site_url'], '/') . '/' . $src;
+            }
+            
+            error_log('NEWSLETTER DEBUG - Converted to: ' . $full_url);
             
             return '<img' . $before . 'src="' . $full_url . '"' . $after . '>';
         },
         $content
     );
+    
+    // Also convert localhost URLs to production URLs for emails
+    if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
+        $content = preg_replace_callback(
+            '/<img([^>]*)src=["\']http:\/\/localhost:3000\/public_html\/([^"\']+)["\']([^>]*)>/i',
+            function($matches) {
+                $before = $matches[1];
+                $path = $matches[2];
+                $after = $matches[3];
+                
+                error_log('NEWSLETTER DEBUG - Found LOCALHOST image: ' . $path);
+                
+                $production_url = 'https://glitchwizarddigitalsolutions.com/' . $path;
+                
+                error_log('NEWSLETTER DEBUG - Converted localhost to: ' . $production_url);
+                
+                return '<img' . $before . 'src="' . $production_url . '"' . $after . '>';
+            },
+            $content
+        );
+    }
+    
+    error_log('NEWSLETTER DEBUG - After conversion length: ' . strlen($content));
+    error_log('NEWSLETTER DEBUG - Images after conversion: ' . substr_count(strtolower($content), '<img'));
 	
     $stmt = $blog_pdo->query("SELECT * FROM `newsletter`");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -69,13 +112,13 @@ if (isset($_POST['send_mass_message'])) {
         $message = '
 <html>
 <body>
-  <b><h1><a href="' . $settings['site_url'] . '/" title="Visit the website">' . $settings['sitename'] . '</a></h1><b/>
+  <b><h1><a href="' . rtrim($settings['site_url'], '/') . '/" title="Visit the website">' . $settings['sitename'] . '</a></h1><b/>
   <br />
 
   ' . html_entity_decode($content) . '
   
   <hr />
-  <i>If you do not want to receive more notifications, you can <a href="' . $settings['site_url'] . '/unsubscribe?email=' . $to . '">Unsubscribe</a></i>
+  <i>If you do not want to receive more notifications, you can <a href="' . rtrim($settings['site_url'], '/') . '/unsubscribe?email=' . $to . '">Unsubscribe</a></i>
 </body>
 </html>
 ';
