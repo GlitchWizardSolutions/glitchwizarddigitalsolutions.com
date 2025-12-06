@@ -121,9 +121,15 @@ if (isset($_GET['newsletter'])) {
         $stmt = $pdo->prepare('SELECT content FROM newsletters WHERE id = ?');
         $stmt->execute([ $_GET['newsletter'] ]);
         $newsletter = $stmt->fetch(PDO::FETCH_ASSOC);
+        
         ob_end_clean();
         header('Content-Type: application/json');
-        exit(json_encode($newsletter));
+        
+        if ($newsletter && isset($newsletter['content'])) {
+            exit(json_encode(['content' => $newsletter['content']]));
+        } else {
+            exit(json_encode(['content' => '']));
+        }
     } catch (Exception $e) {
         ob_end_clean();
         header('Content-Type: application/json');
