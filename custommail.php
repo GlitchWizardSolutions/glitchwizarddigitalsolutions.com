@@ -1,22 +1,10 @@
 <?php
-include_once 'assets/includes/process-config.php';
+require_once __DIR__ . '/../private/config.php';
 ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
 echo 'Fix your code, in custommail.php';
-// Namespaces for the PHPMailer library
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-// Connect to MySQL database function
 
-function pdo_connect_mysql() {
-    try {
-    	$pdo = new PDO('mysql:host=' . db_host . ';dbname=' . db_name . ';charset=utf8', db_user, db_pass);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $exception) {
-    	// If there is an error with the connection, stop the script and display the error.
-    	exit('Failed to connect to database!');
-    }
-    return $pdo;
-}
+// Database connection already loaded from config.php
+// No need to redeclare pdo_connect_mysql()
 
 // Send ticket email function
 function send_ticket_email($email, $id, $title, $msg, $priority, $category, $private, $status, $type = 'create', $name = '', $user_email = '') {

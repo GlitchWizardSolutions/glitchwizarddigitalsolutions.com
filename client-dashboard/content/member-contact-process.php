@@ -1,17 +1,7 @@
 <?php
-include_once'assets/includes/process-config.php';
-// Namespaces
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+require_once __DIR__ . '/../../private/config.php';
 
-// Include PHPMailer library
-include_once public_path . 'lib/phpmailer/Exception.php';
-include_once public_path . 'lib/phpmailer/PHPMailer.php';
-include_once public_path . 'lib/phpmailer/SMTP.php';
-
-// Create an instance; passing `true` enables exceptions
-$mail = new PHPMailer(true);
-
+// Use Graph API for email (no need for PHPMailer)
 // Connect to the MySQL database using the PDO interface
 try {
     $pdo = new PDO('mysql:host=' . db_host . ';dbname=' . db_name . ';charset=' . db_charset, db_user, db_pass);
