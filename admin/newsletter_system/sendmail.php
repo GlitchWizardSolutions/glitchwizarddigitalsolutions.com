@@ -1,13 +1,9 @@
 <?php
-// Start output buffering BEFORE any includes
-ob_start();
-
-require 'assets/includes/admin_config.php';
-
-// Handle image uploads for newsletter editor BEFORE any HTML output
+// Handle image uploads for newsletter editor BEFORE loading anything else
 if (isset($_FILES['newsletter_image'])) {
-    // Clear any output from includes
-    ob_end_clean();
+    // Load minimal config needed for uploads
+    session_start();
+    require_once '../../../private/config.php';
     
     $upload_dir = 'uploads/';
     
@@ -142,8 +138,9 @@ if (isset($_FILES['newsletter_image'])) {
 
 // Get list of uploaded images for the image browser
 if (isset($_GET['list_images'])) {
-    // Clear any output from includes
-    ob_end_clean();
+    // Load minimal config needed for image list
+    session_start();
+    require_once '../../../private/config.php';
     
     $upload_dir = 'uploads/';
     $images = [];
@@ -175,12 +172,10 @@ if (isset($_GET['list_images'])) {
     exit(json_encode($images));
 }
 
-// If we got here, we're rendering HTML, so end the output buffer normally
-if (ob_get_level() > 0) {
-    ob_end_flush();
-}
+// Normal page load - load full admin config
+require 'assets/includes/admin_config.php';
 
-// Now include components for HTML rendering (after all JSON API handlers)
+// Now include components for HTML rendering
 include_once '../assets/includes/components.php';
 
 // Get all placeholders
