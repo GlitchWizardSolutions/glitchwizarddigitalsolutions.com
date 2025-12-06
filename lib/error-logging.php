@@ -303,8 +303,10 @@ function critical_log($application, $pagename, $section, $error_message, $severi
  * @return bool True on success, false on failure
  */
 function debug_log($application, $pagename, $section, $error_message, $severity = 'Info', $additional_data = []) {
-    // Include environment detection
-    require_once '../private/config.php';
+    // Include environment detection if not already loaded
+    if (!defined('ENVIRONMENT')) {
+        require_once __DIR__ . '/../../private/config.php';
+    }
 
     // Always log in development
     if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
