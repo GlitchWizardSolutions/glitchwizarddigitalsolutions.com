@@ -48,12 +48,12 @@ if (isset($_GET['cron_secret']) && $_GET['cron_secret'] == cron_secret) {
                 $content = str_replace($placeholder['placeholder_text'], $placeholder['placeholder_value'], $content);
             }
             // Attachments
-            $attachments = array_filter(explode(',', $item['attachments']));
+            $attachments = array_filter(explode(',', $item['attachments'] ?? ''));
             $attachments = array_map(function($attachment) {
                 return '../' . $attachment;
             }, $attachments);
-            // Send newsletter to the recipient
-            $response = send_mail(mail_from, mail_from_name, $item['email'], $item['title'], $content, $attachments);
+            // Send newsletter to the recipient via Graph API
+            $response = admin_sendmail(mail_from, mail_from_name, $item['email'], $item['title'], $content, $attachments);
             // If successfull
             if ($response == 'success') {
                 // Mark the item as completed
@@ -63,9 +63,10 @@ if (isset($_GET['cron_secret']) && $_GET['cron_secret'] == cron_secret) {
                 $stmt = $pdo->prepare('UPDATE newsletters SET last_scheduled = ? WHERE id = ?');
                 $stmt->execute([ $date, $item['newsletter_id'] ]);
             } else {
-                // Failed! Mark the item as failed
+                // Failed! Mark the item as failed - truncate error to fit database column
+                $error_msg = substr($response, 0, 500);
                 $stmt = $pdo->prepare('UPDATE campaign_items ci SET ci.update_date = ?, ci.status = "Failed", ci.fail_text = ? WHERE ci.id = ?');
-                $stmt->execute([ $date, $response, $item['id'] ]);           
+                $stmt->execute([ $date, $error_msg, $item['id'] ]);           
             }
         } else {
             // The user previously unsubscribed, so skip the user and mark the item as failed

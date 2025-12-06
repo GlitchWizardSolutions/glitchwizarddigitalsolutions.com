@@ -102,7 +102,7 @@ if (isset($_POST['add'])) {
                     // Debug: Post inserted successfully
                     error_log('FORM SUBMITTED - Post inserted successfully with ID: ' . $post_id);
 
-                    // Send newsletter emails
+                    // Send newsletter emails via Graph API
                     $from     = $settings['email'];
                     $sitename = $settings['sitename'];
 
@@ -124,11 +124,8 @@ if (isset($_POST['add'])) {
 </html>
 ';
 
-                        $headers = 'MIME-Version: 1.0' . "\r\n";
-                        $headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
-                        $headers .= 'From: ' . $from . '';
-
-                        @mail($to, $subject, $message, $headers);
+                        // Send via Graph API with general context (webmaster@ reply-to)
+                        send_contextual_email('general', $to, explode('@', $to)[0], $subject, $message);
                     }
 
                     $success_message = 'Post created successfully! <a href="' . $settings['site_url'] . '/post.php?id=' . $post_id . '" target="_blank" class="btn btn-sm btn-success">View Post</a> <a href="posts.php" class="btn btn-sm btn-primary">Back to Posts</a>';

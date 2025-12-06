@@ -17,55 +17,39 @@ function send_confirmation_email($email, $id) {
 }
 // Send mail function
 function admin_sendmail($from, $name, $to, $subject, $content, $attachments = []) {
-	// Include PHPMailer library only if not already loaded
-	if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
-		require_once 'lib/phpmailer/Exception.php';
-		require_once 'lib/phpmailer/PHPMailer.php';
-		require_once 'lib/phpmailer/SMTP.php';
-	}
-    // Create an instance; passing `true` enables exceptions
-    $mail = new PHPMailer(true);
-    // Try to send the mail 
+    // Use Microsoft Graph API for newsletter emails
     try {
-		// Server settings
-		if (SMTP) {
-			$mail->isSMTP();
-			$mail->Host = smtp_host;
-			$mail->SMTPAuth = empty(smtp_user) && empty(smtp_pass) ? false : true;
-			$mail->Username = smtp_user;
-			$mail->Password = smtp_pass;
-			$mail->SMTPSecure = smtp_secure == 'tls' ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
-			$mail->Port = smtp_port;
-		}
-        // Recipients
-        $mail->setFrom($from, $name);
-        $mail->addAddress($to);
-        // Content
-        $mail->isHTML(true);
-        // Set UTF-8 charset
-        $mail->CharSet = 'UTF-8';
-        // Update content
+        // Update content with placeholders
         $content = replace_placeholders($content);
+        
         // Update name placeholder
         $recipient_name = htmlspecialchars(explode('@', $to)[0], ENT_QUOTES);
         $content = str_replace('%name%', $recipient_name, $content);
-        // Set email subject and body
-        $mail->Subject = $subject;
-        $mail->Body = base_template($content, $subject);
-        $mail->AltBody = strip_tags($content);
-        // Attachments
-        foreach ($attachments as $attachment) {
-            if (file_exists($attachment)) {
-                $mail->addAttachment($attachment);
-            }
+        
+        // Wrap content in base template
+        $html_body = base_template($content, $subject);
+        
+        // Send via Graph API with attachments
+        $result = send_email_via_graph_with_attachments(
+            $to,             // Recipient email
+            $recipient_name, // Recipient name
+            $subject,        // Email subject
+            $html_body,      // HTML body with template
+            $attachments,    // File attachments array
+            mail_from,       // From email
+            mail_from_name,  // From name
+            'webmaster@glitchwizardsolutions.com', // Reply-to for newsletters
+            'GlitchWizard Digital Solutions'       // Reply-to name
+        );
+        
+        if ($result) {
+            return 'success';
+        } else {
+            return 'Graph API failed to send email. Check error logs.';
         }
-        // Send mail
-        $mail->send();
-        // Return success message
-        return 'success';
+        
     } catch (Exception $e) {
-        // Return error message
-        return $mail->ErrorInfo;
+        return 'Newsletter send error: ' . $e->getMessage();
     }
 }
 // Base template function

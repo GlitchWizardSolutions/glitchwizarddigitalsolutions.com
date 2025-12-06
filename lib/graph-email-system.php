@@ -272,3 +272,151 @@ function send_contextual_email($context, $to_email, $to_name, $subject, $body_ht
         ''  // Reply-to name not needed
     );
 }
+
+/**
+ * Send email via Microsoft Graph API with attachment support
+ * 
+ * @param string $to_email Recipient email address
+ * @param string $to_name Recipient display name
+ * @param string $subject Email subject
+ * @param string $body_html HTML email body
+ * @param array $attachments Array of file paths to attach
+ * @param string $from_email Sender email address (defaults to mail_from constant)
+ * @param string $from_name Sender display name (defaults to mail_name constant)
+ * @param string $reply_to_email Reply-To email address (optional)
+ * @param string $reply_to_name Reply-To display name (optional)
+ * @return bool Success status
+ */
+function send_email_via_graph_with_attachments(
+    $to_email,
+    $to_name,
+    $subject,
+    $body_html,
+    $attachments = [],
+    $from_email = null,
+    $from_name = null,
+    $reply_to_email = null,
+    $reply_to_name = null
+) {
+    try {
+        // Use defaults from config if not provided
+        if ($from_email === null) {
+            $from_email = defined('mail_from') ? mail_from : 'notifications@glitchwizarddigitalsolutions.com';
+        }
+        if ($from_name === null) {
+            $from_name = defined('mail_name') ? mail_name : 'GlitchWizard Digital Solutions';
+        }
+        
+        // Get OAuth2 access token
+        $accessToken = get_graph_access_token();
+        
+        if (!$accessToken) {
+            if (function_exists('critical_log')) {
+                critical_log('Graph Email', 'send_email_via_graph_with_attachments', 'Token Failed', 'Could not obtain access token');
+            }
+            return false;
+        }
+        
+        // Build email message
+        $message = [
+            'subject' => $subject,
+            'body' => [
+                'contentType' => 'HTML',
+                'content' => $body_html
+            ],
+            'toRecipients' => [
+                [
+                    'emailAddress' => [
+                        'address' => $to_email,
+                        'name' => $to_name
+                    ]
+                ]
+            ]
+        ];
+        
+        // Add Reply-To if provided
+        if ($reply_to_email) {
+            $message['replyTo'] = [
+                [
+                    'emailAddress' => [
+                        'address' => $reply_to_email,
+                        'name' => $reply_to_name ? $reply_to_name : ''
+                    ]
+                ]
+            ];
+        }
+        
+        // Add attachments if provided
+        if (!empty($attachments)) {
+            $message['attachments'] = [];
+            foreach ($attachments as $file_path) {
+                if (file_exists($file_path)) {
+                    $file_content = file_get_contents($file_path);
+                    $file_name = basename($file_path);
+                    $file_base64 = base64_encode($file_content);
+                    
+                    $message['attachments'][] = [
+                        '@odata.type' => '#microsoft.graph.fileAttachment',
+                        'name' => $file_name,
+                        'contentType' => mime_content_type($file_path),
+                        'contentBytes' => $file_base64
+                    ];
+                }
+            }
+        }
+        
+        // Prepare request body
+        $requestBody = [
+            'message' => $message,
+            'saveToSentItems' => true
+        ];
+        
+        // Send email via Graph API using cURL
+        $url = "https://graph.microsoft.com/v1.0/users/$from_email/sendMail";
+        
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($requestBody));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $accessToken,
+            'Content-Type: application/json'
+        ]);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+        
+        // Check for errors
+        if ($curlError) {
+            if (function_exists('critical_log')) {
+                critical_log('Graph Email', 'send_email_via_graph_with_attachments', 'cURL Error', $curlError);
+            }
+            return false;
+        }
+        
+        if ($httpCode !== 202) {
+            if (function_exists('critical_log')) {
+                critical_log('Graph Email', 'send_email_via_graph_with_attachments', 'HTTP Error', 
+                    "HTTP $httpCode: $response");
+            }
+            return false;
+        }
+        
+        // Log success
+        if (function_exists('debug_log')) {
+            $attachment_count = count($attachments);
+            debug_log('Graph Email', 'send_email_via_graph_with_attachments', 'Email Sent', 
+                "To: $to_email, Subject: $subject, Attachments: $attachment_count");
+        }
+        
+        return true;
+        
+    } catch (\Exception $e) {
+        if (function_exists('critical_log')) {
+            critical_log('Graph Email', 'send_email_via_graph_with_attachments', 'Exception', $e->getMessage());
+        }
+        return false;
+    }
+}

@@ -139,7 +139,7 @@ if (isset($_GET['send'])) {
                     $content = str_replace($placeholder['placeholder_text'], $placeholder['placeholder_value'], $content);
                 }
                 // Attachments
-                $attachments = array_filter(explode(',', $newsletter['attachments']));
+                $attachments = array_filter(explode(',', $newsletter['attachments'] ?? ''));
                 $attachments = array_map(function($attachment) {
                     return '../' . $attachment;
                 }, $attachments);
@@ -153,9 +153,10 @@ if (isset($_GET['send'])) {
                     $stmt->execute([ $date, $newsletter['id'] ]);
                     header('Location: campaign_view.php?id=' . $_GET['id'] . '&success_msg=2');
                 } else {
-                    // If the newsletter failed to send
+                    // If the newsletter failed to send - truncate error to fit database column
+                    $error_msg = substr($response, 0, 500); // Limit to 500 characters
                     $stmt = $pdo->prepare('UPDATE campaign_items ci SET ci.update_date = ?, ci.status = "Failed", ci.fail_text = ? WHERE ci.id = ?');
-                    $stmt->execute([ $date, $response, $recipient['id'] ]);        
+                    $stmt->execute([ $date, $error_msg, $recipient['id'] ]);        
                     header('Location: campaign_view.php?id=' . $_GET['id'] . '&success_msg=3');   
                 }
             } else if ($_GET['send'] == $recipient['id'] && $recipient['subscriber_status'] == 'Unsubscribed') {
