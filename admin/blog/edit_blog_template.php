@@ -300,34 +300,9 @@ window.addEventListener('load', function() {
             }
         });
     }
+    });
 });
 </script>
-
-<script>
-// Ensure form validation works with TinyMCE
-document.addEventListener(\'DOMContentLoaded\', function() {
-    const form = document.querySelector(\'form\');
-    if (form) {
-        form.addEventListener(\'submit\', function(e) {
-            // Ensure TinyMCE content is saved to textarea before form submission
-            if (typeof tinymce !== \'undefined\') {
-                tinymce.triggerSave();
-            }
-            
-            // Check if content is empty
-            const contentTextarea = document.getElementById(\'content\');
-            if (!contentTextarea || !contentTextarea.value.trim()) {
-                e.preventDefault();
-                alert(\'Please enter some content for the template.\');
-                return false;
-            }
-        });
-    }
-});
-});
-</script>
-
-<?=template_admin_footer()?>
 
 <script>
 // Ensure form validation works with TinyMCE
@@ -351,3 +326,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<?=template_admin_footer()?>

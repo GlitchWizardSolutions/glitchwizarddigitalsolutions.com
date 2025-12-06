@@ -106,6 +106,23 @@ if (isset($_POST['add'])) {
                     $from     = $settings['email'];
                     $sitename = $settings['sitename'];
 
+                    // Convert relative image paths to absolute URLs in content
+                    $email_content = preg_replace_callback(
+                        '/<img([^>]*)src=["\'](?!http)([^"\']+)["\']([^>]*)>/i',
+                        function($matches) use ($settings) {
+                            $before = $matches[1];
+                            $src = $matches[2];
+                            $after = $matches[3];
+                            
+                            // Remove leading slashes and construct full URL
+                            $src = ltrim($src, '/');
+                            $full_url = rtrim($settings['site_url'], '/') . '/' . $src;
+                            
+                            return '<img' . $before . 'src="' . $full_url . '"' . $after . '>';
+                        },
+                        $content
+                    );
+
                     $stmt = $blog_pdo->query("SELECT * FROM `newsletter`");
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         $to = $row['email'];
@@ -116,7 +133,7 @@ if (isset($_POST['add'])) {
   <b><h1>' . $settings['sitename'] . '</h1><b/>
   <h2>New post: <b><a href="' . $settings['site_url'] . '/post.php?id=' . $post_id . '" title="Read more">' . $title . '</a></b></h2><br />
 
-  ' . html_entity_decode($content) . '
+  ' . html_entity_decode($email_content) . '
 
   <hr />
   <i>If you do not want to receive more notifications, you can <a href="' . $settings['site_url'] . '/unsubscribe?email=' . $to . '">Unsubscribe</a></i>
@@ -138,7 +155,6 @@ if (isset($_POST['add'])) {
             }
         }
     }
-# }
 
 // Debug: Script reached template rendering
 error_log('FORM PROCESSING COMPLETE - Success: ' . (isset($success_message) ? 'yes' : 'no') . ', Error: ' . (isset($error_message) ? 'yes' : 'no'));

@@ -19,6 +19,14 @@ include admin_includes_path . 'components.php';
 include process_path . 'email-process.php';
 require_once __DIR__ . '/../../functions.php';
 
+// Load Graph API email system for blog post notifications
+$graph_email_file = public_path . 'lib/graph-email-system.php';
+if (!file_exists($graph_email_file)) {
+    error_log("CRITICAL: graph-email-system.php not found at: " . $graph_email_file);
+} else {
+    require_once $graph_email_file;
+}
+
 // Initialize blog database connection
 try {
     $blog_pdo = new PDO('mysql:host=' . db_host . ';dbname=' . db_name12 . ';charset=' . db_charset, db_user, db_pass);

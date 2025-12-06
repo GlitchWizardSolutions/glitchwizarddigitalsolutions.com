@@ -145,18 +145,20 @@ $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- Renewal Details -->
     <div class="info-section">
         <h3><i class="fa-solid fa-server"></i> Renewal Details</h3>
-        <div class="info-grid">
+        <div style="display: flex; flex-direction: column; gap: 15px;">
             <div class="info-item">
                 <span class="label">Renewal Host:</span>
                 <span class="value"><?=htmlspecialchars($record['host_url'] ?? '', ENT_QUOTES)?></span>
             </div>
-            <div class="info-item">
-                <span class="label">Host Login:</span>
-                <span class="value"><?=htmlspecialchars($record['host_login'] ?? '', ENT_QUOTES)?></span>
-            </div>
-            <div class="info-item">
-                <span class="label">Host Password:</span>
-                <span class="value"><?=htmlspecialchars($record['host_password'] ?? '', ENT_QUOTES)?></span>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                <div class="info-item">
+                    <span class="label">Host Login:</span>
+                    <span class="value" style="word-break: break-all;"><?=htmlspecialchars($record['host_login'] ?? '', ENT_QUOTES)?></span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Host Password:</span>
+                    <span class="value"><?=htmlspecialchars($record['host_password'] ?? '', ENT_QUOTES)?></span>
+                </div>
             </div>
         </div>
     </div>

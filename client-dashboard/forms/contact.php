@@ -363,29 +363,25 @@ $email_body_text .= "This is a demonstration of custom form capabilities.\n";
 $email_body_text .= "GlitchWizard Solutions - Professional Web Development\n";
 $email_body_text .= "https://glitchwizarddigitalsolutions.com\n";
 
-// Send email using PHPMailer directly
+// Send email using Microsoft Graph API
 try {
-    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+    $result = send_email_via_graph(
+        $email,                    // To address
+        $name,                     // To name
+        $email_subject,            // Subject
+        $email_body,               // HTML body
+        mail_from,                 // From (authenticated user)
+        mail_name,                 // From name
+        'webmaster@glitchwizardsolutions.com',  // Reply-to
+        'Webmaster'                // Reply-to name
+    );
     
-    // Configure SMTP
-    configure_smtp_mail($mail);
-    
-    // Recipients
-    $mail->setFrom('noreply@glitchwizarddigitalsolutions.com', 'GlitchWizard Solutions');
-    $mail->addAddress($email, $name);
-    $mail->addReplyTo('webmaster@glitchwizardsolutions.com', 'Webmaster');
-    
-    // Content
-    $mail->isHTML(true);
-    $mail->CharSet = 'UTF-8';
-    $mail->Subject = $email_subject;
-    $mail->Body = $email_body;
-    $mail->AltBody = $email_body_text;
-    
-    // Send mail
-    $mail->send();
-    echo 'OK';
+    if ($result) {
+        echo 'OK';
+    } else {
+        throw new Exception('Failed to send email via Graph API');
+    }
 } catch (Exception $e) {
-    die('An error occurred: ' . $mail->ErrorInfo);
+    die('An error occurred: ' . $e->getMessage());
 }
 ?>
