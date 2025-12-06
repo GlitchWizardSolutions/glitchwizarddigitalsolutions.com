@@ -1,9 +1,111 @@
 <?php
-// Handle image uploads for newsletter editor BEFORE loading anything else
-if (isset($_FILES['newsletter_image'])) {
-    // Load minimal config needed for uploads
+// ============================================================================
+// JSON API HANDLERS - Must run BEFORE any HTML output or includes
+// ============================================================================
+
+// Load minimal config for JSON APIs
+if (isset($_FILES['newsletter_image']) || isset($_GET['list_images']) || isset($_POST['subject']) || isset($_FILES['attachments']) || isset($_GET['newsletter'])) {
     session_start();
     require_once '../../../private/config.php';
+    
+    // Also load functions for email sending
+    if (isset($_POST['subject'])) {
+        require_once 'functions.php';
+    }
+}
+
+// Handle email sending (POST with subject)
+if (isset($_POST['subject'])) {
+    // Validate recipients
+    if (!isset($_POST['recipients']) || !is_array($_POST['recipients']) || empty($_POST['recipients'])) {
+        header('Content-Type: application/json');
+        exit(json_encode(['status' => 'error', 'message' => 'No recipients selected']));
+    }
+    
+    // Get placeholders
+    $placeholders = $pdo->query('SELECT * FROM custom_placeholders')->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Get attachments and convert to absolute paths
+    $attachments = isset($_POST['attachments']) ? $_POST['attachments'] : [];
+    $attachment_errors = [];
+    $attachments = array_map(function($attachment) use (&$attachment_errors) {
+        $abs_path = dirname(__DIR__) . '/' . $attachment;
+        if (!file_exists($abs_path)) {
+            $attachment_errors[] = "File not found: $abs_path";
+        }
+        return $abs_path;
+    }, $attachments);
+    
+    if (!empty($attachment_errors)) {
+        error_log("Newsletter attachment errors: " . implode(", ", $attachment_errors));
+    }
+    
+    // Send email to each recipient
+    $success_count = 0;
+    $failed_count = 0;
+    $errors = [];
+    
+    foreach ($_POST['recipients'] as $recipient_email) {
+        $content = $_POST['content'];
+        
+        // Replace custom placeholders
+        foreach ($placeholders as $placeholder) {
+            $content = str_replace($placeholder['placeholder_text'], $placeholder['placeholder_value'], $content);
+        }
+        
+        // Get subscriber from database
+        $stmt = $pdo->prepare('SELECT * FROM subscribers WHERE email = ?');
+        $stmt->execute([ $recipient_email ]);
+        $subscriber = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $base_url = defined('BASE_URL') ? BASE_URL : 'https://glitchwizarddigitalsolutions.com/';
+        
+        if ($subscriber) {
+            $tracking_code = sha1($subscriber['id'] . $subscriber['email'] . time());
+            $unsubscribe_link = $base_url . 'unsubscribe.php?id=' . sha1($subscriber['id'] . $subscriber['email']);
+            
+            $content = str_replace('%open_tracking_code%', '<img src="' . $base_url . 'tracking.php?action=open&id=' . $tracking_code . '" width="1" height="1" alt="">', $content);
+            $content = str_replace('%click_link%', $base_url . 'tracking.php?action=click&id=' . $tracking_code . '&url=', $content);
+            $content = str_replace('%unsubscribe_link%', $unsubscribe_link, $content);
+        } else {
+            $content = str_replace('%open_tracking_code%', '', $content);
+            $content = str_replace('%click_link%', '', $content);
+            $content = str_replace('%unsubscribe_link%', '#', $content);
+        }
+        
+        // Convert relative image URLs to absolute URLs
+        $content = preg_replace('/src="uploads\//', 'src="' . $base_url . 'admin/newsletter_system/uploads/', $content);
+        $content = preg_replace('/src="\.\.\/uploads\//', 'src="' . $base_url . 'admin/newsletter_system/uploads/', $content);
+        
+        // Send the mail
+        $response = admin_sendmail($_POST['from'], $_POST['from_name'], $recipient_email, $_POST['subject'], $content, $attachments);
+        
+        if ($response === 'success') {
+            $success_count++;
+        } else {
+            $failed_count++;
+            $errors[] = $recipient_email . ': ' . $response;
+        }
+    }
+    
+    // Return results as JSON
+    header('Content-Type: application/json');
+    if ($failed_count == 0) {
+        exit(json_encode([
+            'status' => 'success',
+            'message' => 'Successfully sent to ' . $success_count . ' recipient' . ($success_count != 1 ? 's' : '') . '!'
+        ]));
+    } else {
+        exit(json_encode([
+            'status' => 'partial',
+            'message' => 'Sent to ' . $success_count . ' recipient(s), but ' . $failed_count . ' failed.',
+            'errors' => $errors
+        ]));
+    }
+}
+
+// Handle image uploads for newsletter editor BEFORE loading anything else
+if (isset($_FILES['newsletter_image'])) {
     
     $upload_dir = 'uploads/';
     
@@ -178,107 +280,9 @@ require 'assets/includes/admin_config.php';
 // Now include components for HTML rendering
 include_once '../assets/includes/components.php';
 
-// Get all placeholders
+// Get all placeholders for HTML rendering
 $placeholders = $pdo->query('SELECT * FROM custom_placeholders')->fetchAll(PDO::FETCH_ASSOC);
-// If submit form, send mail to the specified recipients
-if (isset($_POST['subject'])) {
-    include_once 'functions.php';
-    
-    // Validate recipients
-    if (!isset($_POST['recipients']) || !is_array($_POST['recipients']) || empty($_POST['recipients'])) {
-        exit('Error: No recipients selected');
-    }
-    
-    // Get attachments and convert to absolute paths
-    $attachments = isset($_POST['attachments']) ? $_POST['attachments'] : [];
-    $attachment_errors = [];
-    $attachments = array_map(function($attachment) use (&$attachment_errors) {
-        // The attachment path is relative like "attachments/file.pdf"
-        // Convert to absolute path - go up one level from newsletter_system to admin
-        $abs_path = dirname(__DIR__) . '/' . $attachment;
-        
-        // Debug: Check if file exists
-        if (!file_exists($abs_path)) {
-            $attachment_errors[] = "File not found: $abs_path";
-        }
-        
-        return $abs_path;
-    }, $attachments);
-    
-    // If there are attachment errors, log them but continue
-    if (!empty($attachment_errors)) {
-        error_log("Newsletter attachment errors: " . implode(", ", $attachment_errors));
-    }
-    
-    // Send email to each recipient
-    $success_count = 0;
-    $failed_count = 0;
-    $errors = [];
-    
-    foreach ($_POST['recipients'] as $recipient_email) {
-        // Replace placeholders in the content for each recipient
-        $content = $_POST['content'];
-        
-        // First replace custom placeholders
-        foreach ($placeholders as $placeholder) {
-            $content = str_replace($placeholder['placeholder_text'], $placeholder['placeholder_value'], $content);
-        }
-        
-        // Get subscriber from database
-        $stmt = $pdo->prepare('SELECT * FROM subscribers WHERE email = ?');
-        $stmt->execute([ $recipient_email ]);
-        $subscriber = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        // Use BASE_URL instead of broken website_url
-        $base_url = defined('BASE_URL') ? BASE_URL : 'https://glitchwizarddigitalsolutions.com/';
-        
-        if ($subscriber) {
-            // Generate unique tracking code for this subscriber
-            $tracking_code = sha1($subscriber['id'] . $subscriber['email'] . time());
-            $unsubscribe_link = $base_url . 'unsubscribe.php?id=' . sha1($subscriber['id'] . $subscriber['email']);
-            
-            // Replace tracking placeholders with actual tracking codes (PUBLIC URLs, not in /admin/)
-            $content = str_replace('%open_tracking_code%', '<img src="' . $base_url . 'tracking.php?action=open&id=' . $tracking_code . '" width="1" height="1" alt="">', $content);
-            $content = str_replace('%click_link%', $base_url . 'tracking.php?action=click&id=' . $tracking_code . '&url=', $content);
-            $content = str_replace('%unsubscribe_link%', $unsubscribe_link, $content);
-        } else {
-            // For non-subscribers (custom emails), just convert click links to regular links without tracking
-            $content = str_replace('%open_tracking_code%', '', $content);
-            // Replace %click_link% with nothing so the URL becomes a normal link
-            $content = str_replace('%click_link%', '', $content);
-            $content = str_replace('%unsubscribe_link%', '#', $content);
-        }
-        
-        // Convert relative image URLs to absolute URLs for email compatibility
-        $content = preg_replace('/src="uploads\//', 'src="' . $base_url . 'admin/newsletter_system/uploads/', $content);
-        $content = preg_replace('/src="\.\.\/uploads\//', 'src="' . $base_url . 'admin/newsletter_system/uploads/', $content);
-        
-        // Send the mail
-        $response = admin_sendmail($_POST['from'], $_POST['from_name'], $recipient_email, $_POST['subject'], $content, $attachments);
-        
-        if ($response === 'success') {
-            $success_count++;
-        } else {
-            $failed_count++;
-            $errors[] = $recipient_email . ': ' . $response;
-        }
-    }
-    
-    // Return results as JSON
-    header('Content-Type: application/json');
-    if ($failed_count == 0) {
-        exit(json_encode([
-            'status' => 'success',
-            'message' => 'Successfully sent to ' . $success_count . ' recipient' . ($success_count != 1 ? 's' : '') . '!'
-        ]));
-    } else {
-        exit(json_encode([
-            'status' => 'partial',
-            'message' => 'Sent to ' . $success_count . ' recipient(s), but ' . $failed_count . ' failed.',
-            'errors' => $errors
-        ]));
-    }
-}
+
 // iterate attachments and move files to the attachments directory
 if (isset($_FILES['attachments']) && is_array($_FILES['attachments']['name'])) {
     $attachments = [];
