@@ -466,26 +466,7 @@ function send_ticket_email($email, $id, $title, $msg, $priority, $category, $pri
 function send_client_invoice_email($invoice, $client, $subject = '') {
     if (!mail_enabled) return false;
     
-    // Create PHPMailer instance
-    $mail = new PHPMailer(true);
-    
     try {
-        // Configure SMTP
-        configure_smtp_mail($mail);
-        
-        // Recipients
-        $mail->setFrom(mail_from, mail_name);
-        $mail->addAddress($client['email'], rtrim($client['first_name'] . ' ' . $client['last_name'], ' '));
-        // Only add reply-to if configured (not empty)
-        if (!empty(reply_to_email)) {
-            $mail->addReplyTo(reply_to_email, reply_to_name);
-        }
-        
-        // Content
-        $mail->isHTML(true);
-        $mail->CharSet = 'UTF-8';
-        $mail->Subject = empty($subject) ? 'Invoice #' . $invoice['invoice_number'] . ' from ' . company_name : $subject;
-        
         // Determine message type and amount based on payment status
         $invoice_total = $invoice['payment_amount'] + $invoice['tax_total'];
         $balance_due = isset($invoice['balance_due']) ? $invoice['balance_due'] : ($invoice_total - $invoice['paid_total']);
@@ -512,20 +493,48 @@ function send_client_invoice_email($invoice, $client, $subject = '') {
             file_get_contents(public_path . 'client-invoices/templates/client-email-template.html')
         );
         
-        // Check if PDF attachment is enabled
+        $body_html = append_email_signature($email_template, 'html', mail_from);
+        $email_subject = empty($subject) ? 'Invoice #' . $invoice['invoice_number'] . ' from ' . company_name : $subject;
+        $client_name = rtrim($client['first_name'] . ' ' . $client['last_name'], ' ');
+        
+        // Prepare attachments if PDF is enabled
+        $attachments = [];
         if (defined('pdf_attachments') && pdf_attachments && file_exists(public_path . '/client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf') && !$subject) {
-            $mail->AddAttachment(public_path . '/client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf', $invoice['invoice_number'] . '.pdf');
+            $attachments[] = [
+                'path' => public_path . '/client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf',
+                'name' => $invoice['invoice_number'] . '.pdf'
+            ];
         }
         
-        $mail->Body = append_email_signature($email_template, 'html', mail_from);
-        $mail->AltBody = append_email_signature(strip_tags($email_template), 'text', mail_from);
+        // Determine reply-to
+        $reply_to_email = !empty(reply_to_email) ? reply_to_email : null;
+        $reply_to_name_val = !empty(reply_to_name) ? reply_to_name : null;
         
-        // Send mail
-        $mail->send();
-        return true;
+        // Send via Graph API with attachments
+        $result = send_email_via_graph_with_attachments(
+            $client['email'],        // To
+            $client_name,            // To name
+            $email_subject,          // Subject
+            $body_html,              // HTML body
+            $attachments,            // Attachments array
+            mail_from,               // From
+            mail_name,               // From name
+            $reply_to_email,         // Reply-To
+            $reply_to_name_val       // Reply-To name
+        );
+        
+        if (!$result) {
+            $error_msg = "INVOICE EMAIL ERROR for invoice #{$invoice['invoice_number']} to {$client['email']}: Graph API send failed";
+            error_log($error_msg);
+            if (function_exists('critical_log')) {
+                critical_log('Email System', 'email-system.php', 'Invoice Email', $error_msg);
+            }
+        }
+        
+        return $result;
     } catch (Exception $e) {
         // Log detailed error information
-        $error_msg = "INVOICE EMAIL ERROR for invoice #{$invoice['invoice_number']} to {$client['email']}: " . $mail->ErrorInfo;
+        $error_msg = "INVOICE EMAIL ERROR for invoice #{$invoice['invoice_number']} to {$client['email']}: " . $e->getMessage();
         error_log($error_msg);
         
         // Also log to critical log if available
@@ -548,25 +557,9 @@ function send_client_invoice_email($invoice, $client, $subject = '') {
 function send_client_receipt_email($invoice, $client, $subject = '') {
     if (!mail_enabled) return false;
     
-    // Create PHPMailer instance
-    $mail = new PHPMailer(true);
-    
     try {
-        // Configure SMTP
-        configure_smtp_mail($mail);
-        
-        // Recipients
-        $mail->setFrom(mail_from, mail_name);
-        $mail->addAddress($client['email'], rtrim($client['first_name'] . ' ' . $client['last_name'], ' '));
-        // Only add reply-to if configured (not empty)
-        if (!empty(reply_to_email)) {
-            $mail->addReplyTo(reply_to_email, reply_to_name);
-        }
-        
-        // Content
-        $mail->isHTML(true);
-        $mail->CharSet = 'UTF-8';
-        $mail->Subject = empty($subject) ? 'Receipt for Invoice #' . $invoice['invoice_number'] . ' - ' . company_name : $subject;
+        $email_subject = empty($subject) ? 'Receipt for Invoice #' . $invoice['invoice_number'] . ' - ' . company_name : $subject;
+        $client_name = rtrim($client['first_name'] . ' ' . $client['last_name'], ' ');
         
         // Read receipt template and replace placeholders
         $email_template = str_replace(
@@ -581,19 +574,41 @@ function send_client_receipt_email($invoice, $client, $subject = '') {
             file_get_contents(public_path . 'client-invoices/templates/client-receipt-template.html')
         );
         
-        // Check if PDF attachment is enabled
+        $body_html = append_email_signature($email_template, 'html', mail_from);
+        
+        // Prepare attachments if PDF is enabled
+        $attachments = [];
         if (defined('pdf_attachments') && pdf_attachments && file_exists(public_path . '/client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf')) {
-            $mail->AddAttachment(public_path . '/client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf', $invoice['invoice_number'] . '.pdf');
+            $attachments[] = [
+                'path' => public_path . '/client-invoices/pdfs/' . $invoice['invoice_number'] . '.pdf',
+                'name' => $invoice['invoice_number'] . '.pdf'
+            ];
         }
         
-        $mail->Body = append_email_signature($email_template, 'html', mail_from);
-        $mail->AltBody = append_email_signature(strip_tags($email_template), 'text', mail_from);
+        // Determine reply-to
+        $reply_to_email = !empty(reply_to_email) ? reply_to_email : null;
+        $reply_to_name_val = !empty(reply_to_name) ? reply_to_name : null;
         
-        // Send mail
-        $mail->send();
-        return true;
+        // Send via Graph API
+        $result = send_email_via_graph_with_attachments(
+            $client['email'],        // To
+            $client_name,            // To name
+            $email_subject,          // Subject
+            $body_html,              // HTML body
+            $attachments,            // Attachments
+            mail_from,               // From
+            mail_name,               // From name
+            $reply_to_email,         // Reply-To
+            $reply_to_name_val       // Reply-To name
+        );
+        
+        if (!$result) {
+            error_log("RECEIPT EMAIL ERROR: Graph API send failed");
+        }
+        
+        return $result;
     } catch (Exception $e) {
-        error_log("RECEIPT EMAIL ERROR: " . $mail->ErrorInfo);
+        error_log("RECEIPT EMAIL ERROR: " . $e->getMessage());
         return false;
     }
 }
@@ -608,34 +623,16 @@ function send_client_receipt_email($invoice, $client, $subject = '') {
 function send_admin_invoice_email($invoice, $client) {
     if (!defined('notifications_enabled') || !notifications_enabled || !mail_enabled) return false;
     
-    // Create PHPMailer instance
-    $mail = new PHPMailer(true);
-    
     try {
-        // Configure SMTP
-        configure_smtp_mail($mail);
-        
-        // Recipients
-        $mail->setFrom(mail_from, mail_name);
-        $mail->addAddress(notification_email);
-        // Only add reply-to if configured (not empty)
-        if (!empty(reply_to_email)) {
-            $mail->addReplyTo(reply_to_email, reply_to_name);
-        }
-        
-        // Content
-        $mail->isHTML(true);
-        $mail->CharSet = 'UTF-8';
-        
         // Set subject based on payment status
         if ($invoice['payment_status'] == 'Paid') {
-            $mail->Subject = 'Invoice #' . $invoice['invoice_number'] . ' has been paid.';
+            $email_subject = 'Invoice #' . $invoice['invoice_number'] . ' has been paid.';
         } elseif ($invoice['payment_status'] == 'Cancelled') {
-            $mail->Subject = 'Invoice #' . $invoice['invoice_number'] . ' has been cancelled.';
+            $email_subject = 'Invoice #' . $invoice['invoice_number'] . ' has been cancelled.';
         } elseif ($invoice['payment_status'] == 'Pending') {
-            $mail->Subject = 'Invoice #' . $invoice['invoice_number'] . ' is pending payment.';
+            $email_subject = 'Invoice #' . $invoice['invoice_number'] . ' is pending payment.';
         } else {
-            $mail->Subject = 'Invoice #' . $invoice['invoice_number'] . ' has been updated.';
+            $email_subject = 'Invoice #' . $invoice['invoice_number'] . ' has been updated.';
         }
         
         // Read template and replace placeholders
@@ -651,14 +648,31 @@ function send_admin_invoice_email($invoice, $client) {
             file_get_contents(client_side_invoice . 'templates/notification-email-template.html')
         );
         
-        $mail->Body = append_email_signature($email_template, 'html', mail_from);
-        $mail->AltBody = append_email_signature(strip_tags($email_template), 'text', mail_from);
+        $body_html = append_email_signature($email_template, 'html', mail_from);
         
-        // Send mail
-        $mail->send();
-        return true;
+        // Determine reply-to
+        $reply_to_email = !empty(reply_to_email) ? reply_to_email : null;
+        $reply_to_name_val = !empty(reply_to_name) ? reply_to_name : null;
+        
+        // Send via Graph API
+        $result = send_email_via_graph(
+            notification_email,      // To
+            '',                      // To name
+            $email_subject,          // Subject
+            $body_html,              // HTML body
+            mail_from,               // From
+            mail_name,               // From name
+            $reply_to_email,         // Reply-To
+            $reply_to_name_val       // Reply-To name
+        );
+        
+        if (!$result) {
+            error_log("ADMIN EMAIL ERROR: Graph API send failed");
+        }
+        
+        return $result;
     } catch (Exception $e) {
-        error_log("ADMIN EMAIL ERROR: " . $mail->ErrorInfo);
+        error_log("ADMIN EMAIL ERROR: " . $e->getMessage());
         return false;
     }
 }
